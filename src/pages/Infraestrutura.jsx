@@ -1,3 +1,5 @@
+// ✅ src/pages/Infraestrutura.jsx
+
 import { useEffect, useState } from 'react';
 import {
   Tabs,
@@ -10,6 +12,8 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,68 +21,77 @@ import {
   createPredio,
   updatePredio,
   deletePredio,
+  fetchSalas,
+  createSala,
+  updateSala,
+  deleteSala,
 } from '../services/apiService';
 
 export default function Infraestrutura() {
+  const [tab, setTab] = useState('predios');
+
+  // Predios
   const [predios, setPredios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState(null);
+  const [formPredio, setFormPredio] = useState({ nome: '', endereco: '' });
+  const [editandoPredio, setEditandoPredio] = useState(null);
+  const [modalPredioAberto, setModalPredioAberto] = useState(false);
 
-  const [modalAberto, setModalAberto] = useState(false);
-  const [editandoId, setEditandoId] = useState(null);
-  const [form, setForm] = useState({ nome: '', endereco: '' });
-
-  const carregarPredios = async () => {
-    try {
-      setLoading(true);
-      const dados = await fetchPredios();
-      setPredios(dados);
-    } catch (err) {
-      setErro('Erro ao carregar prédios');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Salas
+  const [salas, setSalas] = useState([]);
+  const [formSala, setFormSala] = useState({ numero: '', tipo: '', ocupada: false });
+  const [editandoSala, setEditandoSala] = useState(null);
+  const [modalSalaAberto, setModalSalaAberto] = useState(false);
 
   useEffect(() => {
-    carregarPredios();
+    carregarTudo();
   }, []);
 
-  const abrirModalParaEditar = (predio) => {
-    setEditandoId(predio.id);
-    setForm({ nome: predio.nome, endereco: predio.endereco });
-    setModalAberto(true);
+  const carregarTudo = async () => {
+    setPredios(await fetchPredios());
+    setSalas(await fetchSalas());
   };
 
-  const abrirModalParaNovo = () => {
-    setEditandoId(null);
-    setForm({ nome: '', endereco: '' });
-    setModalAberto(true);
-  };
-
-  const handleSalvar = async () => {
-    try {
-      if (editandoId) {
-        await updatePredio(editandoId, { id: editandoId, ...form });
-      } else {
-        await createPredio(form);
-      }
-      setModalAberto(false);
-      setForm({ nome: '', endereco: '' });
-      carregarPredios();
-    } catch (err) {
-      alert('Erro ao salvar prédio.');
+  const salvarOuEditar = async (tipo) => {
+    if (tipo === 'predio') {
+      if (editandoPredio) await updatePredio(editandoPredio, formPredio);
+      else await createPredio(formPredio);
+      setModalPredioAberto(false);
+      setFormPredio({ nome: '', endereco: '' });
+      setEditandoPredio(null);
+      setPredios(await fetchPredios());
+    } else if (tipo === 'sala') {
+      if (editandoSala) await updateSala(editandoSala, formSala);
+      else await createSala(formSala);
+      setModalSalaAberto(false);
+      setFormSala({ numero: '', tipo: '', ocupada: false });
+      setEditandoSala(null);
+      setSalas(await fetchSalas());
     }
   };
 
-  const handleExcluir = async (id) => {
+  const handleEditarPredio = (predio) => {
+    setEditandoPredio(predio.id);
+    setFormPredio({ nome: predio.nome, endereco: predio.endereco });
+    setModalPredioAberto(true);
+  };
+
+  const handleExcluirPredio = async (id) => {
     if (confirm('Tem certeza que deseja excluir este prédio?')) {
-      try {
-        await deletePredio(id);
-        carregarPredios();
-      } catch {
-        alert('Erro ao excluir prédio.');
-      }
+      await deletePredio(id);
+      setPredios(await fetchPredios());
+    }
+  };
+
+  const handleEditarSala = (sala) => {
+    setEditandoSala(sala.id);
+    setFormSala({ numero: sala.numero, tipo: sala.tipo, ocupada: sala.ocupada });
+    setModalSalaAberto(true);
+  };
+
+  const handleExcluirSala = async (id) => {
+    if (confirm('Tem certeza que deseja excluir esta sala?')) {
+      await deleteSala(id);
+      setSalas(await fetchSalas());
     }
   };
 
@@ -86,7 +99,7 @@ export default function Infraestrutura() {
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Infraestrutura</h1>
 
-      <Tabs defaultValue="predios" className="w-full">
+      <Tabs defaultValue="predios" value={tab} onValueChange={setTab} className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="predios">Prédios</TabsTrigger>
           <TabsTrigger value="salas">Salas</TabsTrigger>
@@ -94,84 +107,128 @@ export default function Infraestrutura() {
           <TabsTrigger value="kits">Kits</TabsTrigger>
         </TabsList>
 
-        {/* Aba de PRÉDIOS */}
+        {/* Aba de Prédios */}
         <TabsContent value="predios">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Lista de Prédios</h2>
-            <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+            <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogTrigger asChild>
-                <Button onClick={abrirModalParaNovo}>+ Cadastrar Prédio</Button>
+                <Button onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '' }); }}>
+                  + Cadastrar Prédio
+                </Button>
               </DialogTrigger>
               <DialogContent className="max-w-sm">
-                <h3 className="text-lg font-semibold mb-4">
-                  {editandoId ? 'Editar Prédio' : 'Novo Prédio'}
-                </h3>
+                <DialogTitle>{editandoPredio ? 'Editar Prédio' : 'Novo Prédio'}</DialogTitle>
+                <DialogDescription className="mb-4">
+                  Preencha os dados do prédio para {editandoPredio ? 'editar' : 'cadastrar'}.
+                </DialogDescription>
                 <Input
                   placeholder="Nome do prédio"
-                  value={form.nome}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                  value={formPredio.nome}
+                  onChange={(e) => setFormPredio({ ...formPredio, nome: e.target.value })}
                   className="mb-3"
                 />
                 <Input
                   placeholder="Endereço"
-                  value={form.endereco}
-                  onChange={(e) =>
-                    setForm({ ...form, endereco: e.target.value })
-                  }
+                  value={formPredio.endereco}
+                  onChange={(e) => setFormPredio({ ...formPredio, endereco: e.target.value })}
                   className="mb-4"
                 />
-                <Button onClick={handleSalvar}>Salvar</Button>
+                <Button onClick={() => salvarOuEditar('predio')}>Salvar</Button>
               </DialogContent>
             </Dialog>
           </div>
 
-          {loading && <p className="text-gray-500">Carregando prédios...</p>}
-          {erro && <p className="text-red-500">{erro}</p>}
-
-          {!loading && !erro && (
-            <div className="overflow-x-auto border rounded-md">
-              <table className="min-w-full bg-white text-sm">
-                <thead className="bg-gray-100 text-left">
-                  <tr>
-                    <th className="py-2 px-4 border-b">ID</th>
-                    <th className="py-2 px-4 border-b">Nome</th>
-                    <th className="py-2 px-4 border-b">Endereço</th>
-                    <th className="py-2 px-4 border-b text-right">Ações</th>
+          <div className="overflow-x-auto border rounded-md">
+            <table className="min-w-full bg-white text-sm">
+              <thead className="bg-gray-100 text-left">
+                <tr>
+                  <th className="py-2 px-4 border-b">ID</th>
+                  <th className="py-2 px-4 border-b">Nome</th>
+                  <th className="py-2 px-4 border-b">Endereço</th>
+                  <th className="py-2 px-4 border-b text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {predios.map((p) => (
+                  <tr key={p.id}>
+                    <td className="py-2 px-4 border-b">{p.id}</td>
+                    <td className="py-2 px-4 border-b">{p.nome}</td>
+                    <td className="py-2 px-4 border-b">{p.endereco}</td>
+                    <td className="py-2 px-4 border-b text-right">
+                      <Button variant="outline" className="mr-2" onClick={() => handleEditarPredio(p)}>Editar</Button>
+                      <Button variant="destructive" onClick={() => handleExcluirPredio(p.id)}>Excluir</Button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {predios.map((p) => (
-                    <tr key={p.id}>
-                      <td className="py-2 px-4 border-b">{p.id}</td>
-                      <td className="py-2 px-4 border-b">{p.nome}</td>
-                      <td className="py-2 px-4 border-b">{p.endereco}</td>
-                      <td className="py-2 px-4 border-b text-right">
-                        <Button
-                          variant="outline"
-                          className="mr-2"
-                          onClick={() => abrirModalParaEditar(p)}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleExcluir(p.id)}
-                        >
-                          Excluir
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                ))}
+              </tbody>
+            </table>
+          </div>
         </TabsContent>
 
-        {/* Abas futuras */}
-        <TabsContent value="salas">Em breve: gerenciamento de salas.</TabsContent>
+        {/* Aba de Salas */}
+        <TabsContent value="salas">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Lista de Salas</h2>
+            <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
+              <DialogTrigger asChild>
+                <Button onClick={() => { setEditandoSala(null); setFormSala({ numero: '', tipo: '', ocupada: false }); }}>
+                  + Cadastrar Sala
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm">
+                <DialogTitle>{editandoSala ? 'Editar Sala' : 'Nova Sala'}</DialogTitle>
+                <DialogDescription className="mb-4">
+                  Preencha os dados da sala para {editandoSala ? 'editar' : 'cadastrar'}.
+                </DialogDescription>
+                <Input
+                  placeholder="Número da sala"
+                  value={formSala.numero}
+                  onChange={(e) => setFormSala({ ...formSala, numero: e.target.value })}
+                  className="mb-3"
+                />
+                <Input
+                  placeholder="Tipo de sala"
+                  value={formSala.tipo}
+                  onChange={(e) => setFormSala({ ...formSala, tipo: e.target.value })}
+                  className="mb-4"
+                />
+                <Button onClick={() => salvarOuEditar('sala')}>Salvar</Button>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="overflow-x-auto border rounded-md">
+            <table className="min-w-full bg-white text-sm">
+              <thead className="bg-gray-100 text-left">
+                <tr>
+                  <th className="py-2 px-4 border-b">ID</th>
+                  <th className="py-2 px-4 border-b">Número</th>
+                  <th className="py-2 px-4 border-b">Tipo</th>
+                  <th className="py-2 px-4 border-b text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salas.map((sala) => (
+                  <tr key={sala.id}>
+                    <td className="py-2 px-4 border-b">{sala.id}</td>
+                    <td className="py-2 px-4 border-b">{sala.numero}</td>
+                    <td className="py-2 px-4 border-b">{sala.tipo}</td>
+                    <td className="py-2 px-4 border-b text-right">
+                      <Button variant="outline" className="mr-2" onClick={() => handleEditarSala(sala)}>Editar</Button>
+                      <Button variant="destructive" onClick={() => handleExcluirSala(sala.id)}>Excluir</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+        {/* Futuras abas de Chaves e Kits */}
         <TabsContent value="chaves">Em breve: gerenciamento de chaves.</TabsContent>
         <TabsContent value="kits">Em breve: gerenciamento de kits.</TabsContent>
+
       </Tabs>
     </div>
   );
