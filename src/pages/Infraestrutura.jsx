@@ -25,6 +25,14 @@ import {
   createSala,
   updateSala,
   deleteSala,
+  fetchChaves,  
+  createChave,
+  updateChave,
+  deleteChave,
+  fetchKits,     
+  createKit,
+  updateKit,
+  deleteKit,
 } from '../services/apiService';
 
 export default function Infraestrutura() {
@@ -42,6 +50,19 @@ export default function Infraestrutura() {
   const [editandoSala, setEditandoSala] = useState(null);
   const [modalSalaAberto, setModalSalaAberto] = useState(false);
 
+  // Chaves
+  const [chaves, setChaves] = useState([]);
+  const [formChave, setFormChave] = useState({ numero: '', numeracaoArmario: '', salaId: '' });
+  const [editandoChave, setEditandoChave] = useState(null);
+  const [modalChaveAberto, setModalChaveAberto] = useState(false);
+
+  // Kits
+  const [kits, setKits] = useState([]);
+  const [formKit, setFormKit] = useState({ numero: '', numeracaoArmario: '', salaId: '' });
+  const [editandoKit, setEditandoKit] = useState(null);
+  const [modalKitAberto, setModalKitAberto] = useState(false);
+
+
   useEffect(() => {
     carregarTudo();
   }, []);
@@ -49,6 +70,8 @@ export default function Infraestrutura() {
   const carregarTudo = async () => {
     setPredios(await fetchPredios());
     setSalas(await fetchSalas());
+    setChaves(await fetchChaves()); 
+    setKits(await fetchKits()); 
   };
 
   const salvarOuEditar = async (tipo) => {
@@ -66,6 +89,13 @@ export default function Infraestrutura() {
       setFormSala({ numero: '', tipo: '', ocupada: false });
       setEditandoSala(null);
       setSalas(await fetchSalas());
+    } else if (tipo === 'chave') {
+      if (editandoChave) await updateChave(editandoChave, formChave);
+      else await createChave(formChave);
+      setModalChaveAberto(false);
+      setFormChave({ numero: '', numeracaoArmario: '', salaId: '' });
+      setEditandoChave(null);
+      setChaves(await fetchChaves());
     }
   };
 
@@ -92,6 +122,19 @@ export default function Infraestrutura() {
     if (confirm('Tem certeza que deseja excluir esta sala?')) {
       await deleteSala(id);
       setSalas(await fetchSalas());
+    }
+  };
+
+  const handleEditarChave = (chave) => {
+    setEditandoChave(chave.id);
+    setFormChave({ numero: chave.numero, numeracaoArmario: chave.numeracaoArmario, salaId: chave.salaId });
+    setModalChaveAberto(true);
+  };
+  
+  const handleExcluirChave = async (id) => {
+    if (confirm('Tem certeza que deseja excluir esta chave?')) {
+      await deleteChave(id);
+      setChaves(await fetchChaves());
     }
   };
 
@@ -226,7 +269,89 @@ export default function Infraestrutura() {
         </TabsContent>
 
         {/* Futuras abas de Chaves e Kits */}
-        <TabsContent value="chaves">Em breve: gerenciamento de chaves.</TabsContent>
+        {/* Aba de Chaves */}
+        <TabsContent value="chaves">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Lista de Chaves</h2>
+            <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
+              <DialogTrigger asChild>
+                <Button onClick={() => { setEditandoChave(null); setFormChave({ numero: '', numeracaoArmario: '', salaId: '' }); setModalChaveAberto(true); }}>
+                  + Cadastrar Chave
+                </Button>
+              </DialogTrigger>
+                <DialogContent className="max-w-sm">
+                  <DialogTitle className="text-lg font-semibold mb-4">
+                    {editandoChave ? 'Editar Chave' : 'Nova Chave'}
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-gray-500 mb-4">
+                    Preencha as informações da chave.
+                  </DialogDescription>
+                  
+                  <Input
+                    placeholder="Número da chave"
+                    value={formChave.numero}
+                    onChange={(e) => setFormChave({ ...formChave, numero: e.target.value })}
+                    className="mb-3"
+                  />
+                  <Input
+                    placeholder="Numeração do Armário"
+                    value={formChave.numeracaoArmario}
+                    onChange={(e) => setFormChave({ ...formChave, numeracaoArmario: e.target.value })}
+                    className="mb-3"
+                  />
+                  <Input
+                    placeholder="ID da Sala"
+                    value={formChave.salaId}
+                    onChange={(e) => setFormChave({ ...formChave, salaId: e.target.value })}
+                    className="mb-4"
+                  />
+                  <Button onClick={() => salvarOuEditar('chave')}>Salvar</Button>
+                </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="overflow-x-auto border rounded-md">
+            <table className="min-w-full bg-white text-sm">
+              <thead className="bg-gray-100 text-left">
+                <tr>
+                  <th className="py-2 px-4 border-b">ID</th>
+                  <th className="py-2 px-4 border-b">Número</th>
+                  <th className="py-2 px-4 border-b">Armário</th>
+                  <th className="py-2 px-4 border-b">Sala ID</th>
+                  <th className="py-2 px-4 border-b text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chaves.map((chave) => (
+                  <tr key={chave.id}>
+                    <td className="py-2 px-4 border-b">{chave.id}</td>
+                    <td className="py-2 px-4 border-b">{chave.numero}</td>
+                    <td className="py-2 px-4 border-b">{chave.numeracaoArmario}</td>
+                    <td className="py-2 px-4 border-b">{chave.salaId}</td>
+                    <td className="py-2 px-4 border-b text-right">
+                      <Button
+                        variant="outline"
+                        className="mr-2"
+                        onClick={() => handleEditarChave(chave)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleExcluirChave(chave.id)}
+                      >
+                        Excluir
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+
+
         <TabsContent value="kits">Em breve: gerenciamento de kits.</TabsContent>
 
       </Tabs>
