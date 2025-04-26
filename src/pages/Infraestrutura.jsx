@@ -96,12 +96,23 @@ export default function Infraestrutura() {
       setFormChave({ numero: '', numeracaoArmario: '', salaId: '' });
       setEditandoChave(null);
       setChaves(await fetchChaves());
+    } else if (tipo === 'kit') {
+      if (editandoKit) await updateKit(editandoKit, formKit);
+      else await createKit(formKit);
+      setModalKitAberto(false);
+      setFormKit({ numero: '', numeracaoArmario: '', salaId: '' });
+      setEditandoKit(null);
+      setKits(await fetchKits());
     }
+    
   };
 
   const handleEditarPredio = (predio) => {
     setEditandoPredio(predio.id);
-    setFormPredio({ nome: predio.nome, endereco: predio.endereco });
+    setFormPredio({
+      nome: predio.nome || '',
+      endereco: predio.endereco || '',
+    });
     setModalPredioAberto(true);
   };
 
@@ -114,7 +125,11 @@ export default function Infraestrutura() {
 
   const handleEditarSala = (sala) => {
     setEditandoSala(sala.id);
-    setFormSala({ numero: sala.numero, tipo: sala.tipo, ocupada: sala.ocupada });
+    setFormSala({
+      numero: sala.numero || '',
+      tipo: sala.tipo || '',
+      ocupada: sala.ocupada || false,
+    });
     setModalSalaAberto(true);
   };
 
@@ -127,7 +142,11 @@ export default function Infraestrutura() {
 
   const handleEditarChave = (chave) => {
     setEditandoChave(chave.id);
-    setFormChave({ numero: chave.numero, numeracaoArmario: chave.numeracaoArmario, salaId: chave.salaId });
+    setFormChave({
+      numero: chave.numero || '',
+      numeracaoArmario: chave.numeracaoArmario || '',
+      salaId: chave.salaId || '',
+    });
     setModalChaveAberto(true);
   };
   
@@ -137,6 +156,24 @@ export default function Infraestrutura() {
       setChaves(await fetchChaves());
     }
   };
+
+  const handleEditarKit = (kit) => {
+    setEditandoKit(kit.id);
+    setFormKit({
+      numero: kit.numero || '',
+      numeracaoArmario: kit.numeracaoArmario || '',
+      salaId: kit.salaId || '',
+    });
+    setModalKitAberto(true);
+  };
+  
+  const handleExcluirKit = async (id) => {
+    if (confirm('Tem certeza que deseja excluir este kit?')) {
+      await deleteKit(id);
+      setKits(await fetchKits());
+    }
+  };
+  
 
   return (
     <div className="p-8">
@@ -268,7 +305,6 @@ export default function Infraestrutura() {
           </div>
         </TabsContent>
 
-        {/* Futuras abas de Chaves e Kits */}
         {/* Aba de Chaves */}
         <TabsContent value="chaves">
           <div className="flex justify-between items-center mb-4">
@@ -351,9 +387,75 @@ export default function Infraestrutura() {
         </TabsContent>
 
 
+        {/* Aba de Kit */}
+        <TabsContent value="kits">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Lista de Kits</h2>
+            <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
+              <DialogTrigger asChild>
+                <Button onClick={() => { setEditandoKit(null); setFormKit({ numero: '', numeracaoArmario: '', salaId: '' }); }}>
+                  + Cadastrar Kit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm">
+                <DialogTitle className="text-lg font-semibold mb-4">
+                  {editandoKit ? 'Editar Kit' : 'Novo Kit'}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-gray-500 mb-4">
+                  Preencha as informações do Kit.
+                </DialogDescription>
 
-        <TabsContent value="kits">Em breve: gerenciamento de kits.</TabsContent>
+                <Input
+                  placeholder="Número do Kit"
+                  value={formKit.numero}
+                  onChange={(e) => setFormKit({ ...formKit, numero: e.target.value })}
+                  className="mb-3"
+                />
+                <Input
+                  placeholder="Numeração do Armário"
+                  value={formKit.numeracaoArmario}
+                  onChange={(e) => setFormKit({ ...formKit, numeracaoArmario: e.target.value })}
+                  className="mb-3"
+                />
+                <Input
+                  placeholder="ID da Sala"
+                  value={formKit.salaId}
+                  onChange={(e) => setFormKit({ ...formKit, salaId: e.target.value })}
+                  className="mb-4"
+                />
+                <Button onClick={() => salvarOuEditar('kit')}>Salvar</Button>
+              </DialogContent>
+            </Dialog>
+          </div>
 
+          <div className="overflow-x-auto border rounded-md">
+            <table className="min-w-full bg-white text-sm">
+              <thead className="bg-gray-100 text-left">
+                <tr>
+                  <th className="py-2 px-4 border-b">ID</th>
+                  <th className="py-2 px-4 border-b">Número</th>
+                  <th className="py-2 px-4 border-b">Armário</th>
+                  <th className="py-2 px-4 border-b">Sala ID</th>
+                  <th className="py-2 px-4 border-b text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {kits.map((kit) => (
+                  <tr key={kit.id}>
+                    <td className="py-2 px-4 border-b">{kit.id}</td>
+                    <td className="py-2 px-4 border-b">{kit.numero}</td>
+                    <td className="py-2 px-4 border-b">{kit.numeracaoArmario}</td>
+                    <td className="py-2 px-4 border-b">{kit.salaId}</td>
+                    <td className="py-2 px-4 border-b text-right">
+                      <Button variant="outline" className="mr-2" onClick={() => handleEditarKit(kit)}>Editar</Button>
+                      <Button variant="destructive" onClick={() => handleExcluirKit(kit.id)}>Excluir</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
