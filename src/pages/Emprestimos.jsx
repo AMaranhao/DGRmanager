@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchEmprestimos } from '../services/apiService';
+import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
+import { parseISO, isAfter } from "date-fns";
 
 export default function Emprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
@@ -13,99 +16,128 @@ export default function Emprestimos() {
       const dados = await fetchEmprestimos();
       setEmprestimos(dados);
     };
-
     carregarEmprestimos();
   }, []);
 
   const emprestimosFiltrados = emprestimos.filter((e) => {
     const atendeStatus = statusFiltro ? e.status === statusFiltro : true;
 
-    const dataRetirada = new Date(e.horario_retirada);
-    const dataFormatada = dataRetirada.toISOString().slice(0, 10); // retorna YYYY-MM-DD
+    const dataRetirada = e.horario_retirada ? parseISO(e.horario_retirada) : null;
 
-    const atendeDataInicial = dataInicial
-      ? dataFormatada >= dataInicial
-      : true;
+    let inicio = dataInicial ? parseISO(dataInicial) : null;
+    let fim = dataFinal ? parseISO(dataFinal) : null;
 
-    const atendeDataFinal = dataFinal
-      ? dataFormatada <= dataFinal
-      : true;
+    if (inicio && fim && isAfter(inicio, fim)) {
+      [inicio, fim] = [fim, inicio];
+    }
+
+    const dentroDataInicio = inicio ? isAfter(dataRetirada, inicio) : true;
+    const dentroDataFim = fim ? isAfter(fim, dataRetirada) : true;
 
     const atendeTexto = textoPesquisa
       ? e.usuario.toLowerCase().includes(textoPesquisa.toLowerCase()) ||
         e.sala.toLowerCase().includes(textoPesquisa.toLowerCase())
       : true;
 
-    return atendeStatus && atendeDataInicial && atendeDataFinal && atendeTexto;
+      return atendeStatus && dentroDataInicio && dentroDataFim && atendeTexto;
+
   });
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">Histórico de Empréstimos</h1>
 
-      {/* Filtros lado a lado com espaçamento */}
-      <div className="grid grid-cols-4 gap-x-8 items-end mb-6">
-        {/* Pesquisa por texto */}
-        <div className="px-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pesquisar por Usuário ou Sala:
-          </label>
-          <input
+      {/* Filtros com botões de limpar */}
+      <div className="flex flex-wrap items-end gap-6 px-10 bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
+        {/* Campo de Pesquisa */}
+        <div className="flex items-center gap-2 px-20">
+          <Input
             type="text"
-            placeholder="Digite nome ou sala"
+            placeholder="Usuário ou Sala"
             value={textoPesquisa}
             onChange={(e) => setTextoPesquisa(e.target.value)}
-            className="border px-3 py-2 rounded h-10"
+            className="w-56"
           />
+          {textoPesquisa && (
+            <button
+              type="button"
+              onClick={() => setTextoPesquisa("")}
+              className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
-        {/* Filtro por Status */}
-        <div className="px-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Filtrar por Status:
-          </label>
+        {/* Select de Status */}
+        <div className="flex items-center gap-2 px-20">
           <select
             value={statusFiltro}
             onChange={(e) => setStatusFiltro(e.target.value)}
-            className="border px-3 py-2 rounded h-10"
+            className="border rounded h-10 px-3"
           >
             <option value="">Todos</option>
             <option value="Em andamento">Em andamento</option>
             <option value="Finalizado">Finalizado</option>
             <option value="Em atraso">Em atraso</option>
           </select>
+          {statusFiltro && (
+            <button
+              type="button"
+              onClick={() => setStatusFiltro("")}
+              className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
         {/* Data Inicial */}
-        <div className="px-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Data Inicial:
-          </label>
-          <input
+        <div className="flex items-center gap-2 px-2">
+          <Input
             type="date"
             value={dataInicial}
             onChange={(e) => setDataInicial(e.target.value)}
-            className="border px-3 py-2 rounded h-10"
+            className="w-40"
           />
+          {dataInicial && (
+            <button
+              type="button"
+              onClick={() => setDataInicial("")}
+              className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
         {/* Data Final */}
-        <div className="px-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Data Final:
-          </label>
-          <input
+        <div className="flex items-center gap-2 px-2">
+          <Input
             type="date"
             value={dataFinal}
             onChange={(e) => setDataFinal(e.target.value)}
-            className="border px-3 py-2 rounded h-10"
+            className="w-40"
           />
+          {dataFinal && (
+            <button
+              type="button"
+              onClick={() => setDataFinal("")}
+              className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Tabela */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border">
+        <table className="min-w-full bg-white border rounded-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="text-left py-2 px-4">Sala</th>

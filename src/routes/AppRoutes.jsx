@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Dashboard from '../pages/Dashboard';
 import Emprestimos from '../pages/Emprestimos';
-import Relatorios from '../pages/Relatorios';
+import Relatorios from '../pages/relatorios/GuiasRelatorios';
 import Infraestrutura from '../pages/Infraestrutura';
 import Login from '../pages/Login';
 
