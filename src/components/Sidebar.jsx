@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { KeyRound, ClipboardList, BookText, Building2 } from 'lucide-react';
+import { KeyRound, ClipboardList, BookText, Building2, Users } from 'lucide-react';
 
 export default function Sidebar() {
   return (
@@ -19,6 +19,11 @@ export default function Sidebar() {
         <Link to="/emprestimos" title="Empréstimos">
           <ClipboardList size={28} color="white" />
         </Link>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center gap-8">
+          <Link to="/usuarios" title="Usuários">
+            <Users size={28} color="white" />
+          </Link>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center gap-8">
         <Link to="/infraestrutura" title="Instalações">
