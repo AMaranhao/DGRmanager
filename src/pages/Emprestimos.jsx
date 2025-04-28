@@ -25,7 +25,7 @@ export default function Emprestimos() {
     const atendeStatus = statusFiltro ? e.status === statusFiltro : true;
 
     const dataRetirada = new Date(e.horario_retirada);
-    const dataFormatada = dataRetirada.toISOString().slice(0, 10); // formato YYYY-MM-DD
+    const dataFormatada = dataRetirada.toISOString().slice(0, 10);
 
     let inicio = dataInicial ? new Date(dataInicial) : null;
     let fim = dataFinal ? new Date(dataFinal) : null;
@@ -51,7 +51,6 @@ export default function Emprestimos() {
 
       {/* Filtros */}
       <div className="flex flex-wrap items-end gap-6 bg-gray-100 p-6 rounded-xl shadow-sm mb-6">
-        {/* Campo de pesquisa */}
         <div className="flex items-center gap-2">
           <Input
             type="text"
@@ -72,7 +71,6 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Filtro de status */}
         <div className="flex items-center gap-2">
           <select
             value={statusFiltro}
@@ -96,7 +94,6 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Data Inicial */}
         <div className="flex items-center gap-2">
           <Input
             type="date"
@@ -116,7 +113,6 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Data Final */}
         <div className="flex items-center gap-2">
           <Input
             type="date"
@@ -139,22 +135,22 @@ export default function Emprestimos() {
 
       {/* Tabela */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border">
-          <thead className="bg-gray-200 text-gray-700 text-sm uppercase">
+        <table className="min-w-full bg-white border text-sm">
+          <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <th className="text-left py-3 px-4">Sala</th>
-              <th className="text-left py-3 px-4">Usuário</th>
-              <th className="text-left py-3 px-4">Status</th>
-              <th className="text-left py-3 px-4">Horário Retirada</th>
-              <th className="text-left py-3 px-4">Horário Devolução</th>
+              <th className="py-2 px-4 border">Sala</th>
+              <th className="py-2 px-4 border">Usuário</th>
+              <th className="py-2 px-4 border">Status</th>
+              <th className="py-2 px-4 border">Horário Retirada</th>
+              <th className="py-2 px-4 border">Horário Devolução</th>
             </tr>
           </thead>
           <tbody>
             {emprestimosFiltrados.map((e, idx) => (
-              <tr key={e.id} className={idx % 2 === 0 ? "bg-gray-50 border-b" : "border-b"}>
-                <td className="py-3 px-4">{e.sala}</td>
-                <td className="py-3 px-4">{e.usuario}</td>
-                <td className="py-3 px-4">
+              <tr key={e.id} className="hover:bg-gray-50">
+                <td className="py-2 px-4 border">{e.sala}</td>
+                <td className="py-2 px-4 border">{e.usuario}</td>
+                <td className="py-2 px-4 border">
                   <span
                     className={`font-semibold ${
                       e.status === 'Em atraso'
@@ -167,10 +163,10 @@ export default function Emprestimos() {
                     {e.status}
                   </span>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-4 border">
                   {new Date(e.horario_retirada).toLocaleString()}
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-4 border">
                   {e.horario_devolucao
                     ? new Date(e.horario_devolucao).toLocaleString()
                     : '-'}
