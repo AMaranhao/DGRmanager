@@ -32,8 +32,9 @@ export default function GuiasRelatorios() {
             </TabsContent>
 
             <TabsContent value="historico-andar">
-                <RelatorioHistoricoUtilizacaoAndar/>
+              <RelatorioHistoricoUtilizacaoAndar/>
             </TabsContent>
+
 
             <TabsContent value="historico-sala">
                 <RelatorioHistoricoUtilizacaoSala/>
