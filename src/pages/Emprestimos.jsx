@@ -17,7 +17,6 @@ export default function Emprestimos() {
       const dados = await fetchEmprestimos();
       setEmprestimos(dados);
     };
-
     carregarEmprestimos();
   }, []);
 
@@ -51,18 +50,18 @@ export default function Emprestimos() {
 
       {/* Filtros */}
       <div className="flex flex-wrap items-end gap-6 bg-gray-100 p-6 rounded-xl shadow-sm mb-6">
+        {/* Data Inicial */}
         <div className="flex items-center gap-2">
           <Input
-            type="text"
-            placeholder="Usuário ou Sala"
-            value={textoPesquisa}
-            onChange={(e) => setTextoPesquisa(e.target.value)}
+            type="date"
+            value={dataInicial}
+            onChange={(e) => setDataInicial(e.target.value)}
             className="w-48 rounded-lg"
           />
-          {textoPesquisa && (
+          {dataInicial && (
             <button
               type="button"
-              onClick={() => setTextoPesquisa("")}
+              onClick={() => setDataInicial("")}
               className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
               title="Limpar"
             >
@@ -71,6 +70,27 @@ export default function Emprestimos() {
           )}
         </div>
 
+        {/* Data Final */}
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            value={dataFinal}
+            onChange={(e) => setDataFinal(e.target.value)}
+            className="w-48 rounded-lg"
+          />
+          {dataFinal && (
+            <button
+              type="button"
+              onClick={() => setDataFinal("")}
+              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Filtro de status */}
         <div className="flex items-center gap-2">
           <select
             value={statusFiltro}
@@ -94,36 +114,19 @@ export default function Emprestimos() {
           )}
         </div>
 
+        {/* Campo de pesquisa */}
         <div className="flex items-center gap-2">
           <Input
-            type="date"
-            value={dataInicial}
-            onChange={(e) => setDataInicial(e.target.value)}
+            type="text"
+            placeholder="Usuário ou Sala"
+            value={textoPesquisa}
+            onChange={(e) => setTextoPesquisa(e.target.value)}
             className="w-48 rounded-lg"
           />
-          {dataInicial && (
+          {textoPesquisa && (
             <button
               type="button"
-              onClick={() => setDataInicial("")}
-              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Input
-            type="date"
-            value={dataFinal}
-            onChange={(e) => setDataFinal(e.target.value)}
-            className="w-48 rounded-lg"
-          />
-          {dataFinal && (
-            <button
-              type="button"
-              onClick={() => setDataFinal("")}
+              onClick={() => setTextoPesquisa("")}
               className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
               title="Limpar"
             >
