@@ -8,33 +8,44 @@ Sistema web desenvolvido para a gestão digital de empréstimos de chaves de sal
 
 - Integração com Microsoft Bookings para agendamentos de salas
 - Controle de empréstimo e devolução de chaves com senha de 4 dígitos
-- Tela de Dashboard:
-  - Agendamentos do horário atual por andar
+- Dashboard:
+  - Agendamentos do horário vigente por andar
   - Status visual (verde = aguardando retirada, vermelho = já retirada)
-- Histórico completo de empréstimos
-- Filtros por:
-  - Data inicial e final
-  - Usuário
-  - Sala
-  - Status
-- Painel de Infraestrutura:
+  - Filtro dinâmico de andares
+- Módulo de Empréstimos:
+  - Histórico completo de empréstimos
+  - Filtros por:
+    - Data inicial e final
+    - Usuário
+    - Sala
+    - Status (Em andamento, Finalizado, Em atraso)
+- Módulo de Infraestrutura:
   - Cadastro, edição e exclusão de Prédios
   - Cadastro, edição e exclusão de Salas
   - Cadastro, edição e exclusão de Chaves
-  - (Em breve: Gestão de Kits)
-- Alertas de atraso no empréstimo via SMS (planejado)
-- Relatórios detalhados de uso (em desenvolvimento)
+- Relatórios:
+  - Relatório de Empréstimos por Período
+  - Relatório de Empréstimos em Atraso
+  - Relatório de Utilização por Andar
+  - Relatório de Utilização por Sala
+  - Relatório de Utilização por Usuário
+  - Relatório de Salas Mais Utilizadas
+  - Relatório Completo com Filtros Avançados
+  - Impressão rápida dos relatórios
+- Integração planejada com envio de alertas por SMS (alerta de atraso)
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
 - **Frontend**: React 18 + Vite
-- **Tailwind CSS**: estilização rápida e responsiva
-- **shadcn/ui**: componentes modernos e personalizáveis
-- **Mockoon**: servidor mockado para desenvolvimento local
-- **PostgreSQL**: banco de dados real (backend futuro)
-- **Spring Boot** (futuro): para desenvolvimento do backend
+- **Tailwind CSS**: estilização moderna e responsiva
+- **shadcn/ui**: biblioteca de componentes UI
+- **Mockoon**: servidor mockado para simulação de API
+- **PostgreSQL** (planejado): banco de dados real
+- **Spring Boot** (planejado): desenvolvimento do backend
+- **Lucide React**: Ícones SVG modernos
+- **date-fns**: manipulação de datas
 
 ---
 
@@ -43,10 +54,11 @@ Sistema web desenvolvido para a gestão digital de empréstimos de chaves de sal
 ```
 src/
 ├── assets/         # Imagens e ícones
-├── components/     # Header, Sidebar, Layout
-├── pages/          # Dashboard, Emprestimos, Infraestrutura, Relatorios, Login
-├── services/       # apiService.js para comunicação com API Mock
-├── routes/         # AppRoutes.jsx (configuração de rotas)
+├── components/     # Componentes visuais (Header, Sidebar, Layout)
+├── pages/          # Páginas principais (Dashboard, Emprestimos, Infraestrutura, Relatorios, Login)
+│   └── relatorios/ # Relatórios separados por arquivo
+├── services/       # Serviços de API (apiService.js)
+├── routes/         # Configuração de rotas (AppRoutes.jsx)
 ├── App.jsx         # Componente principal
 └── main.jsx        # Arquivo de entrada
 ```
@@ -58,13 +70,13 @@ src/
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/AMaranhao/emprestimo-chaves-hc-FrontEnd.git
 ```
 
 ### 2. Acesse a pasta do projeto
 
 ```bash
-cd emprestimo-chaves-hc
+cd emprestimo-chaves-hc-FrontEnd
 ```
 
 ### 3. Instale as dependências
@@ -92,26 +104,27 @@ npm run dev
 ## 📈 Status do Projeto
 
 - ✅ Dashboard de agendamentos implementado
-- ✅ Módulo de Empréstimos com filtros completo
-- ✅ Módulo de Infraestrutura com CRUD de Prédios e Chaves funcionando
-- 🚧 CRUD de Salas (em desenvolvimento)
-- 🚧 Gestão de Kits (planejado)
-- 🚧 Integração com API real via Spring Boot (em breve)
+- ✅ Módulo de Empréstimos com filtros e visualização completa
+- ✅ Administração de Prédios, Salas e Chaves
+- ✅ Relatórios analíticos finalizados com filtros avançados e opção de impressão
+- 🚧 Módulo de Kits (planejado)
+- 🚧 Integração com API real Spring Boot (em breve)
+- 🚧 Alertas de atraso por SMS (planejado)
 - 🚧 Aplicação mobile (etapa futura)
 
 ---
 
 ## 🔥 Próximos Passos
 
-- Finalizar módulo de Salas
-- Desenvolver módulo de Kits
+- Desenvolvimento do módulo de Kits
+- Administração de Usuários
 - Implementar autenticação JWT
-- Implantar backend real com Spring Boot + PostgreSQL
-- Adicionar relatórios analíticos e gráficos
-- Criar aplicação Mobile para controle via celular
+- Backend real com Spring Boot + PostgreSQL
+- Dashboards analíticos com gráficos
+- Aplicativo Mobile para controle de chaves
 
 ---
 
 ## 👩‍💻 Desenvolvido por:
 
-**Carla Ferreira**
+**José Alexandre Maranhão**
