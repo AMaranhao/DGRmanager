@@ -1,5 +1,5 @@
 // src/components/Header.jsx
-import { HelpCircle, User, Settings } from "lucide-react";
+import { User, Settings } from "lucide-react";
 
 export default function Header() {
   return (
@@ -16,7 +16,6 @@ export default function Header() {
 
       {/* Ações à direita */}
       <div className="header-actions">
-        <HelpCircle className="icon" />
         <User className="icon" />
         <Settings className="icon" />
         <button className="logout-button">SAIR</button>
