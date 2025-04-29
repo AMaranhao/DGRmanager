@@ -103,8 +103,7 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
           <select
             value={andarSelecionado}
             onChange={(e) => setAndarSelecionado(e.target.value)}
-            className="border border-gray-300 rounded-md text-sm px-2 h-8"
-          >
+            className="border border-gray-300 rounded-md text-sm px-2 h-8">
             <option value="">Todos os andares</option>
             {todosAndares.map((andar) => (
               <option key={andar} value={andar}>

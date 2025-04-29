@@ -1,13 +1,14 @@
-import Sidebar from './Sidebar';
-import Header from './Header';
+// src/components/Layout.jsx
+import Header from "./Header";
+import Sidebar from "./Sidebar";
 
 export default function Layout({ children }) {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="layout">
       <Sidebar />
-      <div className="flex-1 flex flex-col bg-[#f5fbff]">
+      <div className="flex flex-col flex-1">
         <Header />
-        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+        <main className="main-content">{children}</main>
       </div>
     </div>
   );

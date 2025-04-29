@@ -223,7 +223,6 @@ export default function Infraestrutura() {
             <table className="min-w-full bg-white text-sm">
               <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="py-2 px-4 border-b">ID</th>
                   <th className="py-2 px-4 border-b">Nome</th>
                   <th className="py-2 px-4 border-b">Endereço</th>
                   <th className="py-2 px-4 border-b text-right">Ações</th>
@@ -232,7 +231,6 @@ export default function Infraestrutura() {
               <tbody>
                 {predios.map((p) => (
                   <tr key={p.id}>
-                    <td className="py-2 px-4 border-b">{p.id}</td>
                     <td className="py-2 px-4 border-b">{p.nome}</td>
                     <td className="py-2 px-4 border-b">{p.endereco}</td>
                     <td className="py-2 px-4 border-b text-right">
@@ -282,7 +280,6 @@ export default function Infraestrutura() {
             <table className="min-w-full bg-white text-sm">
               <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="py-2 px-4 border-b">ID</th>
                   <th className="py-2 px-4 border-b">Número</th>
                   <th className="py-2 px-4 border-b">Tipo</th>
                   <th className="py-2 px-4 border-b text-right">Ações</th>
@@ -291,7 +288,6 @@ export default function Infraestrutura() {
               <tbody>
                 {salas.map((sala) => (
                   <tr key={sala.id}>
-                    <td className="py-2 px-4 border-b">{sala.id}</td>
                     <td className="py-2 px-4 border-b">{sala.numero}</td>
                     <td className="py-2 px-4 border-b">{sala.tipo}</td>
                     <td className="py-2 px-4 border-b text-right">
@@ -350,7 +346,6 @@ export default function Infraestrutura() {
             <table className="min-w-full bg-white text-sm">
               <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="py-2 px-4 border-b">ID</th>
                   <th className="py-2 px-4 border-b">Número</th>
                   <th className="py-2 px-4 border-b">Armário</th>
                   <th className="py-2 px-4 border-b">Sala ID</th>
@@ -360,7 +355,6 @@ export default function Infraestrutura() {
               <tbody>
                 {chaves.map((chave) => (
                   <tr key={chave.id}>
-                    <td className="py-2 px-4 border-b">{chave.id}</td>
                     <td className="py-2 px-4 border-b">{chave.numero}</td>
                     <td className="py-2 px-4 border-b">{chave.numeracaoArmario}</td>
                     <td className="py-2 px-4 border-b">{chave.salaId}</td>
@@ -432,7 +426,6 @@ export default function Infraestrutura() {
             <table className="min-w-full bg-white text-sm">
               <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="py-2 px-4 border-b">ID</th>
                   <th className="py-2 px-4 border-b">Número</th>
                   <th className="py-2 px-4 border-b">Armário</th>
                   <th className="py-2 px-4 border-b">Sala ID</th>
@@ -442,7 +435,6 @@ export default function Infraestrutura() {
               <tbody>
                 {kits.map((kit) => (
                   <tr key={kit.id}>
-                    <td className="py-2 px-4 border-b">{kit.id}</td>
                     <td className="py-2 px-4 border-b">{kit.numero}</td>
                     <td className="py-2 px-4 border-b">{kit.numeracaoArmario}</td>
                     <td className="py-2 px-4 border-b">{kit.salaId}</td>
