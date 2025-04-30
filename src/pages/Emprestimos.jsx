@@ -1,5 +1,3 @@
-// src/pages/Emprestimos.jsx
-
 import { useEffect, useState } from "react";
 import { fetchEmprestimos } from "../services/apiService";
 import { Input } from "@/components/ui/input";
@@ -45,24 +43,23 @@ export default function Emprestimos() {
   });
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Histórico de Empréstimos</h1>
+    <div className="dashboard-wrapper">
+      <h3 className="dashboard-heading">Histórico de Empréstimos</h3>
 
       {/* Filtros */}
-      <div className="flex flex-wrap items-end gap-6 bg-gray-100 p-6 rounded-xl shadow-sm mb-6">
-        {/* Data Inicial */}
-        <div className="flex items-center gap-2">
+      <div className="dashboard-filtro">
+        <div className="dashboard-filtro-group dashboard-filtro-text">
           <Input
             type="date"
             value={dataInicial}
             onChange={(e) => setDataInicial(e.target.value)}
-            className="w-48 rounded-lg"
+            className="dashboard-select dashboard-filtro-usuario-input"
           />
           {dataInicial && (
             <button
               type="button"
               onClick={() => setDataInicial("")}
-              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
+              className="dashboard-filtro-clear"
               title="Limpar"
             >
               <X size={14} />
@@ -70,19 +67,18 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Data Final */}
-        <div className="flex items-center gap-2">
+        <div className="dashboard-filtro-group dashboard-filtro-text">
           <Input
             type="date"
             value={dataFinal}
             onChange={(e) => setDataFinal(e.target.value)}
-            className="w-48 rounded-lg"
+            className="dashboard-select dashboard-filtro-usuario-input"
           />
           {dataFinal && (
             <button
               type="button"
               onClick={() => setDataFinal("")}
-              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
+              className="dashboard-filtro-clear"
               title="Limpar"
             >
               <X size={14} />
@@ -90,12 +86,11 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Filtro de status */}
-        <div className="flex items-center gap-2">
+        <div className="dashboard-filtro-group dashboard-filtro-text">
           <select
             value={statusFiltro}
             onChange={(e) => setStatusFiltro(e.target.value)}
-            className="border px-3 py-2 rounded-lg h-10 w-48 text-gray-700"
+            className="dashboard-select dashboard-filtro-usuario-input"
           >
             <option value="">Todos os Status</option>
             <option value="Em andamento">Em andamento</option>
@@ -106,7 +101,7 @@ export default function Emprestimos() {
             <button
               type="button"
               onClick={() => setStatusFiltro("")}
-              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
+              className="dashboard-filtro-clear"
               title="Limpar"
             >
               <X size={14} />
@@ -114,20 +109,18 @@ export default function Emprestimos() {
           )}
         </div>
 
-        {/* Campo de pesquisa */}
-        <div className="flex items-center gap-2">
-          <Input
+        <div className="dashboard-filtro-group dashboard-filtro-text">
+          <input
             type="text"
-            placeholder="Usuário ou Sala"
+            placeholder="Buscar por usuário ou sala"
             value={textoPesquisa}
             onChange={(e) => setTextoPesquisa(e.target.value)}
-            className="w-48 rounded-lg"
+            className="dashboard-select dashboard-filtro-usuario-input"
           />
           {textoPesquisa && (
             <button
-              type="button"
-              onClick={() => setTextoPesquisa("")}
-              className="text-gray-500 hover:text-black border border-gray-300 rounded-full p-1 w-7 h-7 flex items-center justify-center hover:bg-gray-200 transition"
+              onClick={() => setTextoPesquisa('')}
+              className="dashboard-filtro-clear"
               title="Limpar"
             >
               <X size={14} />
@@ -137,43 +130,35 @@ export default function Emprestimos() {
       </div>
 
       {/* Tabela */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border text-sm">
-          <thead className="bg-gray-100 text-gray-700">
+      <div className="emprestimos-tabela-wrapper">
+        <table className="emprestimos-tabela">
+          <thead>
             <tr>
-              <th className="py-2 px-4 border">Sala</th>
-              <th className="py-2 px-4 border">Usuário</th>
-              <th className="py-2 px-4 border">Status</th>
-              <th className="py-2 px-4 border">Horário Retirada</th>
-              <th className="py-2 px-4 border">Horário Devolução</th>
+              <th>Sala</th>
+              <th>Usuário</th>
+              <th>Status</th>
+              <th>Horário Retirada</th>
+              <th>Horário Devolução</th>
             </tr>
           </thead>
           <tbody>
-            {emprestimosFiltrados.map((e, idx) => (
-              <tr key={e.id} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border">{e.sala}</td>
-                <td className="py-2 px-4 border">{e.usuario}</td>
-                <td className="py-2 px-4 border">
-                  <span
-                    className={`font-semibold ${
-                      e.status === 'Em atraso'
-                        ? 'text-red-600'
-                        : e.status === 'Em andamento'
-                        ? 'text-blue-600'
-                        : 'text-green-600'
-                    }`}
-                  >
+            {emprestimosFiltrados.map((e) => (
+              <tr key={e.id}>
+                <td>{e.sala}</td>
+                <td>{e.usuario}</td>
+                <td>
+                  <span className={
+                    e.status === 'Em atraso'
+                      ? 'status-atraso'
+                      : e.status === 'Em andamento'
+                      ? 'status-andamento'
+                      : 'status-finalizado'
+                  }>
                     {e.status}
                   </span>
                 </td>
-                <td className="py-2 px-4 border">
-                  {new Date(e.horario_retirada).toLocaleString()}
-                </td>
-                <td className="py-2 px-4 border">
-                  {e.horario_devolucao
-                    ? new Date(e.horario_devolucao).toLocaleString()
-                    : '-'}
-                </td>
+                <td>{new Date(e.horario_retirada).toLocaleString()}</td>
+                <td>{e.horario_devolucao ? new Date(e.horario_devolucao).toLocaleString() : '-'}</td>
               </tr>
             ))}
           </tbody>

@@ -30,14 +30,20 @@ export const devolverChave = async (dados) => {
   return await res.json();
 };
 
+// ------------------------
 // AGENDAMENTOS
+// ------------------------
+
 export const fetchAgendamentos = async () => {
   const res = await fetch(`${API_URL}/agendamentos`);
   if (!res.ok) throw new Error('Erro ao buscar agendamentos');
   return await res.json();
 };
 
+// ------------------------
 // RELATÓRIOS
+// ------------------------
+
 export const fetchRelatorioUsoSalas = async () => {
   const res = await fetch(`${API_URL}/relatorios/uso-salas`);
   if (!res.ok) throw new Error('Erro ao buscar relatório de uso de salas');
@@ -81,7 +87,10 @@ export const deletePredio = async (id) => {
   if (!res.ok) throw new Error('Erro ao deletar prédio');
 };
 
+// ------------------------
 // 🏫 SALAS
+// ------------------------
+
 export const fetchSalas = async () => {
   const res = await fetch(`${API_URL}/salas`);
   if (!res.ok) throw new Error('Erro ao buscar salas');
@@ -152,7 +161,10 @@ export const deleteChave = async (id) => {
   if (!res.ok) throw new Error('Erro ao deletar chave');
 };
 
+// ------------------------
 // 🛠️ KITS
+// ------------------------
+
 export const fetchKits = async () => {
   const res = await fetch(`${API_URL}/kits`);
   if (!res.ok) throw new Error('Erro ao buscar kits');

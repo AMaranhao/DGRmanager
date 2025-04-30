@@ -1,0 +1,209 @@
+/*==========================*/
+/*        Dashboard         */
+/*==========================*/
+.dashboard-container {
+    padding: 2rem;
+  }
+  
+  .dashboard-title {
+    font-size: 0.5rem;
+    font-weight: 400;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-select-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+  
+  .dashboard-select {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    background-color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1f2937;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    outline: none;
+    width: 13.5rem;
+  }
+  
+  .dashboard-filtro {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-filtro-group,
+  .dashboard-filtro-usuario {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dashboard-filtro-usuario-input {
+    padding-right: 2rem;
+    width: 13.5rem;
+  }
+  
+  .dashboard-filtro-clear {
+    position: absolute;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 10px;
+  }
+  
+  .dashboard-tile {
+    cursor: pointer;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+    width: 100%;
+    max-width: 150px;
+    min-height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1px;
+  }
+  
+  .dashboard-tile:hover {
+    transform: scale(1.03);
+  }
+  
+  .dashboard-tile-retirado {
+    background-color: lightcoral;
+    color: black;
+  }
+  
+  .dashboard-tile-aguardando {
+    background-color: lightgreen;
+    color: black;
+  }
+  
+  .dashboard-sala {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-usuario {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .dashboard-acao {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .dashboard-andar {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: #374151;
+  }
+  
+  /* Corrigir visual do input date */
+  input[type="date"].dashboard-select {
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 9999px;
+    background-color: white;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1f2937;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    width: 13.5rem;
+  }
+  
+  input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.4);
+    position: absolute;
+    right: 1.75rem;
+    z-index: 10;
+  }
+  
+  /* ======================== */
+  /*     Emprestimos Page    */
+  /* ======================== */
+  
+  .emprestimos-wrapper {
+    padding: 2rem;
+  }
+  
+  .emprestimos-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+  }
+  
+  .emprestimos-tabela-wrapper {
+    overflow-x: auto;
+  }
+  
+  .emprestimos-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-size: 0.875rem;
+    text-align: left;
+  }
+  
+  .emprestimos-tabela th,
+  .emprestimos-tabela td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .emprestimos-tabela thead {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+  
+  .status-atraso {
+    color: #dc2626;
+    font-weight: 600;
+  }
+  
+  .status-andamento {
+    color: #2563eb;
+    font-weight: 600;
+  }
+  
+  .status-finalizado {
+    color: #16a34a;
+    font-weight: 600;
+  }
+  

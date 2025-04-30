@@ -5,7 +5,7 @@ import Emprestimos from '../pages/Emprestimos';
 import Relatorios from '../pages/relatorios/GuiasRelatorios';
 import Infraestrutura from '../pages/Infraestrutura';
 import Login from '../pages/Login';
-import Usuarios from "../pages/usuarios/Usuarios"; 
+import Usuarios from "../pages/Usuarios"; 
 
 
 export default function AppRoutes() {

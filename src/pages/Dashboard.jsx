@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react';
 import { fetchAgendamentos } from '../services/apiService';
+import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 export default function Dashboard() {
   const [agendamentos, setAgendamentos] = useState([]);
-  const [andarSelecionado, setAndarSelecionado] = useState('');
+  const [andarSelecionado, setAndarSelecionado] = useState('Todos');
   const [andaresDisponiveis, setAndaresDisponiveis] = useState([]);
+  const [filtroUsuario, setFiltroUsuario] = useState('');
+  const [modalAberto, setModalAberto] = useState(false);
+  const [agendamentoSelecionado, setAgendamentoSelecionado] = useState(null);
+  const [senha, setSenha] = useState('');
+  const [erroSenha, setErroSenha] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState('');
 
   useEffect(() => {
     const carregarAgendamentos = async () => {
@@ -12,68 +22,139 @@ export default function Dashboard() {
       setAgendamentos(dados);
 
       const andares = [...new Set(
-        dados.map(item => item.sala?.numero?.charAt(0)).filter(Boolean)
+        dados.map(item => String(item.sala?.andar)).filter(Boolean)
       )];
 
-      setAndaresDisponiveis(andares);
-      setAndarSelecionado(andares[0] || '');
+      setAndaresDisponiveis(['Todos', ...andares]);
     };
 
     carregarAgendamentos();
   }, []);
 
   const agendamentosFiltrados = agendamentos.filter(
-    (ag) => ag.sala?.numero?.startsWith(andarSelecionado)
+    (ag) => {
+      const correspondeAndar = andarSelecionado === 'Todos' || String(ag.sala?.andar) === String(andarSelecionado);
+      const correspondeUsuario = ag.usuario.toLowerCase().includes(filtroUsuario.toLowerCase());
+      return correspondeAndar && correspondeUsuario;
+    }
   );
 
-  const handleClickTile = (agendamento) => {
-    const senha = prompt("Digite a senha de 4 dígitos:");
-    if (senha && senha.length === 4) {
-      alert(`Ação realizada para a sala ${agendamento.sala.numero} com senha ${senha}`);
+  const abrirModal = (agendamento) => {
+    setAgendamentoSelecionado(agendamento);
+    setModalAberto(true);
+    setSenha('');
+    setErroSenha(false);
+    setMensagemSucesso('');
+  };
+
+  const confirmarAcao = () => {
+    if (senha.length === 4) {
+      setMensagemSucesso(`Ação realizada para a sala ${agendamentoSelecionado.sala.numero} com senha ${senha}`);
+      setErroSenha(false);
+      setTimeout(() => setModalAberto(false), 1500);
     } else {
-      alert("Senha inválida.");
+      setErroSenha(true);
+      setMensagemSucesso('');
     }
   };
 
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Agendamentos do horário atual</h1>
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') confirmarAcao();
+  };
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Selecionar andar:</label>
+  return (
+    <div className="dashboard-wrapper">
+      <h3 className="dashboard-heading">Agendamentos do horário atual</h3>
+
+      <div className="dashboard-filtro">
         <select
           value={andarSelecionado}
           onChange={(e) => setAndarSelecionado(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="dashboard-select"
         >
           {andaresDisponiveis.map((andar, index) => (
             <option key={andar || index} value={andar}>
-              Andar {andar}
+              {andar === 'Todos' ? 'Todos os Andares' : `Andar ${andar}`}
             </option>
           ))}
         </select>
+
+        <div className="dashboard-filtro-usuario">
+          <input
+            type="text"
+            placeholder="Buscar por usuário"
+            value={filtroUsuario}
+            onChange={(e) => setFiltroUsuario(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {filtroUsuario && (
+            <button
+              onClick={() => setFiltroUsuario('')}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-6">
+      <div className="dashboard-grid">
         {agendamentosFiltrados.map((ag) => {
           const retirado = ag.retirado === true || ag.retirado === "true";
-          const bgColor = retirado ? 'bg-[#fca5a5]' : 'bg-[#93c5fd]';
-          const textColor = retirado ? 'text-red-800' : 'text-blue-900';
+          const tileClass = retirado
+            ? 'dashboard-tile dashboard-tile-retirado'
+            : 'dashboard-tile dashboard-tile-aguardando';
+
+          const labelAcao = retirado ? 'Receber' : 'Emprestar';
 
           return (
             <div
               key={ag.id}
-              onClick={() => handleClickTile(ag)}
-              className={`cursor-pointer p-6 rounded-lg shadow-md text-center transition-transform duration-200 hover:scale-[1.03] ${bgColor} ${textColor} w-full max-w-[260px] min-h-[140px] mx-auto`}
+              onClick={() => abrirModal(ag)}
+              className={tileClass}
             >
-              <div className="text-xl font-bold mb-2">
-                Sala {ag.sala?.numero}
-              </div>
-              <div className="text-sm font-medium">{ag.usuario}</div>
+              <div className="dashboard-sala">Sala {ag.sala?.numero}</div>
+              <div className="dashboard-usuario">{ag.usuario}</div>
+              <div className="dashboard-acao">{labelAcao}</div>
             </div>
           );
         })}
       </div>
+
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
+          <div className="dashboard-modal-title">Confirmação de Senha</div>
+          <div className="dashboard-modal-description">
+            Digite a senha de 4 dígitos para confirmar a ação.
+          </div>
+          {!mensagemSucesso && (
+            <>
+              <Input
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Senha de 4 dígitos"
+                maxLength={4}
+                className="dashboard-modal-input"
+              />
+              {erroSenha && (
+                <div className="dashboard-modal-error">Senha inválida. Digite exatamente 4 dígitos.</div>
+              )}
+            </>
+          )}
+          {mensagemSucesso && (
+            <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+          )}
+          {!mensagemSucesso && (
+            <div className="dashboard-modal-actions">
+              <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

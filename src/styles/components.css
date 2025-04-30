@@ -46,7 +46,6 @@
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     height: 8vh;
-    margin-left: 3rem;
     margin-top: 1vh;
     margin-bottom: 1vh;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -132,10 +131,11 @@
 /* Área principal */
 .main-content {
     flex: 1;
-    padding: 1rem;
     background-color: #f9fafb;
-    margin-left: 3rem;
-    margin-left: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    margin: 0;
+    max-width: 100%;
 }
   
 
