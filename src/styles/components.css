@@ -48,6 +48,7 @@
     height: 8vh;
     margin-top: 1vh;
     margin-bottom: 1vh;
+    margin-left: 3rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
 }
@@ -135,6 +136,7 @@
     margin-top: 1rem;
     margin-bottom: 1rem;
     margin: 0;
+    margin-left: 3rem;
     max-width: 100%;
 }
   

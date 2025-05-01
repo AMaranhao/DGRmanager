@@ -88,7 +88,10 @@
     min-height: 100px;
     margin-left: auto;
     margin-right: auto;
-    padding: 1px;
+    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   
   .dashboard-tile:hover {
@@ -157,7 +160,6 @@
   /* ======================== */
   /*     Emprestimos Page    */
   /* ======================== */
-  
   .emprestimos-wrapper {
     padding: 2rem;
   }
@@ -205,5 +207,179 @@
   .status-finalizado {
     color: #16a34a;
     font-weight: 600;
+  }
+  
+  /* ======================== */
+  /*     Usuarios Page       */
+  /* ======================== */
+  .usuarios-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  
+  .usuarios-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .usuarios-tabela-wrapper {
+    overflow-x: auto;
+  }
+  
+  .usuarios-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-size: 0.875rem;
+    text-align: left;
+  }
+  
+  .usuarios-tabela th,
+  .usuarios-tabela td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .usuarios-tabela thead {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+  
+  .usuarios-modal {
+    max-width: 24rem !important;
+    padding: 1rem;
+  }
+  
+  .usuarios-modal-descricao {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+  }
+  
+  .usuarios-modal-input {
+    margin-bottom: 0.75rem;
+  }
+  
+  .usuarios-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .usuarios-status-inativo {
+    color: #dc2626;
+    font-weight: 600;
+  }
+  
+.dashboard-select {
+  max-height: 2.5rem;
+  line-height: 2.5rem;
+  max-width: 15rem;
+}
+
+.dashboard-filtro-usuario-input {
+    max-height: 2.5rem;
+    line-height: 1.2rem;
+    max-width: 12rem;
+}
+
+/* ======================== */
+/*   Dashboard - Modal     */
+/* ======================== */
+.dashboard-modal {
+    width: 100%;
+    max-width: 22rem !important;
+    height: auto;
+    margin: 0 auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-modal-description {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-modal-input {
+    max-width: 20rem !important;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
+  }
+  
+  .dashboard-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .dashboard-modal-error {
+    font-size: 0.875rem;
+    color: #dc2626;
+    margin-left: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-no-close button[aria-label="Close"] {
+    display: none !important;
+  }
+  
+  .dashboard-modal-success-bg {
+    background-color: #d1fae5 !important;
+    border: 1px solid #10b981;
+  }
+  
+  .dashboard-modal-success-message {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #065f46;
+    background-color: #a7f3d0;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border-radius: 0.375rem;
+    text-align: center;
+  }
+  
+  /* Overlay */
+  .dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+  }
+  
+  [data-state="open"] > .fixed.inset-0 {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+  }
+  
+  .dialog-overlay-custom {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
   }
   

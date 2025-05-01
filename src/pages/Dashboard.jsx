@@ -1,3 +1,5 @@
+// src/pages/Dashboard.jsx
+
 import { useEffect, useState } from 'react';
 import { fetchAgendamentos } from '../services/apiService';
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
@@ -31,13 +33,14 @@ export default function Dashboard() {
     carregarAgendamentos();
   }, []);
 
-  const agendamentosFiltrados = agendamentos.filter(
-    (ag) => {
-      const correspondeAndar = andarSelecionado === 'Todos' || String(ag.sala?.andar) === String(andarSelecionado);
-      const correspondeUsuario = ag.usuario.toLowerCase().includes(filtroUsuario.toLowerCase());
-      return correspondeAndar && correspondeUsuario;
-    }
-  );
+  const agendamentosFiltrados = agendamentos.filter((ag) => {
+    const correspondeAndar = andarSelecionado === 'Todos' || String(ag.sala?.andar) === String(andarSelecionado);
+    const correspondeTexto =
+      ag.usuario.toLowerCase().includes(filtroUsuario.toLowerCase()) ||
+      ag.sala?.numero.toString().toLowerCase().includes(filtroUsuario.toLowerCase());
+
+    return correspondeAndar && correspondeTexto;
+  });
 
   const abrirModal = (agendamento) => {
     setAgendamentoSelecionado(agendamento);
@@ -82,7 +85,7 @@ export default function Dashboard() {
         <div className="dashboard-filtro-usuario">
           <input
             type="text"
-            placeholder="Buscar por usuário"
+            placeholder="Buscar por usuário ou sala"
             value={filtroUsuario}
             onChange={(e) => setFiltroUsuario(e.target.value)}
             className="dashboard-select dashboard-filtro-usuario-input"

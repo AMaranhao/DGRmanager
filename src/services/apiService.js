@@ -237,3 +237,20 @@ export const desativarUsuario = async (id, novoStatusAtivo) => {
   if (!res.ok) throw new Error('Erro ao alterar status do usuário');
   return res.json();
 };
+
+// ------------------------
+// 👤 CURSO E CARGO
+// ------------------------
+
+export const fetchCargos = async () => {
+  const res = await fetch(`${API_URL}/cargos`);
+  if (!res.ok) throw new Error('Erro ao buscar cargos');
+  return res.json();
+};
+
+
+export const fetchCursos = async () => {
+  const res = await fetch(`${API_URL}/cursos`);
+  if (!res.ok) throw new Error('Erro ao buscar cursos');
+  return res.json();
+};
