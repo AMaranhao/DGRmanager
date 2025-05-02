@@ -92,3 +92,58 @@
     text-align: center;
   }
   
+  .dashboard-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .dashboard-modal-confirm {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    max-width: 24rem;
+    width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    text-align: center;
+  }
+  
+  .dashboard-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .dashboard-btn-confirmar {
+    background-color: #dc2626;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+  
+  .dashboard-btn-cancelar {
+    background-color: #e5e7eb;
+    color: #111827;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+  
+  .dashboard-modal-success-float {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #10b981;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    font-size: 0.875rem;
+  }
+  

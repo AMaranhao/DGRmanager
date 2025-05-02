@@ -1,38 +1,11 @@
 import { useEffect, useState } from 'react';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from '@/components/ui/tabs';
+import {Tabs,TabsList,TabsTrigger,TabsContent,} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import {
-  fetchPredios,
-  createPredio,
-  updatePredio,
-  deletePredio,
-  fetchSalas,
-  createSala,
-  updateSala,
-  deleteSala,
-  fetchChaves,
-  createChave,
-  updateChave,
-  deleteChave,
-  fetchKits,
-  createKit,
-  updateKit,
-  deleteKit,
-  fetchAndaresPorPredio,
-} from '../services/apiService';
+import { fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
+  deleteSala, fetchChaves, createChave, updateChave, deleteChave, fetchKits, createKit, updateKit, 
+  deleteKit, fetchAndaresPorPredio,} from '../services/apiService';
 import '@/styles/pages/infraestrutura.css';
 import { X } from "lucide-react";
 
@@ -66,6 +39,8 @@ export default function Infraestrutura() {
   const [formKit, setFormKit] = useState({ numero: '', numeracaoArmario: '', predioId: '', sala: null, tipo: '' });
   const [editandoKit, setEditandoKit] = useState(null);
   const [modalKitAberto, setModalKitAberto] = useState(false);
+
+  
 
   useEffect(() => {
     carregarTudo();
@@ -151,12 +126,43 @@ export default function Infraestrutura() {
   };
   
 
-  const handleExcluirPredio = async (id) => {
-    if (confirm('Tem certeza que deseja excluir este prédio?')) {
-      await deletePredio(id);
+  const [confirmarExclusao, setConfirmarExclusao] = useState({ tipo: '', id: null });
+  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+
+const abrirModalConfirmacao = (tipo, id) => {
+  setConfirmarExclusao({ tipo, id });
+  setModalConfirmarAberto(true);
+};
+
+const confirmarExclusaoItem = async () => {
+  try {
+    if (confirmarExclusao.tipo === 'predio') {
+      await deletePredio(confirmarExclusao.id);
       setPredios(await fetchPredios());
+    } else if (confirmarExclusao.tipo === 'sala') {
+      await deleteSala(confirmarExclusao.id);
+      setSalas(await fetchSalas());
+    } else if (confirmarExclusao.tipo === 'chave') {
+      await deleteChave(confirmarExclusao.id);
+      setChaves(await fetchChaves());
+    } else if (confirmarExclusao.tipo === 'kit') {
+      await deleteKit(confirmarExclusao.id);
+      setKits(await fetchKits());
     }
-  };
+
+    setMensagemSucesso("Item excluído com sucesso!");
+
+    setTimeout(() => {
+      setModalConfirmarAberto(false);
+      setMensagemSucesso("");
+      setConfirmarExclusao({ tipo: '', id: null });
+    }, 2000);
+  } catch (error) {
+    console.error("Erro ao excluir:", error);
+  }
+};
+
 
   const handleEditarSala = (sala) => {
     setEditandoSala(sala.id);
@@ -171,13 +177,6 @@ export default function Infraestrutura() {
     setModalSalaAberto(true);
   };
 
-  const handleExcluirSala = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta sala?')) {
-      await deleteSala(id);
-      setSalas(await fetchSalas());
-    }
-  };
-
   const handleEditarChave = (chave) => {
     setEditandoChave(chave.id);
     setFormChave({
@@ -188,13 +187,6 @@ export default function Infraestrutura() {
       sala: chave.sala || null,
     });
     setModalChaveAberto(true);
-  };
-
-  const handleExcluirChave = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta chave?')) {
-      await deleteChave(id);
-      setChaves(await fetchChaves());
-    }
   };
 
   const handleEditarKit = (kit) => {
@@ -210,13 +202,6 @@ export default function Infraestrutura() {
     setModalKitAberto(true);
   };
 
-  const handleExcluirKit = async (id) => {
-    if (confirm('Tem certeza que deseja excluir este kit?')) {
-      await deleteKit(id);
-      setKits(await fetchKits());
-    }
-  };
-
   return (
     <div className="dashboard-wrapper">
       <h1 className="dashboard-heading">Infraestrutura</h1>
@@ -229,6 +214,31 @@ export default function Infraestrutura() {
           <TabsTrigger value="kits">Kits</TabsTrigger>
         </TabsList>
 
+        {modalConfirmarAberto && (
+          <div className="dialog-overlay flex items-center justify-center">
+            <div className="dashboard-modal">
+              {mensagemSucesso ? (
+                <div className="dashboard-modal-success-message">
+                  {mensagemSucesso}
+                </div>
+              ) : (
+                <>
+                  <h2 className="dashboard-modal-title">Confirmar Exclusão</h2>
+                  <p className="dashboard-modal-description">
+                    Tem certeza que deseja excluir este item? Essa ação não poderá ser desfeita.
+                  </p>
+                  <div className="dashboard-modal-actions">
+                    <Button onClick={confirmarExclusaoItem}>Excluir</Button>
+                    <Button variant="outline" onClick={() => setModalConfirmarAberto(false)}>Cancelar</Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+
+        
         {/* Aba de Prédios */}
         <TabsContent value="predios">
           <div className="infraestrutura-section">
@@ -325,7 +335,7 @@ export default function Infraestrutura() {
                     <td>{p.telefone}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarPredio(p)}>Editar</Button>
-                      <Button variant="destructive" onClick={() => handleExcluirPredio(p.id)}>Excluir</Button>
+                      <Button variant="destructive" onClick={() => abrirModalConfirmacao('predio', p.id)}>Excluir</Button>
                     </td>
                   </tr>
                 ))}
@@ -458,7 +468,7 @@ export default function Infraestrutura() {
                     <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarSala(sala)}>Editar</Button>
-                      <Button variant="destructive" onClick={() => handleExcluirSala(sala.id)}>Excluir</Button>
+                      <Button variant="destructive" onClick={() => abrirModalConfirmacao('sala', sala.id)}>Excluir</Button>
                     </td>
                   </tr>
                 ))}
@@ -583,7 +593,7 @@ export default function Infraestrutura() {
                   <td>{chave.salaNumero}</td>
                   <td className="tabela-col-acoes">
                     <Button variant="outline" onClick={() => handleEditarChave(chave)}>Editar</Button>
-                    <Button variant="destructive" onClick={() => handleExcluirChave(chave.id)}>Excluir</Button>
+                    <Button variant="destructive" onClick={() => abrirModalConfirmacao('chave', chave.id)}>Excluir</Button>
                   </td>
                 </tr>
               ))}
@@ -741,7 +751,7 @@ export default function Infraestrutura() {
                     <td>{kit.tipo}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarKit(kit)}>Editar</Button>
-                      <Button variant="destructive" onClick={() => handleExcluirKit(kit.id)}>Excluir</Button>
+                      <Button variant="destructive" onClick={() => abrirModalConfirmacao('kit', kit.id)}>Excluir</Button>
                     </td>
                   </tr>
                 ))}
