@@ -1,21 +1,8 @@
-// src/pages/Usuarios.jsx
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogOverlay,
-} from "@/components/ui/dialog";
+import { Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay,} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  fetchUsuarios,
-  criarUsuario,
-  desativarUsuario,
-} from "@/services/apiService";
+import { fetchUsuarios,criarUsuario,desativarUsuario, fetchCursos, fetchCargos} from "@/services/apiService";
 import { Plus, Trash, X } from "lucide-react";
 
 export default function Usuarios() {
@@ -32,6 +19,7 @@ export default function Usuarios() {
     curso: "",
     cargo: ""
   });
+
   const [cursos, setCursos] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
@@ -42,9 +30,11 @@ export default function Usuarios() {
 
   useEffect(() => {
     carregarUsuarios();
-    fetch("/curso").then(res => res.json()).then(setCursos);
-    fetch("/cargo").then(res => res.json()).then(setCargos);
+    fetchCursos().then(setCursos);
+    fetchCargos().then(setCargos);
   }, []);
+  
+  
 
   const carregarUsuarios = async () => {
     const dados = await fetchUsuarios();
@@ -52,7 +42,7 @@ export default function Usuarios() {
   };
 
   const handleSalvarUsuario = async () => {
-    if (!formUsuario.nome.trim() || !formUsuario.email.trim()) return;
+    if (!formUsuario.nome.trim() || !formUsuario.email.includes("@")) return;
     await criarUsuario(formUsuario);
     setFormUsuario({
       nome: "",
@@ -154,25 +144,43 @@ export default function Usuarios() {
             <DialogDescription className="usuarios-modal-descricao">
               Preencha as informações do novo usuário.
             </DialogDescription>
-            <Input placeholder="Nome" value={formUsuario.nome} onChange={(e) => setFormUsuario({ ...formUsuario, nome: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="Email" value={formUsuario.email} onChange={(e) => setFormUsuario({ ...formUsuario, email: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="CPF" value={formUsuario.cpf} onChange={(e) => setFormUsuario({ ...formUsuario, cpf: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="Matrícula" value={formUsuario.matricula} onChange={(e) => setFormUsuario({ ...formUsuario, matricula: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="Telefone" value={formUsuario.telefone} onChange={(e) => setFormUsuario({ ...formUsuario, telefone: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="Senha" value={formUsuario.senha} onChange={(e) => setFormUsuario({ ...formUsuario, senha: e.target.value })} className="usuarios-modal-input" />
-            <Input placeholder="Senha de Assinatura (4 dígitos)" value={formUsuario.senhaAssinatura} onChange={(e) => setFormUsuario({ ...formUsuario, senhaAssinatura: e.target.value })} className="usuarios-modal-input" />
-            <select value={formUsuario.curso} onChange={(e) => setFormUsuario({ ...formUsuario, curso: e.target.value })} className="dashboard-select usuarios-modal-input">
+
+            {["nome", "email", "cpf", "matricula", "telefone", "senha", "senhaAssinatura"].map((campo) => (
+              <div key={campo} className="dashboard-filtro-group">
+                <Input
+                  type={campo === "email" ? "email" : "text"}
+                  placeholder={campo === "senhaAssinatura" ? "Senha de Assinatura (4 dígitos)" : campo.charAt(0).toUpperCase() + campo.slice(1)}
+                  value={formUsuario[campo]}
+                  onChange={(e) => setFormUsuario({ ...formUsuario, [campo]: e.target.value })}
+                  className="usuarios-modal-input"
+                />
+                {formUsuario[campo] && (
+                  <button
+                    onClick={() => setFormUsuario({ ...formUsuario, [campo]: "" })}
+                    className="dashboard-filtro-clear"
+                    title="Limpar"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+            <div>
+            <select value={formUsuario.curso} onChange={(e) => setFormUsuario({ ...formUsuario, curso: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Curso</option>
               {cursos.map(c => (
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
-            <select value={formUsuario.cargo} onChange={(e) => setFormUsuario({ ...formUsuario, cargo: e.target.value })} className="dashboard-select usuarios-modal-input">
+            </div>
+            <div>
+            <select value={formUsuario.cargo} onChange={(e) => setFormUsuario({ ...formUsuario, cargo: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Cargo</option>
               {cargos.map(c => (
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
+            </div>
             <div className="usuarios-modal-actions">
               <Button onClick={handleSalvarUsuario}>Salvar</Button>
             </div>

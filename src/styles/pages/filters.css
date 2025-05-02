@@ -1,0 +1,26 @@
+/* ======================== */
+/*         Filters          */
+/* ======================== */
+.dashboard-filtro {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-filtro-group,
+  .dashboard-filtro-usuario {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dashboard-filtro-usuario-input {
+    padding-right: 2rem;
+    width: 13.5rem;
+    max-height: 2.5rem;
+    line-height: 2.5rem;
+  }
+  

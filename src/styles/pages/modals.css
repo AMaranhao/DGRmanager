@@ -1,0 +1,95 @@
+/* ======================== */
+/*         Modals           */
+/* ======================== */
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+  }
+  
+  [data-state="open"] > .fixed.inset-0 {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+  }
+  
+  .dialog-overlay-custom {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+  
+  .dashboard-modal,
+  .usuarios-modal {
+    width: 100%;
+    max-width: 22rem !important;
+    height: auto;
+    margin: 0 auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-modal-description,
+  .usuarios-modal-descricao {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+  }
+  
+  .dashboard-modal-input,
+  .usuarios-modal-input {
+    max-width: 20rem !important;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
+  }
+  
+  .dashboard-modal-actions,
+  .usuarios-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .dashboard-modal-error {
+    font-size: 0.875rem;
+    color: #dc2626;
+    margin-left: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-no-close button[aria-label="Close"] {
+    display: none !important;
+  }
+  
+  .dashboard-modal-success-bg {
+    background-color: #d1fae5 !important;
+    border: 1px solid #10b981;
+  }
+  
+  .dashboard-modal-success-message {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #065f46;
+    background-color: #a7f3d0;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border-radius: 0.375rem;
+    text-align: center;
+  }
+  

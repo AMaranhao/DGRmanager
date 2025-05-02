@@ -1,0 +1,30 @@
+/* ======================== */
+/*        Tabela            */
+/* ======================== */
+.emprestimos-tabela-wrapper,
+.usuarios-tabela-wrapper {
+  overflow-x: auto;
+}
+
+.emprestimos-tabela,
+.usuarios-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.emprestimos-tabela th,
+.emprestimos-tabela td,
+.usuarios-tabela th,
+.usuarios-tabela td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.emprestimos-tabela thead,
+.usuarios-tabela thead {
+  background-color: #f3f4f6;
+  color: #374151;
+}

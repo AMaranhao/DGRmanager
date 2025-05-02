@@ -1,0 +1,18 @@
+/* ======================== */
+/*        Status            */
+/* ======================== */
+.status-atraso,
+.usuarios-status-inativo {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.status-andamento {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.status-finalizado {
+  color: #16a34a;
+  font-weight: 600;
+}

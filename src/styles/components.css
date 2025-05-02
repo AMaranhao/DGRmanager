@@ -1,4 +1,6 @@
-/* Sidebar */
+/* ======================== */
+/*         Sidebar          */
+/* ======================== */
 .sidebar {
     background-color: #2f4674; 
     width: 5rem; 
@@ -12,7 +14,6 @@
     left: 0;
 }
   
-    /* Itens da Sidebar */
     .sidebar-icons {
         flex-grow: 1;
         display: flex;
@@ -22,7 +23,6 @@
         gap: 4rem;
     }
   
-    /* Logo Container */
     .sidebar-logo-container {
         height: 5rem;
         display: flex;
@@ -32,13 +32,14 @@
     }
 
 
-    /* Logo da Sidebar */
     .sidebar-logo {
-        height: 4.5rem; /* h-10 */
+        height: 4.5rem; 
         width: 4.5rem;
     }
   
-/* Header */
+/* ======================== */
+/*         Header           */
+/* ======================== */
 .header {
     background-color: whitesmoke;
     border-bottom: 1px solid #e5e7eb;
@@ -62,7 +63,6 @@
         /* vazio para manter o centro real */
     }
 
-    /* Título do Header */
     .header-title {
         font-size: 1.5rem;
         font-weight: 600;
@@ -106,7 +106,6 @@
         color: white;
     }
 
-    /* Botão de logout no Header (se existir) */
     .logout-button {
         background: transparent;
         color: #2f4674;
@@ -122,14 +121,19 @@
         background: #2f4674;
         color: white;
     }
-  
-/* Layout */
+
+/* ======================== */
+/*         Layout           */
+/* ======================== */
+
 .layout {
     display: flex;
     min-height: 90vh;
 }
   
-/* Área principal */
+/* ======================== */
+/*      Área principal      */
+/* ======================== */
 .main-content {
     flex: 1;
     background-color: #f9fafb;

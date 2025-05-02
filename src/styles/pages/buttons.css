@@ -1,0 +1,16 @@
+/* ======================== */
+/*         Buttons          */
+/* ======================== */
+.dashboard-filtro-clear {
+    position: absolute;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+  }
+  
+  .usuarios-input-wrapper .dashboard-filtro-clear {
+    right: 0.75rem;
+  }
+  
