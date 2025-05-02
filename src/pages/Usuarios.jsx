@@ -5,6 +5,15 @@ import { Input } from "@/components/ui/input";
 import { fetchUsuarios,criarUsuario,desativarUsuario, fetchCursos, fetchCargos} from "@/services/apiService";
 import { Plus, Trash, X } from "lucide-react";
 
+import "@/styles/pages/usuarios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/tables.css";
+import "@/styles/pages/buttons.css";
+import "@/styles/pages/modals.css";
+import "@/styles/pages/status.css";
+
+
+
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
@@ -146,7 +155,7 @@ export default function Usuarios() {
             </DialogDescription>
 
             {["nome", "email", "cpf", "matricula", "telefone", "senha", "senhaAssinatura"].map((campo) => (
-              <div key={campo} className="dashboard-filtro-group">
+              <div key={campo} className="usuarios-input-wrapper">
                 <Input
                   type={campo === "email" ? "email" : "text"}
                   placeholder={campo === "senhaAssinatura" ? "Senha de Assinatura (4 dígitos)" : campo.charAt(0).toUpperCase() + campo.slice(1)}
@@ -165,6 +174,8 @@ export default function Usuarios() {
                 )}
               </div>
             ))}
+
+
             <div>
             <select value={formUsuario.curso} onChange={(e) => setFormUsuario({ ...formUsuario, curso: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Curso</option>

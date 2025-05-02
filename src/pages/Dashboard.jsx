@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
+import "@/styles/pages/dashboard.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/modals.css";
+import "@/styles/pages/buttons.css";
+import "@/styles/pages/status.css";
+
+
 export default function Dashboard() {
   const [agendamentos, setAgendamentos] = useState([]);
   const [andarSelecionado, setAndarSelecionado] = useState('Todos');

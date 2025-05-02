@@ -1,5 +1,14 @@
 @import "./styles/components.css";
-@import "./styles/pages.css";
+@import "./styles/pages/buttons.css";
+@import "./styles/pages/dashboard.css";
+@import "./styles/pages/emprestimos.css";
+@import "./styles/pages/filters.css";
+@import "./styles/pages/modals.css";
+@import "./styles/pages/status.css";
+@import "./styles/pages/tables.css";
+@import "./styles/pages/usuarios.css";
+/* @import "./styles/pages/"; */ 
+
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

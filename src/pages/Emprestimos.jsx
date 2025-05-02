@@ -3,6 +3,14 @@ import { fetchEmprestimos } from "../services/apiService";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 
+import "@/styles/pages/emprestimos.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/tables.css";
+import "@/styles/pages/modals.css";
+import "@/styles/pages/buttons.css";
+import "@/styles/pages/status.css";
+
+
 export default function Emprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
   const [statusFiltro, setStatusFiltro] = useState("");
