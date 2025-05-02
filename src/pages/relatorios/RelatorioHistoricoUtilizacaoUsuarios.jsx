@@ -21,7 +21,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     setEmprestimos(dados);
   };
 
-  const usuariosUnicos = Array.from(new Set(emprestimos.map(emp => emp.usuario?.nome))).filter(Boolean).sort();
+  const usuariosUnicos = Array.from(new Set(emprestimos.map(emp => emp.usuario).filter(Boolean))).sort();
 
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
@@ -34,7 +34,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const usuarioFiltrado = usuarioSelecionado ? emp.usuario?.nome === usuarioSelecionado : true;
+    const usuarioFiltrado = usuarioSelecionado ? emp.usuario === usuarioSelecionado : true;
 
     return dentroDataInicio && dentroDataFim && usuarioFiltrado;
   });
@@ -43,11 +43,11 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.usuario?.nome) return;
-      if (!agrupado[emp.usuario?.nome]) {
-        agrupado[emp.usuario?.nome] = [];
+      if (!emp.usuario) return;
+      if (!agrupado[emp.usuario]) {
+        agrupado[emp.usuario] = [];
       }
-      agrupado[emp.usuario?.nome].push(emp);
+      agrupado[emp.usuario].push(emp);
     });
 
     return agrupado;

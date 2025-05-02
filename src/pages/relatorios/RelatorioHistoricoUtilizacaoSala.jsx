@@ -1,5 +1,3 @@
-// src/pages/relatorios/RelatorioHistoricoUtilizacaoSala.jsx
-
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
 import { Input } from "@/components/ui/input";
@@ -41,12 +39,12 @@ export default function RelatorioHistoricoUtilizacaoSala() {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.sala?.numero || !emp.usuario?.nome) return;
+      if (!emp.sala?.numero || !emp.usuario) return;
 
-      if (!agrupado[emp.sala?.numero]) {
-        agrupado[emp.sala?.numero] = {};
+      if (!agrupado[emp.sala.numero]) {
+        agrupado[emp.sala.numero] = {};
       }
-      agrupado[emp.sala?.numero][emp.usuario?.nome] = (agrupado[emp.sala?.numero][emp.usuario?.nome] || 0) + 1;
+      agrupado[emp.sala.numero][emp.usuario] = (agrupado[emp.sala.numero][emp.usuario] || 0) + 1;
     });
 
     return agrupado;
