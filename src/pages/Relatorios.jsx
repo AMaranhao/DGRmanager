@@ -12,7 +12,7 @@ import RelatorioRelatorioCompleto from "./relatorios/RelatorioRelatorioCompleto"
 export default function Relatorios() {
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Relatórios</h1>
+      <h3 className="dashboard-heading">Relatórios</h3>
 
       <div className="space-y-8">
         <RelatorioEmprestimosPeriodo/>

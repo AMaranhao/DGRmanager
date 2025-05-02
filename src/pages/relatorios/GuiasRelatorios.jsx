@@ -14,7 +14,7 @@ import RelatorioRelatorioCompleto from "./RelatorioRelatorioCompleto";
 export default function GuiasRelatorios() {
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Relatórios</h1>
+      <h3 className="dashboard-heading">Relatórios</h3>
 
         <Tabs defaultValue="emprestimos" className="w-full">
             <TabsList className="mb-6">

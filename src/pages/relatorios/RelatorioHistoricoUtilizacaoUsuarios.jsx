@@ -1,4 +1,6 @@
-// src/pages/relatorios/RelatorioHistoricoUtilizacaoUsuarios.jsx
+import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/buttons.css";
 
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
@@ -21,16 +23,16 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     setEmprestimos(dados);
   };
 
-  const usuariosUnicos = Array.from(new Set(emprestimos.map(emp => emp.usuario).filter(Boolean))).sort();
+  const usuariosUnicos = Array.from(
+    new Set(emprestimos.map(emp => emp.usuario).filter(Boolean))
+  ).sort();
 
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
     let inicio = dataInicio ? parseISO(dataInicio) : null;
     let fim = dataFim ? parseISO(dataFim) : null;
 
-    if (inicio && fim && isAfter(inicio, fim)) {
-      [inicio, fim] = [fim, inicio];
-    }
+    if (inicio && fim && isAfter(inicio, fim)) [inicio, fim] = [fim, inicio];
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
@@ -41,15 +43,11 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
   const agruparPorUsuario = () => {
     const agrupado = {};
-
     emprestimosFiltrados.forEach((emp) => {
       if (!emp.usuario) return;
-      if (!agrupado[emp.usuario]) {
-        agrupado[emp.usuario] = [];
-      }
+      agrupado[emp.usuario] = agrupado[emp.usuario] || [];
       agrupado[emp.usuario].push(emp);
     });
-
     return agrupado;
   };
 
@@ -60,50 +58,60 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Histórico de Utilização por Usuário</h2>
-        <button
-          onClick={handleImprimir}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md shadow-sm"
-        >
-          <Printer size={16} /> Imprimir
+        <h2 className="relatorios-titulo">Histórico de Utilização por Usuário</h2>
+        <button onClick={handleImprimir} className="btn-imprimir">
+          <Printer size={18} />
+          Imprimir
         </button>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap items-end gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-        {[
-          { label: "Data Início", value: dataInicio, setValue: setDataInicio, type: "date" },
-          { label: "Data Fim", value: dataFim, setValue: setDataFim, type: "date" },
-        ].map(({ label, value, setValue, type }, index) => (
-          <div key={index} className="flex items-center gap-2 px-2">
-            <Input
-              type={type}
-              placeholder={label}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="w-40 h-8 text-sm"
-            />
-            {value && (
-              <button
-                type="button"
-                onClick={() => setValue("")}
-                className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-6 h-6 flex items-center justify-center"
-                title="Limpar"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-        ))}
+      <div className="filtro-container">
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataInicio && (
+            <button
+              type="button"
+              onClick={() => setDataInicio("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-        {/* Picklist de Usuário */}
-        <div className="flex items-center gap-2 px-2">
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataFim && (
+            <button
+              type="button"
+              onClick={() => setDataFim("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        <div className="relatorios-filtro-group relatorios-filtro-text">
           <select
             value={usuarioSelecionado}
             onChange={(e) => setUsuarioSelecionado(e.target.value)}
-            className="border border-gray-300 rounded-md text-sm px-2 h-8"
+            className="dashboard-select"
           >
             <option value="">Todos os usuários</option>
             {usuariosUnicos.map((usuario) => (
@@ -112,12 +120,22 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
               </option>
             ))}
           </select>
+          {usuarioSelecionado && (
+            <button
+              type="button"
+              onClick={() => setUsuarioSelecionado("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Resultado */}
       {Object.keys(dadosAgrupados).length === 0 ? (
-        <div className="bg-gray-100 p-3 rounded-md text-gray-600 text-center text-sm">
+        <div className="relatorios-sem-dados">
           Nenhuma utilização encontrada nesse período.
         </div>
       ) : (
@@ -126,20 +144,20 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
           .map((usuario) => {
             const utilizacoes = dadosAgrupados[usuario];
             return (
-              <div key={usuario} className="bg-white border border-gray-200 rounded-md shadow p-4 mb-6">
-                <h3 className="text-lg font-semibold text-blue-700 mb-3">
-                  {usuario} - {utilizacoes?.length} utilizações
+              <div key={usuario} className="relatorios-cartao">
+                <h3 className="relatorios-cartao-nome">
+                  {usuario} - {utilizacoes.length} utilização(ões)
                 </h3>
 
-                <div className="grid md:grid-cols-2 gap-3">
+                <div className="relatorios-grid">
                   {utilizacoes.map((emp) => (
-                    <div
-                      key={emp.id}
-                      className="bg-gray-50 border border-gray-200 rounded-md p-3 transition hover:shadow-sm"
-                    >
-                      <p className="text-sm font-semibold text-gray-700 mb-1">Sala: {emp.sala?.numero}</p>
-                      <p className="text-xs text-gray-600">
-                        <strong>Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
+                    <div key={emp.id} className="relatorios-card-inner">
+                      <p className="relatorios-label"><strong>Sala:</strong> {emp.sala?.numero}</p>
+                      <p className="relatorios-info">
+                        <strong>Retirada:</strong>{" "}
+                        {emp.horario_retirada
+                          ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
+                          : "Não informado"}
                       </p>
                     </div>
                   ))}

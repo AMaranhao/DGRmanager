@@ -1,3 +1,7 @@
+import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/buttons.css";
+
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
 import { Input } from "@/components/ui/input";
@@ -24,9 +28,7 @@ export default function RelatorioHistoricoUtilizacaoSala() {
     let inicio = dataInicio ? parseISO(dataInicio) : null;
     let fim = dataFim ? parseISO(dataFim) : null;
 
-    if (inicio && fim && isAfter(inicio, fim)) {
-      [inicio, fim] = [fim, inicio];
-    }
+    if (inicio && fim && isAfter(inicio, fim)) [inicio, fim] = [fim, inicio];
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
@@ -37,72 +39,75 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
   const agruparPorSala = () => {
     const agrupado = {};
-
     emprestimosFiltrados.forEach((emp) => {
       if (!emp.sala?.numero || !emp.usuario) return;
-
-      if (!agrupado[emp.sala.numero]) {
-        agrupado[emp.sala.numero] = {};
-      }
-      agrupado[emp.sala.numero][emp.usuario] = (agrupado[emp.sala.numero][emp.usuario] || 0) + 1;
+      const sala = emp.sala.numero;
+      agrupado[sala] = agrupado[sala] || {};
+      agrupado[sala][emp.usuario] = (agrupado[sala][emp.usuario] || 0) + 1;
     });
-
     return agrupado;
   };
 
   const dadosAgrupados = agruparPorSala();
+  const salasDisponiveis = Array.from(new Set(emprestimos.map(emp => emp.sala?.numero))).filter(Boolean).sort();
 
-  const salasDisponiveis = Array.from(new Set(emprestimos.map(emp => emp.sala?.numero))).sort();
-
-  const handleImprimir = () => {
-    window.print();
-  };
+  const handleImprimir = () => window.print();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Histórico de Utilização por Sala</h2>
-        <button
-          onClick={handleImprimir}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md shadow-sm"
-        >
-          <Printer size={16} /> Imprimir
+        <h2 className="relatorios-titulo">Histórico de Utilização por Sala</h2>
+        <button onClick={handleImprimir} className="btn-imprimir">
+          <Printer size={18} />
+          Imprimir
         </button>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap items-end gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-        {[ 
-          { label: "Data Início", value: dataInicio, setValue: setDataInicio, type: "date" },
-          { label: "Data Fim", value: dataFim, setValue: setDataFim, type: "date" },
-        ].map(({ label, value, setValue, type }, index) => (
-          <div key={index} className="flex items-center gap-2 px-2">
-            <Input
-              type={type}
-              placeholder={label}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="w-40 h-8 text-sm"
-            />
-            {value && (
-              <button
-                type="button"
-                onClick={() => setValue("")}
-                className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-6 h-6 flex items-center justify-center"
-                title="Limpar"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-        ))}
+      <div className="filtro-container">
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataInicio && (
+            <button
+              type="button"
+              onClick={() => setDataInicio("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-        {/* Filtro de Sala */}
-        <div className="flex items-center gap-2 px-2">
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataFim && (
+            <button
+              type="button"
+              onClick={() => setDataFim("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        <div className="relatorios-filtro-group relatorios-filtro-text">
           <select
             value={salaSelecionada}
             onChange={(e) => setSalaSelecionada(e.target.value)}
-            className="border border-gray-300 rounded-md text-sm px-2 h-8"
+            className="dashboard-select"
           >
             <option value="">Todas as Salas</option>
             {salasDisponiveis.map((sala) => (
@@ -113,10 +118,10 @@ export default function RelatorioHistoricoUtilizacaoSala() {
             <button
               type="button"
               onClick={() => setSalaSelecionada("")}
-              className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-6 h-6 flex items-center justify-center"
+              className="dashboard-filtro-clear"
               title="Limpar Sala"
             >
-              <X size={12} />
+              <X size={14} />
             </button>
           )}
         </div>
@@ -124,27 +129,24 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
       {/* Resultado */}
       {Object.keys(dadosAgrupados).length === 0 ? (
-        <div className="bg-gray-100 p-3 rounded-md text-gray-600 text-center text-sm">
+        <div className="relatorios-sem-dados">
           Nenhum empréstimo encontrado.
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="relatorios-grid">
           {Object.entries(dadosAgrupados).sort().map(([sala, usuarios]) => {
-            const totalUtilizacoes = Object.values(usuarios).reduce((acc, qtd) => acc + qtd, 0);
+            const total = Object.values(usuarios).reduce((acc, qtd) => acc + qtd, 0);
             return (
-              <div
-                key={sala}
-                className="bg-white border border-gray-200 rounded-md shadow p-3 transition hover:shadow-md"
-              >
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Sala {sala}</h3>
+              <div key={sala} className="relatorios-cartao">
+                <h3 className="relatorios-cartao-nome">Sala {sala}</h3>
                 <div className="text-xs text-gray-600 space-y-1">
-                  {Object.entries(usuarios).map(([usuario, quantidade]) => (
+                  {Object.entries(usuarios).map(([usuario, qtd]) => (
                     <p key={usuario}>
-                      <strong>{usuario}:</strong> {quantidade} utilização(ões)
+                      <strong>{usuario}:</strong> {qtd} utilização(ões)
                     </p>
                   ))}
                   <p className="mt-2 font-semibold text-blue-700">
-                    Total: {totalUtilizacoes} utilização(ões)
+                    Total: {total} utilização(ões)
                   </p>
                 </div>
               </div>

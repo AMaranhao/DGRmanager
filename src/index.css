@@ -140,3 +140,27 @@ body {
   }
 }
 
+
+@media print {
+  #root {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 0rem;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Esconder elementos desnecessários na impressão, se quiser */
+  .no-print {
+    display: none !important;
+  }
+}
+

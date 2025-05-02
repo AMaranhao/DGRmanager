@@ -1,4 +1,6 @@
-// src/pages/relatorios/RelatorioSalasMaisUtilizadas.jsx
+import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/buttons.css";
 
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
@@ -10,7 +12,7 @@ export default function RelatorioSalasMaisUtilizadas() {
   const [emprestimos, setEmprestimos] = useState([]);
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  const [ordem, setOrdem] = useState("desc"); // desc = mais usadas primeiro
+  const [ordem, setOrdem] = useState("desc");
 
   useEffect(() => {
     carregarEmprestimos();
@@ -23,13 +25,9 @@ export default function RelatorioSalasMaisUtilizadas() {
 
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
-
     let inicio = dataInicio ? parseISO(dataInicio) : null;
     let fim = dataFim ? parseISO(dataFim) : null;
-
-    if (inicio && fim && isAfter(inicio, fim)) {
-      [inicio, fim] = [fim, inicio];
-    }
+    if (inicio && fim && isAfter(inicio, fim)) [inicio, fim] = [fim, inicio];
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
@@ -39,69 +37,70 @@ export default function RelatorioSalasMaisUtilizadas() {
 
   const agruparPorSala = () => {
     const agrupado = {};
-
     emprestimosFiltrados.forEach((emp) => {
       if (!emp.sala?.numero) return;
-      agrupado[emp.sala?.numero] = (agrupado[emp.sala?.numero] || 0) + 1;
+      agrupado[emp.sala.numero] = (agrupado[emp.sala.numero] || 0) + 1;
     });
-
     return agrupado;
   };
 
   const dadosAgrupados = agruparPorSala();
-
-  const salasOrdenadas = Object.entries(dadosAgrupados)
-    .sort(([_, a], [__, b]) => (ordem === "desc" ? b - a : a - b));
+  const salasOrdenadas = Object.entries(dadosAgrupados).sort(
+    ([, a], [, b]) => (ordem === "desc" ? b - a : a - b)
+  );
 
   const handleImprimir = () => {
     window.print();
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Salas Mais Utilizadas</h2>
-        <button
-          onClick={handleImprimir}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md shadow-sm"
-        >
-          <Printer size={16} /> Imprimir
+        <h2 className="relatorios-titulo">Salas Mais Utilizadas</h2>
+        <button onClick={handleImprimir} className="btn-imprimir">
+          <Printer size={18} />
+          Imprimir
         </button>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap items-end gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-        {[
-          { label: "Data Início", value: dataInicio, setValue: setDataInicio, type: "date" },
-          { label: "Data Fim", value: dataFim, setValue: setDataFim, type: "date" },
-        ].map(({ label, value, setValue, type }, index) => (
-          <div key={index} className="flex items-center gap-2 px-2">
-            <Input
-              type={type}
-              placeholder={label}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="w-40 h-8 text-sm"
-            />
-            {value && (
-              <button
-                type="button"
-                onClick={() => setValue("")}
-                className="text-gray-500 hover:text-gray-700 border border-gray-300 rounded-full p-1 w-6 h-6 flex items-center justify-center"
-                title="Limpar"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-        ))}
+      <div className="filtro-container">
+        {/* Data Início */}
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataInicio && (
+            <button type="button" onClick={() => setDataInicio("")} className="dashboard-filtro-clear" title="Limpar">
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-        {/* Filtro de Ordem */}
-        <div className="flex items-center gap-2 px-2">
+        {/* Data Fim */}
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {dataFim && (
+            <button type="button" onClick={() => setDataFim("")} className="dashboard-filtro-clear" title="Limpar">
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Ordem */}
+        <div className="relatorios-filtro-group relatorios-filtro-text">
           <select
             value={ordem}
             onChange={(e) => setOrdem(e.target.value)}
-            className="border border-gray-300 rounded-md text-sm px-2 h-8"
+            className="dashboard-select"
           >
             <option value="desc">Mais utilizadas primeiro</option>
             <option value="asc">Menos utilizadas primeiro</option>
@@ -111,29 +110,26 @@ export default function RelatorioSalasMaisUtilizadas() {
 
       {/* Resultado */}
       {salasOrdenadas.length === 0 ? (
-        <div className="bg-gray-100 p-3 rounded-md text-gray-600 text-center text-sm">
+        <div className="relatorios-sem-dados">
           Nenhum dado encontrado nesse período.
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="relatorios-grid">
           {salasOrdenadas.map(([sala, quantidade]) => (
-            <div
-              key={sala}
-              className="bg-white border border-gray-200 rounded-md shadow p-3 transition hover:shadow-md"
-            >
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Sala: {sala}</h3>
-              <p className="text-xs text-gray-600">
-                Utilizações: {quantidade}
-              </p>
+            <div key={sala} className="relatorios-cartao">
+              <h3 className="relatorios-cartao-nome">Sala: {sala}</h3>
+              <p className="relatorios-info">Utilizações: {quantidade}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Total Geral */}
-      <div className="bg-blue-50 p-3 rounded-md text-blue-800 text-center text-sm font-semibold">
-        Total Geral de Utilizações: {salasOrdenadas.reduce((acc, [_, quant]) => acc + quant, 0)}
-      </div>
+      {/* Total geral */}
+      {salasOrdenadas.length > 0 && (
+        <div className="relatorios-total-final">
+          Total Geral de Utilizações: {salasOrdenadas.reduce((acc, [, quant]) => acc + quant, 0)}
+        </div>
+      )}
     </div>
   );
 }
