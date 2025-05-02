@@ -219,6 +219,7 @@ export default function Infraestrutura() {
                 <tr>
                   <th>Nome</th>
                   <th>Endereço</th>
+                  <th>Telefone</th>
                   <th className="tabela-col-acoes">Ações</th>
                 </tr>
               </thead>
@@ -227,6 +228,7 @@ export default function Infraestrutura() {
                   <tr key={p.id}>
                     <td>{p.nome}</td>
                     <td>{p.endereco}</td>
+                    <td>{p.telefone}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarPredio(p)}>Editar</Button>
                       <Button variant="destructive" onClick={() => handleExcluirPredio(p.id)}>Excluir</Button>
@@ -273,6 +275,8 @@ export default function Infraestrutura() {
                 <tr>
                   <th>Número</th>
                   <th>Tipo</th>
+                  <th>Andar</th>
+                  <th>Ativa</th>
                   <th className="tabela-col-acoes">Ações</th>
                 </tr>
               </thead>
@@ -281,6 +285,8 @@ export default function Infraestrutura() {
                   <tr key={sala.id}>
                     <td>{sala.numero}</td>
                     <td>{sala.tipo}</td>
+                    <td>{sala.andar}</td>
+                    <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarSala(sala)}>Editar</Button>
                       <Button variant="destructive" onClick={() => handleExcluirSala(sala.id)}>Excluir</Button>
@@ -332,7 +338,7 @@ export default function Infraestrutura() {
                 <tr>
                   <th>Número</th>
                   <th>Armário</th>
-                  <th>Sala ID</th>
+                  <th>Sala</th>
                   <th className="tabela-col-acoes">Ações</th>
                 </tr>
               </thead>
@@ -341,7 +347,7 @@ export default function Infraestrutura() {
                   <tr key={chave.id}>
                     <td>{chave.numero}</td>
                     <td>{chave.numeracaoArmario}</td>
-                    <td>{chave.salaId}</td>
+                    <td>{chave.salaNumero}</td> 
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarChave(chave)}>Editar</Button>
                       <Button variant="destructive" onClick={() => handleExcluirChave(chave.id)}>Excluir</Button>
@@ -393,7 +399,8 @@ export default function Infraestrutura() {
                 <tr>
                   <th>Número</th>
                   <th>Armário</th>
-                  <th>Sala ID</th>
+                  <th>Sala</th>
+                  <th>Tipo de Kit</th>
                   <th className="tabela-col-acoes">Ações</th>
                 </tr>
               </thead>
@@ -402,7 +409,8 @@ export default function Infraestrutura() {
                   <tr key={kit.id}>
                     <td>{kit.numero}</td>
                     <td>{kit.numeracaoArmario}</td>
-                    <td>{kit.salaId}</td>
+                    <td>{kit.salaNumero}</td>
+                    <td>{kit.tipo}</td>
                     <td className="tabela-col-acoes">
                       <Button variant="outline" onClick={() => handleEditarKit(kit)}>Editar</Button>
                       <Button variant="destructive" onClick={() => handleExcluirKit(kit.id)}>Excluir</Button>
