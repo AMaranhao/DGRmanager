@@ -77,17 +77,30 @@ export default function Dashboard() {
       <h3 className="dashboard-heading">Agendamentos do horário atual</h3>
 
       <div className="dashboard-filtro">
-        <select
-          value={andarSelecionado}
-          onChange={(e) => setAndarSelecionado(e.target.value)}
-          className="dashboard-select"
-        >
-          {andaresDisponiveis.map((andar, index) => (
-            <option key={andar || index} value={andar}>
-              {andar === 'Todos' ? 'Todos os Andares' : `Andar ${andar}`}
-            </option>
-          ))}
-        </select>
+        <div className="dashboard-filtro-group">
+          <select
+            value={andarSelecionado}
+            onChange={(e) => setAndarSelecionado(e.target.value)}
+            className="dashboard-select"
+          >
+            {andaresDisponiveis.map((andar, index) => (
+              <option key={andar || index} value={andar}>
+                {andar === 'Todos' ? 'Todos os Andares' : `Andar ${andar}`}
+              </option>
+            ))}
+          </select>
+          {andarSelecionado !== 'Todos' && (
+            <button
+              type="button"
+              onClick={() => setAndarSelecionado('Todos')}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
 
         <div className="dashboard-filtro-usuario">
           <input

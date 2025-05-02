@@ -98,7 +98,7 @@ export default function Emprestimos() {
           <select
             value={statusFiltro}
             onChange={(e) => setStatusFiltro(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
+            className="dashboard-select"
           >
             <option value="">Todos os Status</option>
             <option value="Em andamento">Em andamento</option>
