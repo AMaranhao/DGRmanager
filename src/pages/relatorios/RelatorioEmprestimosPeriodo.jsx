@@ -93,8 +93,8 @@ export default function RelatorioEmprestimosPeriodo() {
               key={emp.id}
               className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition hover:shadow-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario}</h3>
-              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala}</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario?.nome}</h3>
+              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala?.numero}</p>
               <p className="text-sm text-gray-600">
                 <strong>Horário de Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
               </p>

@@ -36,10 +36,10 @@ export default function RelatorioRelatorioCompleto() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const atendeStatus = statusFiltro ? emp.status === statusFiltro : true;
-    const atendeUsuario = usuarioFiltro ? emp.usuario?.toLowerCase().includes(usuarioFiltro.toLowerCase()) : true;
-    const atendeSala = salaFiltro ? emp.sala?.toLowerCase().includes(salaFiltro.toLowerCase()) : true;
-    const atendeAndar = andarFiltro ? emp.sala?.startsWith(andarFiltro.toUpperCase()) : true;
+    const atendeStatus = statusFiltro ? emp.status ?? 'Indefinido' === statusFiltro : true;
+    const atendeUsuario = usuarioFiltro ? emp.usuario?.nome?.toLowerCase().includes(usuarioFiltro.toLowerCase()) : true;
+    const atendeSala = salaFiltro ? emp.sala?.numero?.toLowerCase().includes(salaFiltro.toLowerCase()) : true;
+    const atendeAndar = andarFiltro ? emp.sala?.numero?.startsWith(andarFiltro.toUpperCase()) : true;
 
     return dentroDataInicio && dentroDataFim && atendeStatus && atendeUsuario && atendeSala && atendeAndar;
   });
@@ -194,9 +194,9 @@ export default function RelatorioRelatorioCompleto() {
               key={emp.id}
               className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition hover:shadow-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario}</h3>
-              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala}</p>
-              <p className="text-sm text-gray-600 mb-1"><strong>Status:</strong> {emp.status}</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario?.nome}</h3>
+              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala?.numero}</p>
+              <p className="text-sm text-gray-600 mb-1"><strong>Status:</strong> {emp.status ?? 'Indefinido'}</p>
               <p className="text-sm text-gray-600">
                 <strong>Horário de Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
               </p>

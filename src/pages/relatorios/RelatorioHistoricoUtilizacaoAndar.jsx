@@ -36,14 +36,14 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
     return dentroDataInicio && dentroDataFim;
   });
 
-  const todosAndares = Array.from(new Set(emprestimos.map(emp => emp.sala?.charAt(0).toUpperCase()))).filter(Boolean).sort();
+  const todosAndares = Array.from(new Set(emprestimos.map(emp => emp.sala?.numero?.charAt(0).toUpperCase()))).filter(Boolean).sort();
 
   const agruparPorAndar = () => {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.sala) return;
-      const andar = emp.sala.charAt(0).toUpperCase();
+      if (!emp.sala?.numero) return;
+      const andar = emp.sala?.numero.charAt(0).toUpperCase();
       if (!agrupado[andar]) {
         agrupado[andar] = [];
       }
@@ -137,8 +137,8 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
                       key={emp.id}
                       className="bg-gray-50 border border-gray-200 rounded-md p-3 transition hover:shadow-sm"
                     >
-                      <p className="text-sm font-semibold text-gray-700 mb-1">{emp.usuario}</p>
-                      <p className="text-xs text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala}</p>
+                      <p className="text-sm font-semibold text-gray-700 mb-1">{emp.usuario?.nome}</p>
+                      <p className="text-xs text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala?.numero}</p>
                       <p className="text-xs text-gray-600">
                         <strong>Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
                       </p>

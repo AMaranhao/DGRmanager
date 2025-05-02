@@ -41,8 +41,8 @@ export default function RelatorioSalasMaisUtilizadas() {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.sala) return;
-      agrupado[emp.sala] = (agrupado[emp.sala] || 0) + 1;
+      if (!emp.sala?.numero) return;
+      agrupado[emp.sala?.numero] = (agrupado[emp.sala?.numero] || 0) + 1;
     });
 
     return agrupado;

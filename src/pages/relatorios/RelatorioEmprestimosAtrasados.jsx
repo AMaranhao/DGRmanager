@@ -19,7 +19,7 @@ export default function RelatorioEmprestimosAtrasados() {
 
   const carregarUsuariosAtrasados = async () => {
     const emprestimos = await fetchEmprestimos();
-    const atrasadosFiltrados = emprestimos.filter((emp) => emp.status === "Em atraso");
+    const atrasadosFiltrados = emprestimos.filter((emp) => emp.status ?? 'Indefinido' === "Em atraso");
     setAtrasados(atrasadosFiltrados);
   };
 
@@ -37,8 +37,8 @@ export default function RelatorioEmprestimosAtrasados() {
     const dentroDataFim = fim ? isAfter(fim, horarioRetirada) : true;
 
     return (
-      (filtroSala === "" || emp.sala.toLowerCase().includes(filtroSala.toLowerCase())) &&
-      (filtroUsuario === "" || emp.usuario.toLowerCase().includes(filtroUsuario.toLowerCase())) &&
+      (filtroSala === "" || emp.sala?.numero.toLowerCase().includes(filtroSala.toLowerCase())) &&
+      (filtroUsuario === "" || emp.usuario?.nome.toLowerCase().includes(filtroUsuario.toLowerCase())) &&
       dentroDataInicio &&
       dentroDataFim
     );
@@ -162,8 +162,8 @@ export default function RelatorioEmprestimosAtrasados() {
               key={emp.id}
               className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition hover:shadow-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario}</h3>
-              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala}</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{emp.usuario?.nome}</h3>
+              <p className="text-sm text-gray-600 mb-1"><strong>Sala:</strong> {emp.sala?.numero}</p>
               <p className="text-sm text-gray-600">
                 <strong>Horário de Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
               </p>

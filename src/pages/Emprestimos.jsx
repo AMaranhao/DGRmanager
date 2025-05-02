@@ -44,8 +44,9 @@ export default function Emprestimos() {
 
     const atendeTexto = textoPesquisa
       ? e.usuario.toLowerCase().includes(textoPesquisa.toLowerCase()) ||
-        e.sala.toLowerCase().includes(textoPesquisa.toLowerCase())
+        e.sala.numero.toLowerCase().includes(textoPesquisa.toLowerCase())
       : true;
+
 
     return atendeStatus && atendeDataInicial && atendeDataFinal && atendeTexto;
   });
@@ -152,7 +153,7 @@ export default function Emprestimos() {
           <tbody>
             {emprestimosFiltrados.map((e) => (
               <tr key={e.id}>
-                <td>{e.sala}</td>
+                <td>{e.sala.numero}</td>
                 <td>{e.usuario}</td>
                 <td>
                   <span className={

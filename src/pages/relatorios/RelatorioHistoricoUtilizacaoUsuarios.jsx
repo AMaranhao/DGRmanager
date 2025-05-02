@@ -21,7 +21,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     setEmprestimos(dados);
   };
 
-  const usuariosUnicos = Array.from(new Set(emprestimos.map(emp => emp.usuario))).filter(Boolean).sort();
+  const usuariosUnicos = Array.from(new Set(emprestimos.map(emp => emp.usuario?.nome))).filter(Boolean).sort();
 
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
@@ -34,7 +34,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const usuarioFiltrado = usuarioSelecionado ? emp.usuario === usuarioSelecionado : true;
+    const usuarioFiltrado = usuarioSelecionado ? emp.usuario?.nome === usuarioSelecionado : true;
 
     return dentroDataInicio && dentroDataFim && usuarioFiltrado;
   });
@@ -43,11 +43,11 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.usuario) return;
-      if (!agrupado[emp.usuario]) {
-        agrupado[emp.usuario] = [];
+      if (!emp.usuario?.nome) return;
+      if (!agrupado[emp.usuario?.nome]) {
+        agrupado[emp.usuario?.nome] = [];
       }
-      agrupado[emp.usuario].push(emp);
+      agrupado[emp.usuario?.nome].push(emp);
     });
 
     return agrupado;
@@ -128,7 +128,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
             return (
               <div key={usuario} className="bg-white border border-gray-200 rounded-md shadow p-4 mb-6">
                 <h3 className="text-lg font-semibold text-blue-700 mb-3">
-                  {usuario} - {utilizacoes.length} utilizações
+                  {usuario} - {utilizacoes?.length} utilizações
                 </h3>
 
                 <div className="grid md:grid-cols-2 gap-3">
@@ -137,7 +137,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
                       key={emp.id}
                       className="bg-gray-50 border border-gray-200 rounded-md p-3 transition hover:shadow-sm"
                     >
-                      <p className="text-sm font-semibold text-gray-700 mb-1">Sala: {emp.sala}</p>
+                      <p className="text-sm font-semibold text-gray-700 mb-1">Sala: {emp.sala?.numero}</p>
                       <p className="text-xs text-gray-600">
                         <strong>Retirada:</strong> {emp.horario_retirada ? format(parseISO(emp.horario_retirada), 'dd/MM/yyyy HH:mm') : "Não informado"}
                       </p>

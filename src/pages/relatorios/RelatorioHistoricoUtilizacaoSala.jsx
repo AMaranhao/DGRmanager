@@ -32,7 +32,7 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const correspondeSala = salaSelecionada ? emp.sala === salaSelecionada : true;
+    const correspondeSala = salaSelecionada ? emp.sala?.numero === salaSelecionada : true;
 
     return dentroDataInicio && dentroDataFim && correspondeSala;
   });
@@ -41,12 +41,12 @@ export default function RelatorioHistoricoUtilizacaoSala() {
     const agrupado = {};
 
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.sala || !emp.usuario) return;
+      if (!emp.sala?.numero || !emp.usuario?.nome) return;
 
-      if (!agrupado[emp.sala]) {
-        agrupado[emp.sala] = {};
+      if (!agrupado[emp.sala?.numero]) {
+        agrupado[emp.sala?.numero] = {};
       }
-      agrupado[emp.sala][emp.usuario] = (agrupado[emp.sala][emp.usuario] || 0) + 1;
+      agrupado[emp.sala?.numero][emp.usuario?.nome] = (agrupado[emp.sala?.numero][emp.usuario?.nome] || 0) + 1;
     });
 
     return agrupado;
@@ -54,7 +54,7 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
   const dadosAgrupados = agruparPorSala();
 
-  const salasDisponiveis = Array.from(new Set(emprestimos.map(emp => emp.sala))).sort();
+  const salasDisponiveis = Array.from(new Set(emprestimos.map(emp => emp.sala?.numero))).sort();
 
   const handleImprimir = () => {
     window.print();

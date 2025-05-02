@@ -31,7 +31,7 @@ export default function Dashboard() {
       setAgendamentos(dados);
 
       const andares = [...new Set(
-        dados.map(item => String(item.sala?.andar)).filter(Boolean)
+        dados.map(item => String(item.sala?.andarId)).filter(Boolean)
       )];
 
       setAndaresDisponiveis(['Todos', ...andares]);
@@ -41,7 +41,7 @@ export default function Dashboard() {
   }, []);
 
   const agendamentosFiltrados = agendamentos.filter((ag) => {
-    const correspondeAndar = andarSelecionado === 'Todos' || String(ag.sala?.andar) === String(andarSelecionado);
+    const correspondeAndar = andarSelecionado === 'Todos' || Number(ag.sala?.andarId) === Number(andarSelecionado);
     const correspondeTexto =
       ag.usuario.toLowerCase().includes(filtroUsuario.toLowerCase()) ||
       ag.sala?.numero.toString().toLowerCase().includes(filtroUsuario.toLowerCase());

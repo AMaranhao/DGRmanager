@@ -88,6 +88,17 @@ export const deletePredio = async (id) => {
 };
 
 // ------------------------
+// 🏫 ANDARES
+// ------------------------
+
+
+export const fetchAndaresPorPredio = async (predioId) => {
+  const res = await fetch(`${API_URL}/andares?predioId=${predioId}`);
+  if (!res.ok) throw new Error('Erro ao buscar andares por prédio');
+  return await res.json();
+};
+
+// ------------------------
 // 🏫 SALAS
 // ------------------------
 
