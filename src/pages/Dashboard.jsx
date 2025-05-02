@@ -74,7 +74,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-wrapper">
-      <h3 className="dashboard-heading">Agendamentos do horário atual</h3>
+      <h3 className="dashboard-heading">Agendamentos Próximos</h3>
 
       <div className="dashboard-filtro">
         <div className="dashboard-filtro-group">

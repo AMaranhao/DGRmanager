@@ -64,8 +64,8 @@
     }
 
     .header-title {
-        font-size: 1.5rem;
-        font-weight: 600;
+        font-size: 1.75rem;
+        font-weight: 800;
         color: #1f2937;
         text-align: center;
         line-height: 1.2;
@@ -128,7 +128,7 @@
 
 .layout {
     display: flex;
-    min-height: 90vh;
+    min-height: 98vh;
 }
   
 /* ======================== */
