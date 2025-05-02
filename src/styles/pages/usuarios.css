@@ -77,4 +77,10 @@
     padding: 0rem;
   }
   
-  
+  .usuarios-acoes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding-right: 1rem; /* opcional para afastar um pouco da borda */
+  }

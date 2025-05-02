@@ -28,3 +28,11 @@
   background-color: #f3f4f6;
   color: #374151;
 }
+
+
+.usuarios-tabela td:nth-child(4),
+.usuarios-tabela th:nth-child(4) {
+  max-width: 100px;
+  width: 100px;
+  text-align: center;
+}

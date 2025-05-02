@@ -206,7 +206,7 @@ export default function Usuarios() {
               <th>Nome</th>
               <th>Email</th>
               <th>Status</th>
-              <th className="text-right">Ações</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -219,7 +219,7 @@ export default function Usuarios() {
                     {usuario.ativo ? "Ativo" : "Inativo"}
                   </span>
                 </td>
-                <td className="text-right">
+                <td className="usuarios-acoes">
                   <Button
                     size="sm"
                     variant={usuario.ativo ? "destructive" : "default"}
@@ -233,6 +233,7 @@ export default function Usuarios() {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
 
