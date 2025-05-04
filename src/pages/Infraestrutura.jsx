@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import {Tabs,TabsList,TabsTrigger,TabsContent,} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription, } from '@/components/ui/dialog';
+import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
   deleteSala, fetchChaves, createChave, updateChave, deleteChave, fetchKits, createKit, updateKit, 
   deleteKit, fetchAndaresPorPredio,} from '../services/apiService';
+
 import '@/styles/pages/infraestrutura.css';
+import '@/styles/pages/modals.css';
+import '@/styles/pages/buttons.css';
+import '@/styles/pages/filters.css';
+import '@/styles/pages/status.css';
+import '@/styles/pages/tables.css';
+
 import { X } from "lucide-react";
 
 export default function Infraestrutura() {
@@ -214,28 +221,27 @@ const confirmarExclusaoItem = async () => {
           <TabsTrigger value="kits">Kits</TabsTrigger>
         </TabsList>
 
-        {modalConfirmarAberto && (
-          <div className="dialog-overlay flex items-center justify-center">
-            <div className="dashboard-modal">
-              {mensagemSucesso ? (
-                <div className="dashboard-modal-success-message">
-                  {mensagemSucesso}
+        <Dialog open={modalConfirmarAberto} onOpenChange={setModalConfirmarAberto}>
+          <DialogOverlay className="dialog-overlay" />
+          <DialogContent className="dashboard-modal dashboard-no-close">
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+            {mensagemSucesso ? (
+              <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+            ) : (
+              <>
+                <DialogTitle>Confirmar Exclusão</DialogTitle>
+                <DialogDescription className="dashboard-modal-description">
+                  Tem certeza que deseja excluir este item? Essa ação não poderá ser desfeita.
+                </DialogDescription>
+                <div className="dashboard-modal-actions">
+                  <Button onClick={confirmarExclusaoItem}>Excluir</Button>
+                  <Button variant="outline" onClick={() => setModalConfirmarAberto(false)}>Cancelar</Button>
                 </div>
-              ) : (
-                <>
-                  <h2 className="dashboard-modal-title">Confirmar Exclusão</h2>
-                  <p className="dashboard-modal-description">
-                    Tem certeza que deseja excluir este item? Essa ação não poderá ser desfeita.
-                  </p>
-                  <div className="dashboard-modal-actions">
-                    <Button onClick={confirmarExclusaoItem}>Excluir</Button>
-                    <Button variant="outline" onClick={() => setModalConfirmarAberto(false)}>Cancelar</Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
 
 
         
@@ -244,12 +250,14 @@ const confirmarExclusaoItem = async () => {
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Prédios</h2>
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
+              <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
                 <Button onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
                   + Cadastrar Prédio
                 </Button>
               </DialogTrigger>
               <DialogContent className="usuarios-modal">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
                 <DialogTitle>{editandoPredio ? 'Editar Prédio' : 'Novo Prédio'}</DialogTitle>
                 <DialogDescription className="usuarios-modal-descricao">
                   Preencha os dados do prédio para {editandoPredio ? 'editar' : 'cadastrar'}.
@@ -349,12 +357,15 @@ const confirmarExclusaoItem = async () => {
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Salas</h2>
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
+              <DialogOverlay className="dialog-overlay" />
+
               <DialogTrigger asChild>
                 <Button onClick={() => { setEditandoSala(null); setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });}}>
                   + Cadastrar Sala
                 </Button>
               </DialogTrigger>
               <DialogContent className="usuarios-modal">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
                 <DialogTitle>{editandoSala ? 'Editar Sala' : 'Nova Sala'}</DialogTitle>
                   <DialogDescription className="usuarios-modal-descricao">
                     Preencha os dados da sala para {editandoSala ? 'editar' : 'cadastrar'}.
@@ -482,12 +493,14 @@ const confirmarExclusaoItem = async () => {
         <div className="infraestrutura-section">
         <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
         <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
+         <DialogOverlay className="dialog-overlay" />  
           <DialogTrigger asChild>
             <Button onClick={() => setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null })}>
               + Cadastrar Chave
               </Button>
           </DialogTrigger>
           <DialogContent className="usuarios-modal">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
             <DialogTitle>{editandoChave ? 'Editar Chave' : 'Nova Chave'}</DialogTitle>
             <DialogDescription className="usuarios-modal-descricao">
               Preencha os dados da chave para {editandoChave ? 'editar' : 'cadastrar'}.
@@ -607,10 +620,12 @@ const confirmarExclusaoItem = async () => {
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Kits</h2>
             <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
+              <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
             <Button onClick={() => setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' })}>+ Cadastrar Kit</Button>
           </DialogTrigger>
           <DialogContent className="usuarios-modal">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
             <DialogTitle>{editandoKit ? 'Editar Kit' : 'Novo Kit'}</DialogTitle>
             <DialogDescription className="usuarios-modal-descricao">
               Preencha os dados do kit para {editandoKit ? 'editar' : 'cadastrar'}.

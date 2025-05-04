@@ -149,6 +149,7 @@ export default function Usuarios() {
             </Button>
           </DialogTrigger>
           <DialogContent className="dashboard-modal dashboard-no-close">
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
             <DialogTitle>Novo Usuário</DialogTitle>
             <DialogDescription className="usuarios-modal-descricao">
               Preencha as informações do novo usuário.
@@ -238,13 +239,17 @@ export default function Usuarios() {
       </div>
 
       <Dialog open={confirmarModalAberto} onOpenChange={setConfirmarModalAberto}>
+        <DialogOverlay className="dialog-overlay" />
         <DialogContent className="dashboard-modal dashboard-no-close">
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
           <DialogTitle>Confirmação</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao">
             {usuarioSelecionado?.ativo
               ? `Tem certeza que deseja desativar ${usuarioSelecionado?.nome}?`
               : `Tem certeza que deseja ativar ${usuarioSelecionado?.nome}?`}
           </DialogDescription>
+
           <div className="usuarios-modal-actions">
             <Button variant="outline" onClick={() => setConfirmarModalAberto(false)}>Cancelar</Button>
             <Button
@@ -256,6 +261,7 @@ export default function Usuarios() {
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

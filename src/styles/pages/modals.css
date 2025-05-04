@@ -151,3 +151,12 @@
     display: none !important;
   }
   
+  .dashboard-no-close button[aria-label="Close"] {
+    display: none !important;
+  }
+
+  /* Esconde o botão X (fechar) do Dialog */
+.dialog-content button[aria-label="Close"],
+.dialog-content > button.absolute.top-4.right-4 {
+  display: none !important;
+}

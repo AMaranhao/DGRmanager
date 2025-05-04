@@ -148,6 +148,9 @@ export default function Dashboard() {
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
+          {/* Estilo inline para ocultar o botão de fechar */}
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
           <div className="dashboard-modal-title">Confirmação de Senha</div>
           <div className="dashboard-modal-description">
             Digite a senha de 4 dígitos para confirmar a ação.
@@ -177,6 +180,7 @@ export default function Dashboard() {
             </div>
           )}
         </DialogContent>
+
       </Dialog>
     </div>
   );
