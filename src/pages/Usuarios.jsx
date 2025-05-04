@@ -144,8 +144,9 @@ export default function Usuarios() {
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
-            <Button>
-              <Plus size={16} className="mr-2" /> Novo Usuário
+            <Button className="usuarios-btn-material">
+              <Plus size={18} className="mr-2" />
+              Novo Usuário
             </Button>
           </DialogTrigger>
           <DialogContent className="dashboard-modal dashboard-no-close">
@@ -221,15 +222,14 @@ export default function Usuarios() {
                   </span>
                 </td>
                 <td className="usuarios-acoes">
-                  <Button
-                    size="sm"
-                    variant={usuario.ativo ? "destructive" : "default"}
-                    onClick={() => handleAtivarDesativar(usuario)}
-                    className="flex gap-1"
-                  >
-                    <Trash size={14} />
-                    {usuario.ativo ? "Desativar" : "Ativar"}
-                  </Button>
+                <Button
+                  variant={usuario.ativo ? "destructive" : "default"}
+                  onClick={() => handleAtivarDesativar(usuario)}
+                  className={"ativar-desativar-btn"}
+                >
+                  <Trash size={18} className="mr-2" />
+                  {usuario.ativo ? "Desativar" : "Ativar"}
+                </Button>
                 </td>
               </tr>
             ))}

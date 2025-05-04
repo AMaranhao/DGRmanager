@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {Tabs,TabsList,TabsTrigger,TabsContent,} from '@/components/ui/tabs';
+import {Tabs,TabsContent,} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import '@/styles/pages/filters.css';
 import '@/styles/pages/status.css';
 import '@/styles/pages/tables.css';
 
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 export default function Infraestrutura() {
   const [tab, setTab] = useState('predios');
@@ -64,6 +64,10 @@ export default function Infraestrutura() {
       carregarAndaresPorPredio(formSala.predioId);
     }
   }, [formSala.predioId]);
+
+  const [buscaSala, setBuscaSala] = useState('');
+  const [buscaChaveSala, setBuscaChaveSala] = useState('');
+  const [buscaKitsSala, setBuscaKitsSala] = useState('');
 
   const carregarAndaresPorPredio = async (predioId) => {
     const andares = await fetchAndaresPorPredio(predioId);
@@ -191,7 +195,7 @@ const confirmarExclusaoItem = async () => {
       numeracaoArmario: chave.numeracaoArmario || '',
       predioId: chave.predioId || '',
       andarId: chave.andarId || '',
-      sala: chave.sala || null,
+      sala: chave.sala?.id ? chave.sala : null,
     });
     setModalChaveAberto(true);
   };
@@ -214,12 +218,19 @@ const confirmarExclusaoItem = async () => {
       <h1 className="dashboard-heading">Infraestrutura</h1>
 
       <Tabs defaultValue="predios" value={tab} onValueChange={setTab} className="infraestrutura-tabs">
-        <TabsList className="infraestrutura-tabs-list">
-          <TabsTrigger value="predios">Prédios</TabsTrigger>
-          <TabsTrigger value="salas">Salas</TabsTrigger>
-          <TabsTrigger value="chaves">Chaves</TabsTrigger>
-          <TabsTrigger value="kits">Kits</TabsTrigger>
-        </TabsList>
+      <div className="dashboard-select-wrapper mb-6">
+        <select
+          value={tab}
+          onChange={(e) => setTab(e.target.value)}
+          className="dashboard-select"
+        >
+          <option value="predios">Prédios</option>
+          <option value="salas">Salas</option>
+          <option value="chaves">Chaves</option>
+          <option value="kits">Kits</option>
+        </select>
+      </div>
+
 
         <Dialog open={modalConfirmarAberto} onOpenChange={setModalConfirmarAberto}>
           <DialogOverlay className="dialog-overlay" />
@@ -252,8 +263,9 @@ const confirmarExclusaoItem = async () => {
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
-                <Button onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
-                  + Cadastrar Prédio
+                <Button className="usuarios-btn-material" onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
+                <Plus size={18} className="mr-2" />
+                  Cadastrar Predio
                 </Button>
               </DialogTrigger>
               <DialogContent className="usuarios-modal">
@@ -355,21 +367,52 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Salas */}
         <TabsContent value="salas">
           <div className="infraestrutura-section">
+
+            <div className="dashboard-filtro">
+              <div className="dashboard-filtro-usuario">
+                <input
+                  type="text"
+                  placeholder="Buscar por número da sala"
+                  value={buscaSala}
+                  onChange={(e) => setBuscaSala(e.target.value)}
+                  className="dashboard-select dashboard-filtro-usuario-input"
+                />
+                {buscaSala && (
+                  <button
+                    onClick={() => setBuscaSala('')}
+                    className="dashboard-filtro-clear"
+                    title="Limpar"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
             <h2 className="infraestrutura-section-title">Lista de Salas</h2>
+
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
               <DialogOverlay className="dialog-overlay" />
 
               <DialogTrigger asChild>
-                <Button onClick={() => { setEditandoSala(null); setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });}}>
-                  + Cadastrar Sala
+                <Button
+                  className="usuarios-btn-material"
+                  onClick={() => {
+                    setEditandoSala(null);
+                    setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });
+                  }}
+                >
+                  <Plus size={18} className="mr-2" />
+                  Cadastrar Sala
                 </Button>
               </DialogTrigger>
+
               <DialogContent className="usuarios-modal">
                 <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
                 <DialogTitle>{editandoSala ? 'Editar Sala' : 'Nova Sala'}</DialogTitle>
-                  <DialogDescription className="usuarios-modal-descricao">
-                    Preencha os dados da sala para {editandoSala ? 'editar' : 'cadastrar'}.
-                  </DialogDescription>
+                <DialogDescription className="usuarios-modal-descricao">
+                  Preencha os dados da sala para {editandoSala ? 'editar' : 'cadastrar'}.
+                </DialogDescription>
 
                   <div className="usuarios-input-wrapper">
                     <Input
@@ -455,297 +498,354 @@ const confirmarExclusaoItem = async () => {
                   <div className="usuarios-modal-actions">
                     <Button onClick={() => salvarOuEditar('sala')}>Salvar</Button>
                   </div>
-              </DialogContent>
+                </DialogContent>
+              </Dialog>
+              </div>
 
+              <div className="usuarios-tabela-wrapper">
+                <table className="usuarios-tabela">
+                  <thead>
+                    <tr>
+                      <th>Número</th>
+                      <th>Tipo</th>
+                      <th>Andar</th>
+                      <th>Ativa</th>
+                      <th className="tabela-col-acoes">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {salas
+                      .filter((sala) =>
+                        sala.numero?.toLowerCase().includes(buscaSala.toLowerCase())
+                      )
+                      .map((sala) => (
+                        <tr key={sala.id}>
+                          <td>{sala.numero}</td>
+                          <td>{sala.tipo}</td>
+                          <td>{sala.andar?.nome}</td>
+                          <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
+                          <td className="tabela-col-acoes">
+                            <Button variant="outline" onClick={() => handleEditarSala(sala)}>Editar</Button>
+                            <Button variant="destructive" onClick={() => abrirModalConfirmacao('sala', sala.id)}>Excluir</Button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+
+        {/* Aba de Chaves */}
+        <TabsContent value="chaves">
+          <div className="infraestrutura-section">
+            {/* Filtro por número da sala */}
+            <div className="dashboard-filtro">
+              <div className="dashboard-filtro-usuario">
+                <input
+                  type="text"
+                  placeholder="Buscar por número da sala"
+                  value={buscaChaveSala}
+                  onChange={(e) => setBuscaChaveSala(e.target.value)}
+                  className="dashboard-select dashboard-filtro-usuario-input"
+                />
+                {buscaChaveSala && (
+                  <button
+                    onClick={() => setBuscaChaveSala('')}
+                    className="dashboard-filtro-clear"
+                    title="Limpar"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
+
+            <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
+              <DialogOverlay className="dialog-overlay" />  
+              <DialogTrigger asChild>
+                <Button className="usuarios-btn-material" onClick={() => setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null })}>
+                  <Plus size={18} className="mr-2" />
+                  Cadastrar Chave
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="usuarios-modal">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+                <DialogTitle>{editandoChave ? 'Editar Chave' : 'Nova Chave'}</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">
+                  Preencha os dados da chave para {editandoChave ? 'editar' : 'cadastrar'}.
+                </DialogDescription>
+
+                {/* Campos do formulário */}
+                <div className="usuarios-input-wrapper">
+                  <Input
+                    placeholder="Número da chave"
+                    value={formChave.numero}
+                    onChange={e => setFormChave({ ...formChave, numero: e.target.value })}
+                    className="usuarios-modal-input"
+                  />
+                  {formChave.numero && (
+                    <button
+                      className="dashboard-filtro-clear"
+                      onClick={() => setFormChave({ ...formChave, numero: '' })}
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="usuarios-input-wrapper">
+                  <Input
+                    placeholder="Numeração do Armário"
+                    value={formChave.numeracaoArmario}
+                    onChange={e => setFormChave({ ...formChave, numeracaoArmario: e.target.value })}
+                    className="usuarios-modal-input"
+                  />
+                  {formChave.numeracaoArmario && (
+                    <button
+                      className="dashboard-filtro-clear"
+                      onClick={() => setFormChave({ ...formChave, numeracaoArmario: '' })}
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <select
+                  value={formChave.predioId}
+                  onChange={e => {
+                    const id = e.target.value;
+                    setFormChave({ ...formChave, predioId: id, andarId: '', sala: null });
+                    carregarAndaresPorPredio(id);
+                  }}
+                  className="usuarios-modal-select"
+                >
+                  <option value=''>Selecione o Prédio</option>
+                  {prediosDisponiveis.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </select>
+
+                <select
+                  value={formChave.andarId || ''}
+                  onChange={e => {
+                    const id = e.target.value;
+                    setFormChave({ ...formChave, andarId: id, sala: null });
+                    carregarSalasPorAndar(id);
+                  }}
+                  className="usuarios-modal-select"
+                  disabled={!formChave.predioId}
+                >
+                  <option value=''>Selecione o Andar</option>
+                  {andaresDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                </select>
+
+                <select
+                  value={formChave.sala?.id || ''}
+                  onChange={e => setFormChave({ ...formChave, sala: salasFiltradas.find(s => s.id === Number(e.target.value)) })}
+                  className="usuarios-modal-select"
+                  disabled={!formChave.andarId}
+                >
+                  <option value=''>Selecione a Sala</option>
+                  {salasFiltradas.map(s => <option key={s.id} value={s.id}>{s.numero}</option>)}
+                </select>
+
+                <div className="usuarios-modal-actions">
+                  <Button onClick={() => salvarOuEditar('chave')}>Salvar</Button>
+                </div>
+              </DialogContent>
             </Dialog>
           </div>
+
           <div className="usuarios-tabela-wrapper">
             <table className="usuarios-tabela">
               <thead>
                 <tr>
                   <th>Número</th>
-                  <th>Tipo</th>
-                  <th>Andar</th>
-                  <th>Ativa</th>
+                  <th>Armário</th>
+                  <th>Sala</th>
                   <th className="tabela-col-acoes">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {salas.map((sala) => (
-                  <tr key={sala.id}>
-                    <td>{sala.numero}</td>
-                    <td>{sala.tipo}</td>
-                    <td>{sala.andar?.nome}</td>
-                    <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
-                    <td className="tabela-col-acoes">
-                      <Button variant="outline" onClick={() => handleEditarSala(sala)}>Editar</Button>
-                      <Button variant="destructive" onClick={() => abrirModalConfirmacao('sala', sala.id)}>Excluir</Button>
-                    </td>
-                  </tr>
-                ))}
+                {chaves
+                  .filter((chave) =>
+                    chave.sala?.numero?.toLowerCase().includes(buscaChaveSala.toLowerCase())
+                  )
+                  .map((chave) => (
+                    <tr key={chave.id}>
+                      <td>{chave.numero}</td>
+                      <td>{chave.numeracaoArmario}</td>
+                      <td>{chave.sala?.numero || ''}</td>
+                      <td className="tabela-col-acoes">
+                        <Button variant="outline" onClick={() => handleEditarChave(chave)}>Editar</Button>
+                        <Button variant="destructive" onClick={() => abrirModalConfirmacao('chave', chave.id)}>Excluir</Button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
         </TabsContent>
 
-        {/* Aba de Chaves */}
-        <TabsContent value="chaves">
-        <div className="infraestrutura-section">
-        <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
-        <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
-         <DialogOverlay className="dialog-overlay" />  
-          <DialogTrigger asChild>
-            <Button onClick={() => setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null })}>
-              + Cadastrar Chave
-              </Button>
-          </DialogTrigger>
-          <DialogContent className="usuarios-modal">
-                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-            <DialogTitle>{editandoChave ? 'Editar Chave' : 'Nova Chave'}</DialogTitle>
-            <DialogDescription className="usuarios-modal-descricao">
-              Preencha os dados da chave para {editandoChave ? 'editar' : 'cadastrar'}.
-            </DialogDescription>
-
-            <div className="usuarios-input-wrapper">
-              <Input
-                placeholder="Número da chave"
-                value={formChave.numero}
-                onChange={e => setFormChave({ ...formChave, numero: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formChave.numero && (
-                <button
-                  className="dashboard-filtro-clear"
-                  onClick={() => setFormChave({ ...formChave, numero: '' })}
-                  title="Limpar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
-            <div className="usuarios-input-wrapper">
-              <Input
-                placeholder="Numeração do Armário"
-                value={formChave.numeracaoArmario}
-                onChange={e => setFormChave({ ...formChave, numeracaoArmario: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formChave.numeracaoArmario && (
-                <button
-                  className="dashboard-filtro-clear"
-                  onClick={() => setFormChave({ ...formChave, numeracaoArmario: '' })}
-                  title="Limpar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
-            <select
-                value={formChave.predioId}
-                onChange={e => {
-                  const id = e.target.value;
-                  setFormChave({ ...formChave, predioId: id, andarId: '', sala: null });
-                  carregarAndaresPorPredio(id);
-                }}
-                className="usuarios-modal-select"
-              >
-                <option value=''>Selecione o Prédio</option>
-                {prediosDisponiveis.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-              </select>
-
-              <select
-                value={formChave.andarId || ''}
-                onChange={e => {
-                  const id = e.target.value;
-                  setFormChave({ ...formChave, andarId: id, sala: null });
-                  carregarSalasPorAndar(id);
-                }}
-                className="usuarios-modal-select"
-                disabled={!formChave.predioId}
-              >
-                <option value=''>Selecione o Andar</option>
-                {andaresDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-              </select>
-
-              <select
-                value={formChave.sala?.id || ''}
-                onChange={e => setFormChave({ ...formChave, sala: salasFiltradas.find(s => s.id === Number(e.target.value)) })}
-                className="usuarios-modal-select"
-                disabled={!formChave.andarId}
-              >
-                <option value=''>Selecione a Sala</option>
-                {salasFiltradas.map(s => <option key={s.id} value={s.id}>{s.numero}</option>)}
-              </select>
-
-
-            <div className="usuarios-modal-actions">
-              <Button onClick={() => salvarOuEditar('chave')}>Salvar</Button>
-            </div>
-          </DialogContent>
-
-        </Dialog>
-        </div>
-
-        <div className="usuarios-tabela-wrapper">
-          <table className="usuarios-tabela">
-            <thead>
-              <tr>
-                <th>Número</th>
-                <th>Armário</th>
-                <th>Sala</th>
-                <th className="tabela-col-acoes">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {chaves.map((chave) => (
-                <tr key={chave.id}>
-                  <td>{chave.numero}</td>
-                  <td>{chave.numeracaoArmario}</td>
-                  <td>{chave.salaNumero}</td>
-                  <td className="tabela-col-acoes">
-                    <Button variant="outline" onClick={() => handleEditarChave(chave)}>Editar</Button>
-                    <Button variant="destructive" onClick={() => abrirModalConfirmacao('chave', chave.id)}>Excluir</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </TabsContent>
-
         {/* Aba de Kits */}
         <TabsContent value="kits">
           <div className="infraestrutura-section">
+            {/* Filtro por número da sala */}
+            <div className="dashboard-filtro">
+              <div className="dashboard-filtro-usuario">
+                <input
+                  type="text"
+                  placeholder="Buscar por número da sala"
+                  value={buscaKitsSala}
+                  onChange={(e) => setBuscaKitsSala(e.target.value)}
+                  className="dashboard-select dashboard-filtro-usuario-input"
+                />
+                {buscaKitsSala && (
+                  <button
+                    onClick={() => setBuscaKitsSala('')}
+                    className="dashboard-filtro-clear"
+                    title="Limpar"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
             <h2 className="infraestrutura-section-title">Lista de Kits</h2>
+
             <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
               <DialogOverlay className="dialog-overlay" />
-          <DialogTrigger asChild>
-            <Button onClick={() => setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' })}>+ Cadastrar Kit</Button>
-          </DialogTrigger>
-          <DialogContent className="usuarios-modal">
+              <DialogTrigger asChild>
+                <Button className="usuarios-btn-material" onClick={() => setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' })}>
+                  <Plus size={18} className="mr-2" />
+                  Cadastrar Kit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="usuarios-modal">
                 <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-            <DialogTitle>{editandoKit ? 'Editar Kit' : 'Novo Kit'}</DialogTitle>
-            <DialogDescription className="usuarios-modal-descricao">
-              Preencha os dados do kit para {editandoKit ? 'editar' : 'cadastrar'}.
-            </DialogDescription>
+                <DialogTitle>{editandoKit ? 'Editar Kit' : 'Novo Kit'}</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">
+                  Preencha os dados do kit para {editandoKit ? 'editar' : 'cadastrar'}.
+                </DialogDescription>
 
-            <div className="usuarios-input-wrapper">
-              <Input
-                placeholder="Número do kit"
-                value={formKit.numero}
-                onChange={(e) => setFormKit({ ...formKit, numero: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formKit.numero && (
-                <button
-                  className="dashboard-filtro-clear"
-                  onClick={() => setFormKit({ ...formKit, numero: '' })}
-                  title="Limpar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <Input
+                    placeholder="Número do kit"
+                    value={formKit.numero}
+                    onChange={(e) => setFormKit({ ...formKit, numero: e.target.value })}
+                    className="usuarios-modal-input"
+                  />
+                  {formKit.numero && (
+                    <button
+                      className="dashboard-filtro-clear"
+                      onClick={() => setFormKit({ ...formKit, numero: '' })}
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
 
-            <div className="usuarios-input-wrapper">
-              <Input
-                placeholder="Numeração do Armário"
-                value={formKit.numeracaoArmario}
-                onChange={(e) => setFormKit({ ...formKit, numeracaoArmario: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formKit.numeracaoArmario && (
-                <button
-                  className="dashboard-filtro-clear"
-                  onClick={() => setFormKit({ ...formKit, numeracaoArmario: '' })}
-                  title="Limpar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <Input
+                    placeholder="Numeração do Armário"
+                    value={formKit.numeracaoArmario}
+                    onChange={(e) => setFormKit({ ...formKit, numeracaoArmario: e.target.value })}
+                    className="usuarios-modal-input"
+                  />
+                  {formKit.numeracaoArmario && (
+                    <button
+                      className="dashboard-filtro-clear"
+                      onClick={() => setFormKit({ ...formKit, numeracaoArmario: '' })}
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
 
-            <div className="usuarios-input-wrapper">
-              <select
-                value={formKit.predioId}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  setFormKit({ ...formKit, predioId: id, andarId: '', sala: null });
-                  carregarAndaresPorPredio(id);
-                }}
-                className="usuarios-modal-select"
-              >
-                <option value="">Selecione o Prédio</option>
-                {prediosDisponiveis.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nome}</option>
-                ))}
-              </select>
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <select
+                    value={formKit.predioId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setFormKit({ ...formKit, predioId: id, andarId: '', sala: null });
+                      carregarAndaresPorPredio(id);
+                    }}
+                    className="usuarios-modal-select"
+                  >
+                    <option value="">Selecione o Prédio</option>
+                    {prediosDisponiveis.map((p) => (
+                      <option key={p.id} value={p.id}>{p.nome}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="usuarios-input-wrapper">
-              <select
-                value={formKit.andarId || ''}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  setFormKit({ ...formKit, andarId: id, sala: null });
-                  carregarSalasPorAndar(id);
-                }}
-                className="usuarios-modal-select"
-                disabled={!formKit.predioId}
-              >
-                <option value="">Selecione o Andar</option>
-                {andaresDisponiveis.map((a) => (
-                  <option key={a.id} value={a.id}>{a.nome}</option>
-                ))}
-              </select>
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <select
+                    value={formKit.andarId || ''}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setFormKit({ ...formKit, andarId: id, sala: null });
+                      carregarSalasPorAndar(id);
+                    }}
+                    className="usuarios-modal-select"
+                    disabled={!formKit.predioId}
+                  >
+                    <option value="">Selecione o Andar</option>
+                    {andaresDisponiveis.map((a) => (
+                      <option key={a.id} value={a.id}>{a.nome}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="usuarios-input-wrapper">
-              <select
-                value={formKit.sala?.id || ''}
-                onChange={(e) =>
-                  setFormKit({
-                    ...formKit,
-                    sala: salasFiltradas.find((s) => s.id === Number(e.target.value)),
-                  })
-                }
-                className="usuarios-modal-select"
-                disabled={!formKit.andarId}
-              >
-                <option value="">Selecione a Sala</option>
-                {salasFiltradas.map((s) => (
-                  <option key={s.id} value={s.id}>{s.numero}</option>
-                ))}
-              </select>
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <select
+                    value={formKit.sala?.id || ''}
+                    onChange={(e) =>
+                      setFormKit({
+                        ...formKit,
+                        sala: salasFiltradas.find((s) => s.id === Number(e.target.value)),
+                      })
+                    }
+                    className="usuarios-modal-select"
+                    disabled={!formKit.andarId}
+                  >
+                    <option value="">Selecione a Sala</option>
+                    {salasFiltradas.map((s) => (
+                      <option key={s.id} value={s.id}>{s.numero}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="usuarios-input-wrapper">
-              <Input
-                placeholder="Tipo de Kit"
-                value={formKit.tipo}
-                onChange={(e) => setFormKit({ ...formKit, tipo: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formKit.tipo && (
-                <button
-                  className="dashboard-filtro-clear"
-                  onClick={() => setFormKit({ ...formKit, tipo: '' })}
-                  title="Limpar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+                <div className="usuarios-input-wrapper">
+                  <Input
+                    placeholder="Tipo de Kit"
+                    value={formKit.tipo}
+                    onChange={(e) => setFormKit({ ...formKit, tipo: e.target.value })}
+                    className="usuarios-modal-input"
+                  />
+                  {formKit.tipo && (
+                    <button
+                      className="dashboard-filtro-clear"
+                      onClick={() => setFormKit({ ...formKit, tipo: '' })}
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
 
-            <div className="usuarios-modal-actions">
-              <Button onClick={() => salvarOuEditar('kit')}>Salvar</Button>
-            </div>
-          </DialogContent>
-
-        </Dialog>
+                <div className="usuarios-modal-actions">
+                  <Button onClick={() => salvarOuEditar('kit')}>Salvar</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
+
           <div className="usuarios-tabela-wrapper">
             <table className="usuarios-tabela">
               <thead>
@@ -758,22 +858,27 @@ const confirmarExclusaoItem = async () => {
                 </tr>
               </thead>
               <tbody>
-                {kits.map((kit) => (
-                  <tr key={kit.id}>
-                    <td>{kit.numero}</td>
-                    <td>{kit.numeracaoArmario}</td>
-                    <td>{kit.salaNumero}</td>
-                    <td>{kit.tipo}</td>
-                    <td className="tabela-col-acoes">
-                      <Button variant="outline" onClick={() => handleEditarKit(kit)}>Editar</Button>
-                      <Button variant="destructive" onClick={() => abrirModalConfirmacao('kit', kit.id)}>Excluir</Button>
-                    </td>
-                  </tr>
-                ))}
+                {kits
+                  .filter((kit) =>
+                    kit.sala?.numero?.toLowerCase().includes(buscaKitsSala.toLowerCase())
+                  )
+                  .map((kit) => (
+                    <tr key={kit.id}>
+                      <td>{kit.numero}</td>
+                      <td>{kit.numeracaoArmario}</td>
+                      <td>{kit.sala?.numero || ''}</td>
+                      <td>{kit.tipo}</td>
+                      <td className="tabela-col-acoes">
+                        <Button variant="outline" onClick={() => handleEditarKit(kit)}>Editar</Button>
+                        <Button variant="destructive" onClick={() => abrirModalConfirmacao('kit', kit.id)}>Excluir</Button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
         </TabsContent>
+
       </Tabs>
     </div>
   );

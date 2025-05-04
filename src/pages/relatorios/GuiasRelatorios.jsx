@@ -1,8 +1,8 @@
 // Estrutura inicial sugerida para o módulo de relatórios:
 
-// src/pages/relatorios/Relatorios.jsx
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-
+// src/pages/relatorios/GuiasRelatorios.jsx
+import { useState } from 'react';
+//import { Select } from '@/components/ui/select'; // Se estiver usando um Select customizado
 import RelatorioEmprestimosPeriodo from "./RelatorioEmprestimosPeriodo";
 import RelatorioHistoricoUtilizacaoAndar from "./RelatorioHistoricoUtilizacaoAndar";
 import RelatorioHistoricoUtilizacaoSala from "./RelatorioHistoricoUtilizacaoSala";
@@ -12,51 +12,51 @@ import RelatorioEmprestimosAtrasados from "./RelatorioEmprestimosAtrasados";
 import RelatorioRelatorioCompleto from "./RelatorioRelatorioCompleto";
 
 export default function GuiasRelatorios() {
+  const [relatorioSelecionado, setRelatorioSelecionado] = useState("emprestimos");
+
+  const renderRelatorio = () => {
+    switch (relatorioSelecionado) {
+      case "emprestimos":
+        return <RelatorioEmprestimosPeriodo />;
+      case "historico-andar":
+        return <RelatorioHistoricoUtilizacaoAndar />;
+      case "historico-sala":
+        return <RelatorioHistoricoUtilizacaoSala />;
+      case "historico-usuarios":
+        return <RelatorioHistoricoUtilizacaoUsuarios />;
+      case "salas":
+        return <RelatorioSalasMaisUtilizadas />;
+      case "emprestimos-atrasados":
+        return <RelatorioEmprestimosAtrasados />;
+      case "completo":
+        return <RelatorioRelatorioCompleto />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="p-8">
-      <h3 className="dashboard-heading">Relatórios</h3>
+      <h3 className="dashboard-heading mb-4">Relatórios</h3>
 
-        <Tabs defaultValue="emprestimos" className="w-full">
-            <TabsList className="mb-6">
-                <TabsTrigger value="emprestimos">Empréstimos</TabsTrigger>
-                <TabsTrigger value="historico-andar">Historico de Uso  por Andar</TabsTrigger>
-                <TabsTrigger value="historico-sala">Historico de Uso por Sala</TabsTrigger>
-                <TabsTrigger value="historico-usuarios">Historico de Uso por Usuários</TabsTrigger>
-                <TabsTrigger value="salas">Salas Mais Utilizadas</TabsTrigger>
-                <TabsTrigger value="emprestimos-atrasados">Emprestimos Atrasados</TabsTrigger>
-                <TabsTrigger value="completo">Relatorio Completo</TabsTrigger>
-            </TabsList>
+      <div className="mb-6">
+        <select
+          className="dashboard-select"
+          value={relatorioSelecionado}
+          onChange={(e) => setRelatorioSelecionado(e.target.value)}
+        >
+          <option value="emprestimos">Empréstimos</option>
+          <option value="historico-andar">Histórico de Uso por Andar</option>
+          <option value="historico-sala">Histórico de Uso por Sala</option>
+          <option value="historico-usuarios">Histórico de Uso por Usuários</option>
+          <option value="salas">Salas Mais Utilizadas</option>
+          <option value="emprestimos-atrasados">Empréstimos Atrasados</option>
+          <option value="completo">Relatório Completo</option>
+        </select>
+      </div>
 
-            <TabsContent value="emprestimos">
-                <RelatorioEmprestimosPeriodo/>
-            </TabsContent>
-
-            <TabsContent value="historico-andar">
-              <RelatorioHistoricoUtilizacaoAndar/>
-            </TabsContent>
-
-
-            <TabsContent value="historico-sala">
-                <RelatorioHistoricoUtilizacaoSala/>
-            </TabsContent>
-
-            <TabsContent value="historico-usuarios">
-                <RelatorioHistoricoUtilizacaoUsuarios/>
-            </TabsContent>
-
-            <TabsContent value="salas">
-                <RelatorioSalasMaisUtilizadas/>
-            </TabsContent>
-
-            <TabsContent value="emprestimos-atrasados">
-                <RelatorioEmprestimosAtrasados/>
-            </TabsContent>
-
-            <TabsContent value="completo">
-                <RelatorioRelatorioCompleto />
-            </TabsContent>
-
-        </Tabs>
+      <div>{renderRelatorio()}</div>
     </div>
   );
 }
+

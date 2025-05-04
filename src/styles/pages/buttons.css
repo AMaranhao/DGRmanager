@@ -74,4 +74,31 @@
   color: #374151; /* hover:text-gray-700 */
 }
 
+.usuarios-btn-material:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.usuarios-btn-material {
+  background-color: #0d2a68; /* azul */
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.usuarios-btn-material:hover {
+  background-color: black;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.ativar-desativar-btn{
+  min-height: 1rem;
+}
 
