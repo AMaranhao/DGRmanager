@@ -113,23 +113,32 @@ export default function RelatorioSalasMaisUtilizadas() {
         <div className="relatorios-sem-dados">
           Nenhum dado encontrado nesse período.
         </div>
-      ) : (
-        <div className="relatorios-grid">
-          {salasOrdenadas.map(([sala, quantidade]) => (
-            <div key={sala} className="relatorios-cartao">
-              <h3 className="relatorios-cartao-nome">Sala: {sala}</h3>
-              <p className="relatorios-info">Utilizações: {quantidade}</p>
-            </div>
-          ))}
+        ) : (
+        <div className="emprestimos-tabela-wrapper">
+          <table className="emprestimos-tabela">
+            <thead>
+              <tr>
+                <th>Sala</th>
+                <th>Quantidade de Utilizações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {salasOrdenadas.map(([sala, quantidade]) => (
+                <tr key={sala}>
+                  <td>{sala}</td>
+                  <td>{quantidade}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="text-right text-sm font-medium mt-2">
+            Total Geral de Utilizações:{" "}
+            {salasOrdenadas.reduce((acc, [, quant]) => acc + quant, 0)}
+          </div>
         </div>
       )}
 
-      {/* Total geral */}
-      {salasOrdenadas.length > 0 && (
-        <div className="relatorios-total-final">
-          Total Geral de Utilizações: {salasOrdenadas.reduce((acc, [, quant]) => acc + quant, 0)}
-        </div>
-      )}
+
     </div>
   );
 }

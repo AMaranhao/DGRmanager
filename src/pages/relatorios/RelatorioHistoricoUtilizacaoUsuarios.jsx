@@ -36,7 +36,10 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const usuarioFiltrado = usuarioSelecionado ? emp.usuario === usuarioSelecionado : true;
+    const usuarioFiltrado = usuarioSelecionado
+    ? emp.usuario.toLowerCase().includes(usuarioSelecionado.toLowerCase())
+    : true;
+  
 
     return dentroDataInicio && dentroDataFim && usuarioFiltrado;
   });
@@ -108,18 +111,13 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
         </div>
 
         <div className="relatorios-filtro-group relatorios-filtro-text">
-          <select
+          <Input
+            type="text"
+            placeholder="Filtrar por usuário"
             value={usuarioSelecionado}
             onChange={(e) => setUsuarioSelecionado(e.target.value)}
-            className="dashboard-select"
-          >
-            <option value="">Todos os usuários</option>
-            {usuariosUnicos.map((usuario) => (
-              <option key={usuario} value={usuario}>
-                {usuario}
-              </option>
-            ))}
-          </select>
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
           {usuarioSelecionado && (
             <button
               type="button"
@@ -131,6 +129,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
             </button>
           )}
         </div>
+
       </div>
 
       {/* Resultado */}
@@ -138,34 +137,44 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
         <div className="relatorios-sem-dados">
           Nenhuma utilização encontrada nesse período.
         </div>
-      ) : (
+       ) : (
         Object.keys(dadosAgrupados)
           .sort()
           .map((usuario) => {
             const utilizacoes = dadosAgrupados[usuario];
             return (
-              <div key={usuario} className="relatorios-cartao">
-                <h3 className="relatorios-cartao-nome">
-                  {usuario} - {utilizacoes.length} utilização(ões)
-                </h3>
-
-                <div className="relatorios-grid">
-                  {utilizacoes.map((emp) => (
-                    <div key={emp.id} className="relatorios-card-inner">
-                      <p className="relatorios-label"><strong>Sala:</strong> {emp.sala?.numero}</p>
-                      <p className="relatorios-info">
-                        <strong>Retirada:</strong>{" "}
-                        {emp.horario_retirada
-                          ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
-                          : "Não informado"}
-                      </p>
-                    </div>
-                  ))}
+              <div key={usuario} className="space-y-2">
+                <h3 className="relatorios-cartao-nome text-left">{usuario}</h3>
+                <div className="emprestimos-tabela-wrapper">
+                  <table className="emprestimos-tabela">
+                    <thead>
+                      <tr>
+                        <th>Sala</th>
+                        <th>Horário de Retirada</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {utilizacoes.map((emp) => (
+                        <tr key={emp.id}>
+                          <td>{emp.sala?.numero}</td>
+                          <td>
+                            {emp.horario_retirada
+                              ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
+                              : "Não informado"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="text-right text-sm font-medium mt-1">
+                    Total de utilizações: {utilizacoes.length}
+                  </div>
                 </div>
               </div>
             );
           })
       )}
+
     </div>
   );
 }

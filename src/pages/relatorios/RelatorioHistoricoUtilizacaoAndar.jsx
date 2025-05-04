@@ -1,6 +1,8 @@
 import "@/styles/pages/relatorios.css";
 import "@/styles/pages/filters.css";
 import "@/styles/pages/buttons.css";
+import "@/styles/pages/tables.css";
+
 
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
@@ -140,35 +142,50 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
         <div className="relatorios-sem-dados">
           Nenhum empréstimo encontrado nesse período.
         </div>
-      ) : (
+       ) : (
         Object.keys(dadosAgrupados)
           .filter((andar) => andarSelecionado === "" || andar === andarSelecionado)
           .sort()
           .map((andar) => {
-            const total = dadosAgrupados[andar].length;
+            const emprestimosDoAndar = dadosAgrupados[andar];
             return (
-              <div key={andar} className="relatorios-cartao">
-                <h3 className="relatorios-cartao-nome">
-                  Andar {andar} - {total} utilização(ões)
+              <div key={andar} className="space-y-2">
+                <h3 className="relatorios-cartao-nome text-left">
+                  Andar {andar}
                 </h3>
-                <div className="relatorios-grid">
-                  {dadosAgrupados[andar].map((emp) => (
-                    <div key={emp.id} className="relatorios-card-inner">
-                      <p className="relatorios-label">{emp.usuario}</p>
-                      <p className="relatorios-info"><strong>Sala:</strong> {emp.sala?.numero}</p>
-                      <p className="relatorios-info">
-                        <strong>Retirada:</strong>{" "}
-                        {emp.horario_retirada
-                          ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
-                          : "Não informado"}
-                      </p>
-                    </div>
-                  ))}
+                <div className="emprestimos-tabela-wrapper">
+                  <table className="emprestimos-tabela">
+                    <thead>
+                      <tr>
+                        <th>Usuário</th>
+                        <th>Sala</th>
+                        <th>Horário de Retirada</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {emprestimosDoAndar.map((emp) => (
+                        <tr key={emp.id}>
+                          <td>{emp.usuario}</td>
+                          <td>{emp.sala?.numero}</td>
+                          <td>
+                            {emp.horario_retirada
+                              ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
+                              : "Não informado"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="text-right text-sm font-medium mt-1">
+                    Total de utilizações: {emprestimosDoAndar.length}
+                  </div>
                 </div>
               </div>
             );
           })
       )}
+
+
     </div>
   );
 }

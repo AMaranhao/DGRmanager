@@ -148,7 +148,7 @@ export default function Usuarios() {
               <Plus size={16} className="mr-2" /> Novo Usuário
             </Button>
           </DialogTrigger>
-          <DialogContent className="usuarios-modal">
+          <DialogContent className="dashboard-modal dashboard-no-close">
             <DialogTitle>Novo Usuário</DialogTitle>
             <DialogDescription className="usuarios-modal-descricao">
               Preencha as informações do novo usuário.
@@ -238,7 +238,7 @@ export default function Usuarios() {
       </div>
 
       <Dialog open={confirmarModalAberto} onOpenChange={setConfirmarModalAberto}>
-        <DialogContent className="usuarios-modal">
+        <DialogContent className="dashboard-modal dashboard-no-close">
           <DialogTitle>Confirmação</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao">
             {usuarioSelecionado?.ativo

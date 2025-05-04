@@ -134,36 +134,23 @@ export default function RelatorioRelatorioCompleto() {
           )}
         </div>
 
-        {/* Sala */}
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="text"
-            placeholder="Filtrar por Sala"
-            value={salaFiltro}
-            onChange={(e) => setSalaFiltro(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {salaFiltro && (
-            <button
-              type="button"
-              onClick={() => setSalaFiltro("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
         {/* Andar */}
         <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="text"
-            placeholder="Filtrar por Andar (ex: A, B, C)"
+          <select
             value={andarFiltro}
             onChange={(e) => setAndarFiltro(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
+            className="dashboard-select"
+          >
+            <option value="">Todos os Andares</option>
+            {[...new Set(emprestimos.map(emp => emp.sala?.numero?.charAt(0).toUpperCase()))]
+              .filter(Boolean)
+              .sort()
+              .map((andar) => (
+                <option key={andar} value={andar}>
+                  Andar {andar}
+                </option>
+              ))}
+          </select>
           {andarFiltro && (
             <button
               type="button"
@@ -175,6 +162,46 @@ export default function RelatorioRelatorioCompleto() {
             </button>
           )}
         </div>
+
+        {/* Sala */}
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <select
+              value={salaFiltro}
+              onChange={(e) => setSalaFiltro(e.target.value)}
+              className="dashboard-select"
+            >
+              <option value="">Todas as Salas</option>
+              {[...new Set(
+                emprestimos
+                  .filter(emp => {
+                    if (!andarFiltro) return true;
+                    return emp.sala?.numero?.startsWith(andarFiltro.toUpperCase());
+                  })
+                  .map(emp => emp.sala?.numero)
+              )]
+                .filter(Boolean)
+                .sort()
+                .map((sala) => (
+                  <option key={sala} value={sala}>
+                    Sala {sala}
+                  </option>
+                ))}
+            </select>
+            {salaFiltro && (
+              <button
+                type="button"
+                onClick={() => setSalaFiltro("")}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+
+
+
       </div>
 
       {/* Resultado */}
@@ -182,23 +209,45 @@ export default function RelatorioRelatorioCompleto() {
         <div className="relatorios-sem-dados">
           Nenhum empréstimo encontrado com esses filtros.
         </div>
-      ) : (
-        <div className="relatorios-grid">
-          {emprestimosFiltrados.map((emp) => (
-            <div key={emp.id} className="relatorios-cartao">
-              <h3 className="relatorios-cartao-nome">{emp.usuario}</h3>
-              <p className="relatorios-info"><strong>Sala:</strong> {emp.sala?.numero}</p>
-              <p className="relatorios-info"><strong>Status:</strong> {emp.status ?? "Indefinido"}</p>
-              <p className="relatorios-info">
-                <strong>Retirada:</strong>{" "}
-                {emp.horario_retirada
-                  ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
-                  : "Não informado"}
-              </p>
-            </div>
-          ))}
+       ) : (
+        <div className="emprestimos-tabela-wrapper">
+          <table className="emprestimos-tabela">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Sala</th>
+                <th>Status</th>
+                <th>Horário de Retirada</th>
+                <th>Horário de Devolução</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emprestimosFiltrados.map((emp) => (
+                <tr key={emp.id}>
+                  <td>{emp.usuario}</td>
+                  <td>{emp.sala?.numero}</td>
+                  <td>{emp.status ?? "Indefinido"}</td>
+                  <td>
+                    {emp.horario_retirada
+                      ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
+                      : "Não informado"}
+                  </td>
+                  <td>
+                    {emp.horario_devolucao
+                      ? format(parseISO(emp.horario_devolucao), "dd/MM/yyyy HH:mm")
+                      : "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="text-right text-sm font-medium mt-2">
+            Total de registros: {emprestimosFiltrados.length}
+          </div>
         </div>
       )}
+
+
     </div>
   );
 }

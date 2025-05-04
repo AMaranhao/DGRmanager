@@ -1,6 +1,8 @@
 import "@/styles/pages/relatorios.css";
 import "@/styles/pages/filters.css";
 import "@/styles/pages/buttons.css";
+import "@/styles/pages/tables.css";
+
 
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
@@ -154,24 +156,61 @@ export default function RelatorioEmprestimosAtrasados() {
         <div className="relatorios-sem-dados">
           Nenhum usuário encontrado com esses filtros.
         </div>
-      ) : (
-        <div className="relatorios-grid">
-          {usuariosFiltrados.map((emp) => (
-            <div key={emp.id} className="relatorios-cartao">
-              <h3 className="relatorios-cartao-nome">{emp.usuario}</h3>
-              <p className="relatorios-cartao-info">
-                <strong>Sala:</strong> {emp.sala?.numero}
-              </p>
-              <p className="relatorios-cartao-info">
-                <strong>Retirada:</strong>{" "}
-                {emp.horario_retirada
-                  ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
-                  : "Não informado"}
-              </p>
-            </div>
-          ))}
+        ) : (
+        <div className="emprestimos-tabela-wrapper">
+          <table className="emprestimos-tabela">
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>Sala</th>
+              <th>Horário de Retirada</th>
+              <th>Tempo de Atraso</th>
+            </tr>
+          </thead>
+            <tbody>
+              {usuariosFiltrados.map((emp) => {
+                const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
+                const agora = new Date();
+                let atraso = "";
+
+                if (retirada) {
+                  const diffMs = agora - retirada;
+                  const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+                  const diffMin = Math.floor((diffMs / (1000 * 60)) % 60);
+                  const diffDias = Math.floor(diffHoras / 24);
+
+                  if (diffDias > 0) {
+                    atraso = `${diffDias}d ${diffHoras % 24}h ${diffMin}min`;
+                  } else if (diffHoras > 0) {
+                    atraso = `${diffHoras}h ${diffMin}min`;
+                  } else {
+                    atraso = `${diffMin}min`;
+                  }
+                } else {
+                  atraso = "N/A";
+                }
+
+                return (
+                  <tr key={emp.id}>
+                    <td>{emp.usuario}</td>
+                    <td>{emp.sala?.numero}</td>
+                    <td>
+                      {emp.horario_retirada
+                        ? format(retirada, "dd/MM/yyyy HH:mm")
+                        : "Não informado"}
+                    </td>
+                    <td>{atraso}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+
+          </table>
         </div>
       )}
+
+
+
     </div>
   );
 }

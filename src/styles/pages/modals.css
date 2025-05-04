@@ -146,4 +146,8 @@
     z-index: 1001;
     font-size: 0.875rem;
   }
+
+  [data-state="open"] button[aria-label="Close"] {
+    display: none !important;
+  }
   

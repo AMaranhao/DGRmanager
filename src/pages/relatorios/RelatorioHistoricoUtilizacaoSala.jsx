@@ -132,28 +132,38 @@ export default function RelatorioHistoricoUtilizacaoSala() {
         <div className="relatorios-sem-dados">
           Nenhum empréstimo encontrado.
         </div>
-      ) : (
-        <div className="relatorios-grid">
-          {Object.entries(dadosAgrupados).sort().map(([sala, usuarios]) => {
-            const total = Object.values(usuarios).reduce((acc, qtd) => acc + qtd, 0);
-            return (
-              <div key={sala} className="relatorios-cartao">
-                <h3 className="relatorios-cartao-nome">Sala {sala}</h3>
-                <div className="text-xs text-gray-600 space-y-1">
-                  {Object.entries(usuarios).map(([usuario, qtd]) => (
-                    <p key={usuario}>
-                      <strong>{usuario}:</strong> {qtd} utilização(ões)
-                    </p>
-                  ))}
-                  <p className="mt-2 font-semibold text-blue-700">
-                    Total: {total} utilização(ões)
-                  </p>
+        ) : (
+        Object.entries(dadosAgrupados).sort().map(([sala, usuarios]) => {
+          const total = Object.values(usuarios).reduce((acc, qtd) => acc + qtd, 0);
+          return (
+            <div key={sala} className="space-y-2">
+              <h3 className="relatorios-cartao-nome text-left">Sala {sala}</h3>
+              <div className="emprestimos-tabela-wrapper">
+                <table className="emprestimos-tabela">
+                  <thead>
+                    <tr>
+                      <th>Usuário</th>
+                      <th>Quantidade de Utilizações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(usuarios).map(([usuario, qtd]) => (
+                      <tr key={usuario}>
+                        <td>{usuario}</td>
+                        <td>{qtd}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="text-right text-sm font-medium mt-1">
+                  Total de utilizações: {total}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })
       )}
+
     </div>
   );
 }

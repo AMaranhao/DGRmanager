@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {Tabs,TabsList,TabsTrigger,TabsContent,} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,} from '@/components/ui/dialog';
+import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription, } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
   deleteSala, fetchChaves, createChave, updateChave, deleteChave, fetchKits, createKit, updateKit, 
