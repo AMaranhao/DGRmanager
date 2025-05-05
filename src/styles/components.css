@@ -37,6 +37,40 @@
         width: 4.5rem;
     }
   
+
+    .sidebar-icons a {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+      
+      .sidebar-icons a:hover::after {
+        content: attr(title);
+        position: absolute;
+        left: 110%;
+        white-space: nowrap;
+        background-color: #CFE6FA;
+        color: #1E3A5F;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 9999; /* 🔺 Elevação máxima */
+      }
+      
+      
+      .sidebar-icons a::after {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
+      }
+
+      
 /* ======================== */
 /*         Header           */
 /* ======================== */

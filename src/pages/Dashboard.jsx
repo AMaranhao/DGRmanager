@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchAgendamentos } from '../services/apiService';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -148,13 +148,12 @@ export default function Dashboard() {
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
+          <DialogTitle>Confirmação de Senha</DialogTitle>
+          <DialogDescription>Digite a senha de 4 dígitos para confirmar a ação.</DialogDescription>
           {/* Estilo inline para ocultar o botão de fechar */}
           <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-          <div className="dashboard-modal-title">Confirmação de Senha</div>
-          <div className="dashboard-modal-description">
-            Digite a senha de 4 dígitos para confirmar a ação.
-          </div>
+         
           {!mensagemSucesso && (
             <>
               <Input

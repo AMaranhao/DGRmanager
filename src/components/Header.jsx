@@ -1,7 +1,10 @@
 // src/components/Header.jsx
 import { User, Settings } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
+  const { logout } = useAuth();
+
   return (
     <header className="header">
       {/* Espaço à esquerda da logo (vazio para equilibrar) */}
@@ -18,7 +21,7 @@ export default function Header() {
       <div className="header-actions">
         <User className="icon" />
         <Settings className="icon" />
-        <button className="logout-button">SAIR</button>
+        <button className="logout-button" onClick={logout}>SAIR</button>
       </div>
     </header>
   );

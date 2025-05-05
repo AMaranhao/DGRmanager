@@ -6,9 +6,9 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <div className="sidebar-logo-container">
+      <Link to="/dashboard" className="sidebar-logo-container">
         <img src="/logo.png" alt="Logo" className="sidebar-logo" />
-      </div>
+      </Link>
 
       {/* Ícones */}
       <div className="sidebar-icons">
