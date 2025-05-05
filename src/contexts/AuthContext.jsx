@@ -20,8 +20,13 @@ export const AuthProvider = ({ children }) => {
     }
   
     const data = await res.json();
+
+    const usuarioValido =
+    (data?.email === login || data?.cpf === login) &&
+    data?.senha === senha &&
+    data?.nome;
   
-    if (data?.email === login && data?.nome) {
+    if (usuarioValido) {
       setUser(data);
       navigate('/dashboard');
     } else {
