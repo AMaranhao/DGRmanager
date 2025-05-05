@@ -110,7 +110,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
           )}
         </div>
 
-        <div className="relatorios-filtro-group relatorios-filtro-text">
+        <div className="dashboard-filtro-usuario">
           <Input
             type="text"
             placeholder="Filtrar por usuário"
@@ -119,13 +119,9 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
             className="dashboard-select dashboard-filtro-usuario-input"
           />
           {usuarioSelecionado && (
-            <button
-              type="button"
-              onClick={() => setUsuarioSelecionado("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
+            <button onClick={() => setUsuarioSelecionado("")} className="dashboard-filtro-clear"
+              title="Limpar">
+                <X size={14} />
             </button>
           )}
         </div>
