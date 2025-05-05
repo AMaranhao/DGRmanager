@@ -76,3 +76,15 @@
     margin-top: 0.5rem;
   }
   
+  .login-erro-msg {
+    color: red;
+    font-size: 0.875rem;
+    min-height: 1.25rem; /* mantém espaço reservado mesmo sem erro */
+    margin-bottom: 0.25rem;
+  }
+  
+  .login-erro-msg.geral {
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+  

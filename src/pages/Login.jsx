@@ -10,38 +10,38 @@ export default function LoginPage() {
   const [senha, setSenha] = useState('');
   const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false);
   const [emailRecuperacao, setEmailRecuperacao] = useState('');
+  const [mensagemErro, setMensagemErro] = useState('');
 
   const { login: loginUsuario } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    loginUsuario(login, senha);
+    let erro = '';
+
+    if (!login.trim()) {
+      erro = 'Preenchimento do campo Login é obrigatório';
+    } else if (!senha.trim()) {
+      erro = 'Preenchimento do campo Senha é obrigatória';
+    }
+
+    if (erro) {
+      setMensagemErro(erro);
+      return;
+    }
+
+    try {
+      await loginUsuario(login, senha);
+      setMensagemErro('');
+    } catch (err) {
+      setMensagemErro('Usuário ou senha inválidos');
+    }
   };
 
   const handleRecuperarSenha = (e) => {
     e.preventDefault();
-
-    // Simulação temporária:
     alert(`Link de recuperação enviado para: ${emailRecuperacao}`);
     setMostrarRecuperacao(false);
     setEmailRecuperacao('');
-
-    /*
-    // Quando o endpoint estiver disponível, use o trecho abaixo:
-    try {
-      const res = await fetch('http://localhost:3001/recuperar-senha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailRecuperacao })
-      });
-      if (!res.ok) throw new Error('Erro ao enviar e-mail de recuperação');
-      alert('Verifique seu e-mail para continuar o processo de recuperação.');
-      setMostrarRecuperacao(false);
-      setEmailRecuperacao('');
-    } catch (error) {
-      alert('Falha ao enviar e-mail. Tente novamente.');
-    }
-    */
   };
 
   return (
@@ -72,6 +72,8 @@ export default function LoginPage() {
                 className="login-input"
               />
 
+              <p className="login-erro-msg geral">{mensagemErro}</p>
+
               <Button type="submit" className="login-button">Entrar</Button>
             </form>
 
@@ -97,9 +99,8 @@ export default function LoginPage() {
             <Button type="submit" className="login-button">Enviar link de recuperação</Button>
             <button
               type="button"
-              className="login-esqueci"
+              className="login-esqueci login-voltar"
               onClick={() => setMostrarRecuperacao(false)}
-              style={{ marginTop: '0.5rem' }}
             >
               Voltar para login
             </button>
