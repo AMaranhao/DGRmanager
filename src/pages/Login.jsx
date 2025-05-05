@@ -43,6 +43,28 @@ export default function LoginPage() {
     setMostrarRecuperacao(false);
     setEmailRecuperacao('');
   };
+/*
+  // Simulação temporária:
+  alert(`Link de recuperação enviado para: ${emailRecuperacao}`);
+  setMostrarRecuperacao(false);
+  setEmailRecuperacao('');
+
+  /*
+  // Quando o endpoint estiver disponível, use o trecho abaixo:
+  try {
+    const res = await fetch('http://localhost:3001/recuperar-senha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailRecuperacao })
+    });
+    if (!res.ok) throw new Error('Erro ao enviar e-mail de recuperação');
+    alert('Verifique seu e-mail para continuar o processo de recuperação.');
+    setMostrarRecuperacao(false);
+    setEmailRecuperacao('');
+  } catch (error) {
+    alert('Falha ao enviar e-mail. Tente novamente.');
+  }
+      */
 
   return (
     <div className="login-container">
