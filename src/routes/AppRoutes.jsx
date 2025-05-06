@@ -7,6 +7,8 @@ import Relatorios from '../pages/relatorios/GuiasRelatorios';
 import Infraestrutura from '../pages/Infraestrutura';
 import Login from '../pages/Login';
 import Usuarios from "../pages/Usuarios"; 
+import PerfilUsuario from '../pages/PerfilUsuario';
+
 
 export default function AppRoutes() {
   return (
@@ -14,10 +16,11 @@ export default function AppRoutes() {
       <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
       <Route path="/emprestimos" element={<Layout><Emprestimos /></Layout>} />
       <Route path="/relatorios" element={<Layout><Relatorios /></Layout>} />
-      <Route path="/usuarios" element={<Layout><Usuarios/></Layout>} />
+      <Route path="/usuarios" element={<Layout><Usuarios /></Layout>} />
       <Route path="/infraestrutura" element={<Layout><Infraestrutura /></Layout>} />
+      <Route path="/perfil" element={<Layout><PerfilUsuario /></Layout>} /> 
       <Route path="/login" element={<Login />} />
-      <Route path="*" element={<Layout><Login /></Layout>} />
+      <Route path="*" element={<Login />} />
     </Routes>
   );
 }

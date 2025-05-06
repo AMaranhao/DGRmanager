@@ -250,6 +250,17 @@ export const desativarUsuario = async (id, novoStatusAtivo) => {
 };
 
 // ------------------------
+// 👤 USUÁRIO LOGADO
+// ------------------------
+
+export const fetchUsuarioLogado = async () => {
+  const res = await fetch(`${API_URL}/me`);
+  if (!res.ok) throw new Error('Erro ao buscar usuário logado');
+  return res.json();
+};
+
+
+// ------------------------
 // 👤 CURSO E CARGO
 // ------------------------
 

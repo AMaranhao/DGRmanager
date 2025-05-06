@@ -1,9 +1,12 @@
 // src/components/Header.jsx
 import { User, Settings } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const { logout } = useAuth();
+  const navigate = useNavigate(); // 👈 necessário para navegação
+
 
   return (
     <header className="header">
@@ -19,7 +22,12 @@ export default function Header() {
 
       {/* Ações à direita */}
       <div className="header-actions">
-        <User className="icon" />
+        <button
+          className="header-icon-button"
+          onClick={() => navigate('/perfil')}
+          title="Perfil do Usuário">
+          <User className="icon" />
+        </button>
         <Settings className="icon" />
         <button className="logout-button" onClick={logout}>SAIR</button>
       </div>
