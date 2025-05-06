@@ -3,7 +3,7 @@ import { fetchAgendamentos } from '../services/apiService';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, PlusCircle } from 'lucide-react';
+import { X, PlusCircle, DoorOpen } from 'lucide-react';
 
 import '@/styles/pages/dashboard.css';
 import '@/styles/pages/filters.css';
@@ -108,10 +108,11 @@ export default function Dashboard() {
             </button>
           )}
         </div>
-
-        <Button className="dashboard-criar-avulso" onClick={() => setModalAvulsoAberto(true)}>
-          <PlusCircle size={16} className="mr-2" /> Novo Empréstimo
-        </Button>
+        <div className="dashboard-filtro-item right-align">
+          <Button className="usuarios-btn-material w-full" onClick={() => setModalAvulsoAberto(true)}>
+            Novo Empréstimo
+          </Button>
+        </div>
       </div>
 
       <div className="dashboard-grid">
@@ -122,7 +123,10 @@ export default function Dashboard() {
 
           return (
             <div key={ag.id} onClick={() => abrirModal(ag)} className={tileClass}>
-              <div className="dashboard-sala">Sala {ag.sala?.numero}</div>
+              <div className="dashboard-sala">
+                <DoorOpen className="dashboard-sala-icon"  /> - {ag.sala?.numero}
+              </div>
+              
               <div className="dashboard-usuario">{ag.usuario}</div>
               <div className="dashboard-acao">{labelAcao}</div>
             </div>

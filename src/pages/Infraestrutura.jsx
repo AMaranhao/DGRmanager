@@ -14,7 +14,7 @@ import '@/styles/pages/filters.css';
 import '@/styles/pages/status.css';
 import '@/styles/pages/tables.css';
 
-import { X, Plus } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function Infraestrutura() {
   const [tab, setTab] = useState('predios');
@@ -264,7 +264,6 @@ const confirmarExclusaoItem = async () => {
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
                 <Button className="usuarios-btn-material" onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
-                <Plus size={18} className="mr-2" />
                   Cadastrar Predio
                 </Button>
               </DialogTrigger>
@@ -399,10 +398,7 @@ const confirmarExclusaoItem = async () => {
                   className="usuarios-btn-material"
                   onClick={() => {
                     setEditandoSala(null);
-                    setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });
-                  }}
-                >
-                  <Plus size={18} className="mr-2" />
+                    setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });}}>
                   Cadastrar Sala
                 </Button>
               </DialogTrigger>
@@ -566,7 +562,6 @@ const confirmarExclusaoItem = async () => {
               <DialogOverlay className="dialog-overlay" />  
               <DialogTrigger asChild>
                 <Button className="usuarios-btn-material" onClick={() => setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null })}>
-                  <Plus size={18} className="mr-2" />
                   Cadastrar Chave
                 </Button>
               </DialogTrigger>
@@ -720,7 +715,6 @@ const confirmarExclusaoItem = async () => {
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
                 <Button className="usuarios-btn-material" onClick={() => setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' })}>
-                  <Plus size={18} className="mr-2" />
                   Cadastrar Kit
                 </Button>
               </DialogTrigger>

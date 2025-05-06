@@ -80,16 +80,22 @@
 }
 
 .usuarios-btn-material {
-  background-color: #0d2a68; /* azul */
+  background-color: #2f4674 !important; /* azul */
   color: white;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  border-radius: 9999px;
+  border-radius: 9999px !important;
   transition: all 0.2s ease-in-out;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  max-height: 2.25rem;
+  max-width: 10rem;
+}
+
+.btn-right{
+  align-self: right !important;
 }
 
 .usuarios-btn-material:hover {

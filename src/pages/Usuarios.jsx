@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay,} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { fetchUsuarios,criarUsuario,desativarUsuario, fetchCursos, fetchCargos} from "@/services/apiService";
-import { Plus, Trash, X } from "lucide-react";
+import { Trash, X } from "lucide-react";
 
 import "@/styles/pages/usuarios.css";
 import "@/styles/pages/filters.css";
@@ -145,7 +145,6 @@ export default function Usuarios() {
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
             <Button className="usuarios-btn-material">
-              <Plus size={18} className="mr-2" />
               Novo Usuário
             </Button>
           </DialogTrigger>

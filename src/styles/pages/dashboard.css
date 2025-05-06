@@ -91,3 +91,21 @@
     color: #374151;
   }
   
+  .dashboard-sala-icon {
+    width: 20px;
+    height: 20px;
+    color: #3b82f6; 
+  }
+  
+  .dashboard-filtro-item.right-align {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .dashboard-filtro-ultimo {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  
+  
