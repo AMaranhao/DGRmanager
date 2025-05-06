@@ -218,7 +218,7 @@ export default function Dashboard() {
           <DialogOverlay className="dialog-overlay" />
           <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
             <DialogTitle>Confirmação de Senha</DialogTitle>
-            <DialogDescription>Digite a senha de 4 dígitos para confirmar a ação.</DialogDescription>
+            <DialogDescription>Digite a senha de 4 dígitos.</DialogDescription>
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
             {!mensagemSucesso && (
