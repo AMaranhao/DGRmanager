@@ -94,9 +94,6 @@
   max-width: 10rem;
 }
 
-.btn-right{
-  align-self: right !important;
-}
 
 .usuarios-btn-material:hover {
   background-color: black;
@@ -107,4 +104,6 @@
 .ativar-desativar-btn{
   min-height: 1rem;
 }
+
+
 

@@ -18,6 +18,7 @@ import { X } from "lucide-react";
 
 export default function Infraestrutura() {
   const [tab, setTab] = useState('predios');
+  const [modalAberto, setModalAberto] = useState(false);
 
   // Estados para Prédios
   const [predios, setPredios] = useState([]);
@@ -47,6 +48,13 @@ export default function Infraestrutura() {
   const [editandoKit, setEditandoKit] = useState(null);
   const [modalKitAberto, setModalKitAberto] = useState(false);
 
+
+  const [buscaSala, setBuscaSala] = useState('');
+  const [buscaChaveSala, setBuscaChaveSala] = useState('');
+  const [buscaKitsSala, setBuscaKitsSala] = useState('');
+  const [confirmarExclusao, setConfirmarExclusao] = useState({ tipo: '', id: null });
+  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
   
 
   useEffect(() => {
@@ -58,6 +66,12 @@ export default function Infraestrutura() {
       carregarAndaresPorPredio(formSala.predioId);
     }
   }, [modalSalaAberto]);
+
+  useEffect(() => {
+    if (modalAvulsoAberto && formAvulso.predioId) {
+      carregarAndaresPorPredio(formAvulso.predioId);
+    }
+  }, [modalAvulsoAberto]);
   
   useEffect(() => {
     if (formSala.predioId) {
@@ -65,10 +79,7 @@ export default function Infraestrutura() {
     }
   }, [formSala.predioId]);
 
-  const [buscaSala, setBuscaSala] = useState('');
-  const [buscaChaveSala, setBuscaChaveSala] = useState('');
-  const [buscaKitsSala, setBuscaKitsSala] = useState('');
-
+  
   const carregarAndaresPorPredio = async (predioId) => {
     const andares = await fetchAndaresPorPredio(predioId);
     setAndaresDisponiveis(andares);
@@ -136,11 +147,6 @@ export default function Infraestrutura() {
     setModalPredioAberto(true);
   };
   
-
-  const [confirmarExclusao, setConfirmarExclusao] = useState({ tipo: '', id: null });
-  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
-  const [mensagemSucesso, setMensagemSucesso] = useState("");
-
 const abrirModalConfirmacao = (tipo, id) => {
   setConfirmarExclusao({ tipo, id });
   setModalConfirmarAberto(true);
@@ -231,8 +237,6 @@ const confirmarExclusaoItem = async () => {
         </select>
       </div>
       {modalAberto && (
-
-
         <Dialog open={modalConfirmarAberto} onOpenChange={setModalConfirmarAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogContent className="dashboard-modal dashboard-no-close">
@@ -262,7 +266,7 @@ const confirmarExclusaoItem = async () => {
         <TabsContent value="predios">
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Prédios</h2>
-            {modalAberto && (
+          
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
@@ -337,7 +341,7 @@ const confirmarExclusaoItem = async () => {
               </DialogContent>
 
             </Dialog>
-            )}
+            
           </div>
 
           <div className="usuarios-tabela-wrapper">
@@ -393,8 +397,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Salas</h2>
-            {modalAberto && (
-
+         
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
               <DialogOverlay className="dialog-overlay" />
 
@@ -501,7 +504,7 @@ const confirmarExclusaoItem = async () => {
                   </div>
                 </DialogContent>
               </Dialog>
-              )}
+              
               </div>
 
               <div className="usuarios-tabela-wrapper">
@@ -563,7 +566,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
-            {modalAberto && (
+            
             <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
               <DialogOverlay className="dialog-overlay" />  
               <DialogTrigger asChild>
@@ -647,7 +650,7 @@ const confirmarExclusaoItem = async () => {
                   onChange={e => setFormChave({ ...formChave, sala: salasFiltradas.find(s => s.id === Number(e.target.value)) })}
                   className="usuarios-modal-select"
                   disabled={!formChave.andarId}
-                >
+                 >
                   <option value=''>Selecione a Sala</option>
                   {salasFiltradas.map(s => <option key={s.id} value={s.id}>{s.numero}</option>)}
                 </select>
@@ -657,7 +660,7 @@ const confirmarExclusaoItem = async () => {
                 </div>
               </DialogContent>
             </Dialog>
-            )}
+            
           </div>
 
           <div className="usuarios-tabela-wrapper">
@@ -717,7 +720,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Kits</h2>
-            {modalAberto && (
+            
             <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
@@ -845,7 +848,7 @@ const confirmarExclusaoItem = async () => {
                 </div>
               </DialogContent>
             </Dialog>
-            )}
+            
           </div>
 
           <div className="usuarios-tabela-wrapper">
