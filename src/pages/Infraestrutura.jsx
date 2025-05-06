@@ -67,11 +67,6 @@ export default function Infraestrutura() {
     }
   }, [modalSalaAberto]);
 
-  useEffect(() => {
-    if (modalAvulsoAberto && formAvulso.predioId) {
-      carregarAndaresPorPredio(formAvulso.predioId);
-    }
-  }, [modalAvulsoAberto]);
   
   useEffect(() => {
     if (formSala.predioId) {
@@ -236,7 +231,7 @@ const confirmarExclusaoItem = async () => {
           <option value="kits">Kits</option>
         </select>
       </div>
-      {modalAberto && (
+      
         <Dialog open={modalConfirmarAberto} onOpenChange={setModalConfirmarAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogContent className="dashboard-modal dashboard-no-close">
@@ -257,7 +252,7 @@ const confirmarExclusaoItem = async () => {
             )}
           </DialogContent>
         </Dialog>
-      )}
+      
 
 
 
@@ -266,7 +261,7 @@ const confirmarExclusaoItem = async () => {
         <TabsContent value="predios">
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Prédios</h2>
-          
+            
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
@@ -397,7 +392,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Salas</h2>
-         
+            
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
               <DialogOverlay className="dialog-overlay" />
 
