@@ -140,76 +140,81 @@ export default function Dashboard() {
         })}
       </div>
 
-      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogOverlay className="dialog-overlay" />
-        <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
-          <DialogTitle>Confirmação de Senha</DialogTitle>
-          <DialogDescription>Digite a senha de 4 dígitos para confirmar a ação.</DialogDescription>
-          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+      {modalAberto && (
+        <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+          <DialogOverlay className="dialog-overlay" />
+          <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
+            <DialogTitle>Confirmação de Senha</DialogTitle>
+            <DialogDescription>Digite a senha de 4 dígitos para confirmar a ação.</DialogDescription>
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-          {!mensagemSucesso && (
-            <>
-              <Input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Senha de 4 dígitos"
-                maxLength={4}
-                className="dashboard-modal-input"
-              />
-              {erroSenha && <div className="dashboard-modal-error">Senha inválida. Digite exatamente 4 dígitos.</div>}
-            </>
-          )}
+            {!mensagemSucesso && (
+              <>
+                <Input
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Senha de 4 dígitos"
+                  maxLength={4}
+                  className="dashboard-modal-input"
+                />
+                {erroSenha && <div className="dashboard-modal-error">Senha inválida. Digite exatamente 4 dígitos.</div>}
+              </>
+            )}
 
-          {mensagemSucesso && <div className="dashboard-modal-success-message">{mensagemSucesso}</div>}
+            {mensagemSucesso && <div className="dashboard-modal-success-message">{mensagemSucesso}</div>}
 
-          {!mensagemSucesso && (
-            <div className="dashboard-modal-actions">
-              <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            {!mensagemSucesso && (
+              <div className="dashboard-modal-actions">
+                <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Modal de Empréstimo Avulso */}
-      <Dialog open={modalAvulsoAberto} onOpenChange={setModalAvulsoAberto}>
-        <DialogOverlay className="dialog-overlay" />
-        <DialogContent className="dashboard-modal">
-          <DialogTitle>Novo Empréstimo Avulso</DialogTitle>
-          <DialogDescription></DialogDescription>
+      {modalAvulsoAberto && (
+        <Dialog open={modalAvulsoAberto} onOpenChange={setModalAvulsoAberto}>
+          <DialogOverlay className="dialog-overlay" />
+          <DialogContent className="dashboard-modal">
+            <DialogTitle>Novo Empréstimo Avulso</DialogTitle>
+            <DialogDescription></DialogDescription>
 
-          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-          <Input placeholder="CPF" value={usuarioAvulso} onChange={(e) => setUsuarioAvulso(e.target.value)} className="mb-2" />
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-          <select value={tipoSala} onChange={(e) => setTipoSala(e.target.value)} className="dashboard-select mb-2">
-            <option value="">Selecione o tipo de sala</option>
-            <option value="auditório">Auditório</option>
-            <option value="sala de aula">Sala de Aula</option>
-            <option value="laboratório">Laboratório</option>
-          </select>
+            <Input placeholder="CPF" value={usuarioAvulso} onChange={(e) => setUsuarioAvulso(e.target.value)} className="mb-2" />
 
-          <Input type="time" placeholder="Horário de Retirada" value={horarioRetirada} onChange={(e) => setHorarioRetirada(e.target.value)} className="mb-2" />
-          <Input type="time" placeholder="Horário de Devolução" value={horarioDevolucao} onChange={(e) => setHorarioDevolucao(e.target.value)} className="mb-2" />
-          <Input placeholder="Prédio" value={predio} onChange={(e) => setPredio(e.target.value)} className="mb-2" />
-          <Input placeholder="Andar" value={andar} onChange={(e) => setAndar(e.target.value)} className="mb-2" />
-          <Input placeholder="Sala" value={sala} onChange={(e) => setSala(e.target.value)} className="mb-2" />
+            <select value={tipoSala} onChange={(e) => setTipoSala(e.target.value)} className="dashboard-select mb-2">
+              <option value="">Selecione o tipo de sala</option>
+              <option value="auditório">Auditório</option>
+              <option value="sala de aula">Sala de Aula</option>
+              <option value="laboratório">Laboratório</option>
+            </select>
 
-          <label className="flex items-center gap-2 mt-2">
-            <input type="checkbox" checked={usarKit} onChange={(e) => setUsarKit(e.target.checked)} />
-            Deseja utilizar um Kit?
-          </label>
+            <Input type="time" placeholder="Horário de Retirada" value={horarioRetirada} onChange={(e) => setHorarioRetirada(e.target.value)} className="mb-2" />
+            <Input type="time" placeholder="Horário de Devolução" value={horarioDevolucao} onChange={(e) => setHorarioDevolucao(e.target.value)} className="mb-2" />
+            <Input placeholder="Prédio" value={predio} onChange={(e) => setPredio(e.target.value)} className="mb-2" />
+            <Input placeholder="Andar" value={andar} onChange={(e) => setAndar(e.target.value)} className="mb-2" />
+            <Input placeholder="Sala" value={sala} onChange={(e) => setSala(e.target.value)} className="mb-2" />
 
-          {usarKit && (
-            <Input placeholder="Kit relacionado à sala" value={kitSelecionado} onChange={(e) => setKitSelecionado(e.target.value)} className="mt-2" />
-          )}
+            <label className="flex items-center gap-2 mt-2">
+              <input type="checkbox" checked={usarKit} onChange={(e) => setUsarKit(e.target.checked)} />
+              Deseja utilizar um Kit?
+            </label>
 
-          <div className="dashboard-modal-actions mt-4">
-            <Button variant="outline" onClick={() => setModalAvulsoAberto(false)}>Cancelar</Button>
-            <Button>Confirmar Empréstimo</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            {usarKit && (
+              <Input placeholder="Kit relacionado à sala" value={kitSelecionado} onChange={(e) => setKitSelecionado(e.target.value)} className="mt-2" />
+            )}
+
+            <div className="dashboard-modal-actions mt-4">
+              <Button variant="outline" onClick={() => setModalAvulsoAberto(false)}>Cancelar</Button>
+              <Button>Confirmar Empréstimo</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -230,6 +230,7 @@ const confirmarExclusaoItem = async () => {
           <option value="kits">Kits</option>
         </select>
       </div>
+      {modalAberto && (
 
 
         <Dialog open={modalConfirmarAberto} onOpenChange={setModalConfirmarAberto}>
@@ -252,6 +253,7 @@ const confirmarExclusaoItem = async () => {
             )}
           </DialogContent>
         </Dialog>
+      )}
 
 
 
@@ -260,6 +262,7 @@ const confirmarExclusaoItem = async () => {
         <TabsContent value="predios">
           <div className="infraestrutura-section">
             <h2 className="infraestrutura-section-title">Lista de Prédios</h2>
+            {modalAberto && (
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
@@ -334,6 +337,7 @@ const confirmarExclusaoItem = async () => {
               </DialogContent>
 
             </Dialog>
+            )}
           </div>
 
           <div className="usuarios-tabela-wrapper">
@@ -389,6 +393,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Salas</h2>
+            {modalAberto && (
 
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
               <DialogOverlay className="dialog-overlay" />
@@ -496,6 +501,7 @@ const confirmarExclusaoItem = async () => {
                   </div>
                 </DialogContent>
               </Dialog>
+              )}
               </div>
 
               <div className="usuarios-tabela-wrapper">
@@ -557,7 +563,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
-
+            {modalAberto && (
             <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
               <DialogOverlay className="dialog-overlay" />  
               <DialogTrigger asChild>
@@ -651,6 +657,7 @@ const confirmarExclusaoItem = async () => {
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </div>
 
           <div className="usuarios-tabela-wrapper">
@@ -710,7 +717,7 @@ const confirmarExclusaoItem = async () => {
             </div>
 
             <h2 className="infraestrutura-section-title">Lista de Kits</h2>
-
+            {modalAberto && (
             <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
               <DialogOverlay className="dialog-overlay" />
               <DialogTrigger asChild>
@@ -838,6 +845,7 @@ const confirmarExclusaoItem = async () => {
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </div>
 
           <div className="usuarios-tabela-wrapper">
