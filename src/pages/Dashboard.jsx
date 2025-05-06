@@ -108,11 +108,17 @@ export default function Dashboard() {
             </button>
           )}
         </div>
-        <div className="dashboard-filtro-item right-align">
+
+
+        <div className="dashboard-filtro-item" style={{ marginLeft: 'auto' }}>
           <Button className="usuarios-btn-material w-full" onClick={() => setModalAvulsoAberto(true)}>
             Novo Empréstimo
           </Button>
         </div>
+
+
+
+        
       </div>
 
       <div className="dashboard-grid">
