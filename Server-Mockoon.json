@@ -1,0 +1,1347 @@
+{
+  "name": "Chaves HC API old",
+  "port": 3001,
+  "routes": [
+    {
+      "uuid": "8c14fdf6-fb35-4b4d-80a0-d6a3724cf455",
+      "documentation": "GET /salas",
+      "method": "get",
+      "endpoint": "/salas",
+      "responses": [
+        {
+          "uuid": "573a71cc-aae4-41f4-aeb9-2844ccd36330",
+          "body": "\n[\n  {\n    \"id\": 1,\n    \"numero\": \"A101\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 1, \"nome\": \"1º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 2,\n    \"numero\": \"A102\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 1, \"nome\": \"1º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 3,\n    \"numero\": \"A103\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 2, \"nome\": \"2º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": true,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 4,\n    \"numero\": \"A104\",\n    \"tipo\": \"Apoio\",\n    \"andar\": { \"id\": 2, \"nome\": \"2º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 5,\n    \"numero\": \"A105\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 3, \"nome\": \"3º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 6,\n    \"numero\": \"A106\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 3, \"nome\": \"3º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": false\n  },\n  {\n    \"id\": 7,\n    \"numero\": \"B201\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 7, \"nome\": \"1º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": true,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 8,\n    \"numero\": \"B202\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 7, \"nome\": \"1º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 9,\n    \"numero\": \"B203\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 8, \"nome\": \"2º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": true,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 10,\n    \"numero\": \"B204\",\n    \"tipo\": \"Apoio\",\n    \"andar\": { \"id\": 8, \"nome\": \"2º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 11,\n    \"numero\": \"B205\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 9, \"nome\": \"3º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": true,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 12,\n    \"numero\": \"B206\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 9, \"nome\": \"3º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": false\n  },\n  {\n    \"id\": 13,\n    \"numero\": \"C301\",\n    \"tipo\": \"Apoio\",\n    \"andar\": { \"id\": 4, \"nome\": \"4º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 14,\n    \"numero\": \"C302\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 4, \"nome\": \"4º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": true,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 15,\n    \"numero\": \"C303\",\n    \"tipo\": \"Aula\",\n    \"andar\": { \"id\": 5, \"nome\": \"5º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  },\n  {\n    \"id\": 16,\n    \"numero\": \"C304\",\n    \"tipo\": \"Laboratório\",\n    \"andar\": { \"id\": 6, \"nome\": \"6º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n    \"ocupada\": false,\n    \"esta_ativa\": true\n  }\n]",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "c40d8e78-0c24-444e-8513-f5508754c7c2",
+      "documentation": "GET /emprestimos",
+      "method": "get",
+      "endpoint": "/emprestimos",
+      "responses": [
+        {
+          "uuid": "ec20c908-4ae2-4d97-8b4e-d61e9aa6bcad",
+          "body": "\n[\n  {\n    \"id\": 9,\n    \"usuario\": \"Prof. Marina Tavares\",\n    \"sala\": { \"id\": 8, \"numero\": \"B205\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T06:45:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 10,\n    \"usuario\": \"Res. Felipe Lima\",\n    \"sala\": { \"id\": 8, \"numero\": \"B205\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-23T09:00:00\",\n    \"horario_devolucao\": \"2025-04-23T11:00:00\"\n  },\n  {\n    \"id\": 11,\n    \"usuario\": \"Prof. Júlia Ribeiro\",\n    \"sala\": { \"id\": 4, \"numero\": \"A104\" },\n    \"status\": \"Em andamento\",\n    \"horario_retirada\": \"2025-04-25T08:30:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 12,\n    \"usuario\": \"Dr. Victor Souza\",\n    \"sala\": { \"id\": 9, \"numero\": \"C101\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-22T14:00:00\",\n    \"horario_devolucao\": \"2025-04-22T15:30:00\"\n  },\n  {\n    \"id\": 13,\n    \"usuario\": \"Res. Ana Beatriz\",\n    \"sala\": { \"id\": 11, \"numero\": \"C201\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T07:10:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 14,\n    \"usuario\": \"Prof. Luiz Otávio\",\n    \"sala\": { \"id\": 15, \"numero\": \"D101\" },\n    \"status\": \"Em andamento\",\n    \"horario_retirada\": \"2025-04-25T10:15:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 15,\n    \"usuario\": \"Dr. Elisa Matos\",\n    \"sala\": { \"id\": 12, \"numero\": \"C202\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-24T09:30:00\",\n    \"horario_devolucao\": \"2025-04-24T11:00:00\"\n  },\n  {\n    \"id\": 16,\n    \"usuario\": \"Prof. Diego Martins\",\n    \"sala\": { \"id\": 13, \"numero\": \"D201\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-23T13:00:00\",\n    \"horario_devolucao\": \"2025-04-23T15:00:00\"\n  },\n  {\n    \"id\": 17,\n    \"usuario\": \"Res. Gabriela Costa\",\n    \"sala\": { \"id\": 16, \"numero\": \"D301\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T06:30:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 18,\n    \"usuario\": \"Prof. Paulo Henrique\",\n    \"sala\": { \"id\": 17, \"numero\": \"E101\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-23T10:00:00\",\n    \"horario_devolucao\": \"2025-04-23T12:00:00\"\n  },\n  {\n    \"id\": 19,\n    \"usuario\": \"Res. Camila Rocha\",\n    \"sala\": { \"id\": 18, \"numero\": \"E102\" },\n    \"status\": \"Em andamento\",\n    \"horario_retirada\": \"2025-04-25T09:45:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 20,\n    \"usuario\": \"Dr. Rafael Nogueira\",\n    \"sala\": { \"id\": 19, \"numero\": \"F101\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-21T08:30:00\",\n    \"horario_devolucao\": \"2025-04-21T09:30:00\"\n  },\n  {\n    \"id\": 21,\n    \"usuario\": \"Prof. Larissa Diniz\",\n    \"sala\": { \"id\": 20, \"numero\": \"F201\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T07:25:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 22,\n    \"usuario\": \"Res. Bruno Almeida\",\n    \"sala\": { \"id\": 21, \"numero\": \"G101\" },\n    \"status\": \"Em andamento\",\n    \"horario_retirada\": \"2025-04-25T08:15:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 23,\n    \"usuario\": \"Dr. Alice Ferreira\",\n    \"sala\": { \"id\": 22, \"numero\": \"G102\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-22T13:00:00\",\n    \"horario_devolucao\": \"2025-04-22T14:30:00\"\n  },\n  {\n    \"id\": 24,\n    \"usuario\": \"Prof. Eduardo Braga\",\n    \"sala\": { \"id\": 23, \"numero\": \"H101\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-23T11:00:00\",\n    \"horario_devolucao\": \"2025-04-23T12:30:00\"\n  },\n  {\n    \"id\": 25,\n    \"usuario\": \"Res. Tatiane Silva\",\n    \"sala\": { \"id\": 24, \"numero\": \"H201\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T07:05:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 26,\n    \"usuario\": \"Prof. Mauro Queiroz\",\n    \"sala\": { \"id\": 25, \"numero\": \"I101\" },\n    \"status\": \"Em andamento\",\n    \"horario_retirada\": \"2025-04-25T10:20:00\",\n    \"horario_devolucao\": null\n  },\n  {\n    \"id\": 27,\n    \"usuario\": \"Dr. Bianca Leal\",\n    \"sala\": { \"id\": 26, \"numero\": \"I102\" },\n    \"status\": \"Finalizado\",\n    \"horario_retirada\": \"2025-04-22T08:00:00\",\n    \"horario_devolucao\": \"2025-04-22T09:00:00\"\n  },\n  {\n    \"id\": 28,\n    \"usuario\": \"Res. Samuel Mendes\",\n    \"sala\": { \"id\": 27, \"numero\": \"I201\" },\n    \"status\": \"Em atraso\",\n    \"horario_retirada\": \"2025-04-25T06:50:00\",\n    \"horario_devolucao\": null\n  }\n]\n",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "068061e3-aac5-4ef4-bbaa-7bacc234312d",
+      "documentation": "POST /emprestimos/retirar",
+      "method": "post",
+      "endpoint": "/emprestimos/retirar",
+      "responses": [
+        {
+          "uuid": "877b0f31-cd9f-436f-9b8d-8309179df8b5",
+          "body": "{\n  \"mensagem\": \"Emprestimo registrado com sucesso.\",\n  \"id_emprestimo\": 4\n}",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "b50bcda4-7c53-465b-8dd6-b5cd7ff844dc",
+      "documentation": "POST /emprestimos/devolver",
+      "method": "post",
+      "endpoint": "/emprestimos/devolver",
+      "responses": [
+        {
+          "uuid": "7fb31d7d-0c0d-47a4-a938-9e0893680941",
+          "body": "{\n  \"mensagem\": \"Chave devolvida com sucesso.\",\n  \"status\": \"Finalizado\"\n}",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "530a3f3c-ded7-48f1-8dad-6c1cab778626",
+      "documentation": "GET /agendamentos",
+      "method": "get",
+      "endpoint": "/agendamentos",
+      "responses": [
+        {
+          "uuid": "58793ca3-28b3-4ec9-be03-4a38fdac7e20",
+          "body": "\n[\n  { \"id\": 1,  \"sala\": { \"id\": 1, \"numero\": \"A101\", \"andarId\": 1 }, \"usuario\": \"Prof. Ana Lima\", \"retirado\": false },\n  { \"id\": 2,  \"sala\": { \"id\": 2, \"numero\": \"A102\", \"andarId\": 1 }, \"usuario\": \"Prof. Bruno Costa\", \"retirado\": true },\n  { \"id\": 3,  \"sala\": { \"id\": 3, \"numero\": \"A103\", \"andarId\": 2 }, \"usuario\": \"Prof. Carla Souza\", \"retirado\": false },\n  { \"id\": 4,  \"sala\": { \"id\": 4, \"numero\": \"A104\", \"andarId\": 2 }, \"usuario\": \"Prof. Diego Ramos\", \"retirado\": true },\n  { \"id\": 5,  \"sala\": { \"id\": 5, \"numero\": \"A105\", \"andarId\": 3 }, \"usuario\": \"Prof. Elisa Martins\", \"retirado\": false },\n  { \"id\": 6,  \"sala\": { \"id\": 6, \"numero\": \"A106\", \"andarId\": 3 }, \"usuario\": \"Prof. Felipe Dias\", \"retirado\": false },\n\n  { \"id\": 7,  \"sala\": { \"id\": 7, \"numero\": \"B201\", \"andarId\": 7 }, \"usuario\": \"Prof. Gabriela Rocha\", \"retirado\": true },\n  { \"id\": 8,  \"sala\": { \"id\": 8, \"numero\": \"B202\", \"andarId\": 7 }, \"usuario\": \"Prof. Henrique Silva\", \"retirado\": false },\n  { \"id\": 9,  \"sala\": { \"id\": 9, \"numero\": \"B203\", \"andarId\": 8 }, \"usuario\": \"Prof. Isabela Nunes\", \"retirado\": true },\n  { \"id\": 10, \"sala\": { \"id\": 10, \"numero\": \"B204\", \"andarId\": 8 }, \"usuario\": \"Prof. João Almeida\", \"retirado\": false },\n  { \"id\": 11, \"sala\": { \"id\": 11, \"numero\": \"B205\", \"andarId\": 9 }, \"usuario\": \"Prof. Karla Moreira\", \"retirado\": false },\n  { \"id\": 12, \"sala\": { \"id\": 12, \"numero\": \"B206\", \"andarId\": 9 }, \"usuario\": \"Prof. Lucas Ferreira\", \"retirado\": true },\n\n  { \"id\": 13, \"sala\": { \"id\": 13, \"numero\": \"C301\", \"andarId\": 4 }, \"usuario\": \"Prof. Mariana Cunha\", \"retirado\": false },\n  { \"id\": 14, \"sala\": { \"id\": 14, \"numero\": \"C302\", \"andarId\": 4 }, \"usuario\": \"Prof. Natan Oliveira\", \"retirado\": true },\n  { \"id\": 15, \"sala\": { \"id\": 15, \"numero\": \"C303\", \"andarId\": 5 }, \"usuario\": \"Prof. Vítor Campos\", \"retirado\": false },\n  { \"id\": 16, \"sala\": { \"id\": 16, \"numero\": \"C304\", \"andarId\": 6 }, \"usuario\": \"Prof. Daniela Mota\", \"retirado\": true }\n]",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "5f6c1f38-6aac-426b-b0e8-226ca5c36f0c",
+      "documentation": "GET /relatorios/uso-salas",
+      "method": "get",
+      "endpoint": "/relatorios/uso-salas",
+      "responses": [
+        {
+          "uuid": "6138b8d7-2e27-4532-9833-d5a6a3cf855d",
+          "body": "[\n  {\n    \"sala\": \"A101\",\n    \"uso_total\": 15\n  },\n  {\n    \"sala\": \"B203\",\n    \"uso_total\": 7\n  },\n  {\n    \"sala\": \"C105\",\n    \"uso_total\": 22\n  }\n]",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "63e6382c-6770-495e-b13c-d61d70be185c",
+      "documentation": "GET /predios",
+      "method": "get",
+      "endpoint": "predios",
+      "responses": [
+        {
+          "uuid": "78548007-d992-4fdb-8955-4ac672387125",
+          "body": "[\n  {\n    \"id\": 1,\n    \"nome\": \"Prédio Central\",\n    \"endereco\": \"Av. Principal, 100\",\n    \"telefone\": \"81999990001\"\n  },\n  {\n    \"id\": 2,\n    \"nome\": \"Bloco A\",\n    \"endereco\": \"Rua Secundária, 50\",\n    \"telefone\": \"81999990002\"\n  }\n]\n\n",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "287e96dc-9f73-4000-b93c-79b7fb5d0981",
+      "documentation": "GET /predios",
+      "method": "post",
+      "endpoint": "predios",
+      "responses": [
+        {
+          "uuid": "eae2ed6a-4781-497d-ae3e-8d34f057edce",
+          "body": "{\n  \"nome\": \"Bloco D\",\n  \"endereco\": \"Rua das Palmeiras, 200\",\n  \"telefone\": \"81999990004\"\n}\n\n",
+          "statusCode": 201,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "805236f3-e726-495b-b432-45358e1506c6",
+      "documentation": "GET /salas/:id",
+      "method": "put",
+      "endpoint": "salas/:id",
+      "responses": [
+        {
+          "uuid": "67d05064-2d08-467e-a422-ba730fab6c8f",
+          "body": "{\n  \"id\": 1,\n  \"numero\": \"104\",\n  \"tipo\": \"Laboratório\",\n  \"ocupada\": true,\n  \"predioId\": 1\n}",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "02a81c2d-99f7-4f9d-af34-f8bc331771e0",
+      "documentation": "GET /salas",
+      "method": "post",
+      "endpoint": "salas",
+      "responses": [
+        {
+          "uuid": "0405ce28-bbfd-45e6-9d0b-87675f1a7e02",
+          "body": "{\n  \"numero\": \"C306\",\n  \"tipo\": \"Laboratório\",\n  \"lotacao\": 20,\n  \"ocupada\": false,\n  \"esta_ativa\": true,\n  \"andarId\": 6\n}\n\n",
+          "statusCode": 201,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "87f3d560-5604-41b2-aaae-794e5bbea687",
+      "documentation": "GET /chaves",
+      "method": "get",
+      "endpoint": "chaves",
+      "responses": [
+        {
+          "uuid": "fc77c6d1-483c-4111-b7a6-2fa2111d6cd3",
+          "body": "[\n  {\n    \"id\": 1,\n    \"numero\": \"CH101\",\n    \"numeracao_armario\": \"01\",\n    \"sala\": {\n      \"id\": 1,\n      \"numero\": \"A101\",\n      \"andarId\": 1\n    }\n  },\n  {\n    \"id\": 2,\n    \"numero\": \"CH102\",\n    \"numeracao_armario\": \"02\",\n    \"sala\": {\n      \"id\": 2,\n      \"numero\": \"A102\",\n      \"andarId\": 1\n    }\n  },\n  {\n    \"id\": 3,\n    \"numero\": \"CH103\",\n    \"numeracao_armario\": \"03\",\n    \"sala\": {\n      \"id\": 3,\n      \"numero\": \"A103\",\n      \"andarId\": 1\n    }\n  },\n  {\n    \"id\": 4,\n    \"numero\": \"CH201\",\n    \"numeracao_armario\": \"04\",\n    \"sala\": {\n      \"id\": 9,\n      \"numero\": \"B201\",\n      \"andarId\": 7\n    }\n  },\n  {\n    \"id\": 5,\n    \"numero\": \"CH202\",\n    \"numeracao_armario\": \"05\",\n    \"sala\": {\n      \"id\": 10,\n      \"numero\": \"B202\",\n      \"andarId\": 7\n    }\n  },\n  {\n    \"id\": 6,\n    \"numero\": \"CH203\",\n    \"numeracao_armario\": \"06\",\n    \"sala\": {\n      \"id\": 11,\n      \"numero\": \"B203\",\n      \"andarId\": 7\n    }\n  }\n]",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "9b3127b7-34c3-4e19-822c-504c4d09f7a2",
+      "documentation": "GET /chaves",
+      "method": "post",
+      "endpoint": "chaves",
+      "responses": [
+        {
+          "uuid": "4300d126-a2ac-4cb3-8657-c0806926de0c",
+          "body": "{\n  \"id\": 3,\n  \"numero\": \"CH103\",\n  \"numeracao_armario\": \"03\",\n  \"salaId\": 3\n}",
+          "statusCode": 201,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "4a9c1508-115c-41ad-b6be-d5c08253394f",
+      "documentation": "GET /kits",
+      "method": "get",
+      "endpoint": "kits",
+      "responses": [
+        {
+          "uuid": "8c5a0344-0473-48de-9be3-2eadb4bebde2",
+          "body": "[\n{\n\"id\": 1,\n\"numero\": \"KIT101\",\n\"numeracao_armario\": \"K01\",\n\"tipo\": \"Primeiros Socorros\",\n\"sala\": {\n\"id\": 1,\n\"numero\": \"A101\",\n\"andarId\": 1\n}\n},\n{\n\"id\": 2,\n\"numero\": \"KIT102\",\n\"numeracao_armario\": \"K02\",\n\"tipo\": \"Manutenção\",\n\"sala\": {\n\"id\": 11,\n\"numero\": \"B203\",\n\"andarId\": 7\n}\n},\n{\n\"id\": 3,\n\"numero\": \"KIT103\",\n\"numeracao_armario\": \"K03\",\n\"tipo\": \"Limpeza\",\n\"sala\": {\n\"id\": 2,\n\"numero\": \"A102\",\n\"andarId\": 1\n}\n},\n{\n\"id\": 4,\n\"numero\": \"KIT104\",\n\"numeracao_armario\": \"K04\",\n\"tipo\": \"Técnico\",\n\"sala\": {\n\"id\": 10,\n\"numero\": \"B202\",\n\"andarId\": 7\n}\n}\n]\n",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "3cf99ef3-e00d-41d5-80ab-fae3cf8ea2ac",
+      "documentation": "GET /kits",
+      "method": "post",
+      "endpoint": "kits",
+      "responses": [
+        {
+          "uuid": "56b68f94-8f05-40a2-8bab-008eb0dcdbf4",
+          "body": "{\n  \"id\": 3,\n  \"numero\": \"KIT103\",\n  \"numeracao_armario\": \"K03\",\n  \"salaId\": 3\n}",
+          "statusCode": 201,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "7cdab75b-c9e0-4555-975f-03a19824b49f",
+      "documentation": "GET /predios/:id",
+      "method": "put",
+      "endpoint": "predios/:id",
+      "responses": [
+        {
+          "uuid": "0e5c9d43-1df8-40bd-a49d-8c4396f80e8d",
+          "body": "{\n  \"id\": 4,\n  \"nome\": \"Bloco D - Ampliado\",\n  \"endereco\": \"Rua das Palmeiras, 202\",\n  \"telefone\": \"81999990005\"\n}\n",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "7490f05a-6c96-4b78-9734-b71256aee7a2",
+      "documentation": "GET /predios/:id",
+      "method": "delete",
+      "endpoint": "predios/:id",
+      "responses": [
+        {
+          "uuid": "a2576fa1-4bb3-4e20-bb21-9af9771aeb8c",
+          "body": "\n",
+          "statusCode": 204,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "9608e8df-acd9-4be8-9eff-f5b163742577",
+      "documentation": "GET /salas/:id",
+      "method": "delete",
+      "endpoint": "salas/:id",
+      "responses": [
+        {
+          "uuid": "339cb6ac-a2a2-401d-a82d-707726e3920f",
+          "body": "",
+          "statusCode": 204,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "983b37db-1033-4d78-940b-bee88938e9c5",
+      "documentation": "GET /chaves/:id",
+      "method": "put",
+      "endpoint": "chaves/:id",
+      "responses": [
+        {
+          "uuid": "04bcb815-5cda-4ccb-91b3-9f41a9296eae",
+          "body": "{\n  \"id\": 3,\n  \"numero\": \"103\",\n  \"tipo\": \"Aula\",\n  \"ocupada\": false,\n  \"predioId\": 2\n}",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "5ffd1b61-4440-4cbb-85f8-a82eac05fbde",
+      "documentation": "GET /chaves/:id",
+      "method": "delete",
+      "endpoint": "chaves/:id",
+      "responses": [
+        {
+          "uuid": "e5fd6e5b-07c9-4d90-a570-61d650dffbe6",
+          "body": "\n\n\n",
+          "statusCode": 204,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "fe001aa8-9b06-4cb1-85ac-5dadbd165567",
+      "documentation": "GET /kits/:id",
+      "method": "put",
+      "endpoint": "kits/:id",
+      "responses": [
+        {
+          "uuid": "033f6d94-3be8-4989-95bd-06501f3f0dea",
+          "body": "{\n  \"id\": 1,\n  \"numero\": \"KIT105\",\n  \"numeracao_armario\": \"K05\",\n  \"salaId\": 2\n}",
+          "statusCode": 200,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "4f336a92-6fad-4f63-a71c-b6343344d98b",
+      "documentation": "GET /kits/:id",
+      "method": "delete",
+      "endpoint": "kits/:id",
+      "responses": [
+        {
+          "uuid": "c343340d-0f40-4d29-82d1-a0447d656bb6",
+          "body": "\n\n",
+          "statusCode": 204,
+          "label": "Default",
+          "latency": 0,
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "uuid": "022671ee-5a7c-45ce-b111-cc2a4221a159",
+      "type": "http",
+      "documentation": "GET /usuarios",
+      "method": "get",
+      "endpoint": "usuarios",
+      "responses": [
+        {
+          "uuid": "27f11bd4-ac23-46b8-8f74-6fc9367e1625",
+          "body": "\n[\n  {\n    \"id\": 1,\n    \"nome\": \"Prof. Ana Souza\",\n    \"email\": \"ana.souza@universidade.edu\",\n    \"ativo\": true,\n    \"tipo\": \"Professor\"\n  },\n  {\n    \"id\": 2,\n    \"nome\": \"Dr. João Silva\",\n    \"email\": \"joao.silva@universidade.edu\",\n    \"ativo\": false,\n    \"tipo\": \"Professor\"\n  },\n  {\n    \"id\": 3,\n    \"nome\": \"Administrador HC\",\n    \"email\": \"admin@hc.edu\",\n    \"ativo\": true,\n    \"tipo\": \"Administrador\"\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "d242c3c1-2743-428a-a6b0-81b350e6e6c2",
+      "type": "http",
+      "documentation": "GET /usuarios/:id",
+      "method": "get",
+      "endpoint": "usuarios/:id",
+      "responses": [
+        {
+          "uuid": "55f1f41c-50a3-4de3-b579-0efdbc6b477d",
+          "body": "{\n    \"id\": 1,\n    \"nome\": \"Prof. Ana Souza\",\n    \"email\": \"ana.souza@universidade.edu\",\n    \"ativo\": true,\n    \"tipo\": \"Professor\"\n  }",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "8dd43fcc-1d3c-442d-a2a8-695093f7b0f8",
+      "type": "http",
+      "documentation": "PUT /usuarios/:id",
+      "method": "put",
+      "endpoint": "usuarios/:id",
+      "responses": [
+        {
+          "uuid": "109c821a-a091-41f9-bcc0-3bf20a5ab525",
+          "body": "{\n  \"message\": \"Usuário atualizado com sucesso.\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "59f5674e-aaf6-45f2-8857-f609dfd628e4",
+      "type": "http",
+      "documentation": "DELETE /usuarios/:id",
+      "method": "delete",
+      "endpoint": "usuarios/:id",
+      "responses": [
+        {
+          "uuid": "6a86333d-a01c-4b31-b1a5-a124dc1292db",
+          "body": "{\n  \"message\": \"Usuário removido com sucesso.\"\n}\n",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "750f032d-1737-4ce6-aa8a-80a2995977b0",
+      "type": "http",
+      "documentation": "POST /usuarios",
+      "method": "post",
+      "endpoint": "usuarios",
+      "responses": [
+        {
+          "uuid": "34d2ed10-42f5-460e-8fee-3bbce725dc20",
+          "body": "{\n  \"username\": \"maria.oliveira\",\n  \"password\": \"senha123\",\n  \"first_name\": \"Maria\",\n  \"last_name\": \"Oliveira\",\n  \"email\": \"maria.oliveira@universidade.edu\",\n  \"cpf\": \"321.654.987-00\",\n  \"matricula\": \"MAT003\",\n  \"telefone\": \"81999992222\",\n  \"senha_assinatura\": \"2468\",\n  \"curso\": 2,\n  \"cargo\": 3\n}\n",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "de86c51a-be82-4c5f-a929-b12714f899a2",
+      "type": "http",
+      "documentation": "GET /curso",
+      "method": "get",
+      "endpoint": "cursos",
+      "responses": [
+        {
+          "uuid": "ac1d6e01-56a6-4676-a931-b29c1f0b088d",
+          "body": "[\n  { \"id\": 1, \"nome\": \"Medicina\" },\n  { \"id\": 2, \"nome\": \"Fisioterapia\" },\n  { \"id\": 3, \"nome\": \"Enfermagem\" },\n  { \"id\": 4, \"nome\": \"Nutricionista\" }\n]\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "278eb21f-3d83-409f-abd7-a48402c8e29e",
+      "type": "http",
+      "documentation": "GET /cargo",
+      "method": "get",
+      "endpoint": "cargos",
+      "responses": [
+        {
+          "uuid": "097cb9ee-0e4e-4415-978e-a5dfb87988c6",
+          "body": "[\n  { \"id\": 1, \"nome\": \"Aluno\" },\n  { \"id\": 2, \"nome\": \"Professor\" },\n  { \"id\": 3, \"nome\": \"Coordenador\" },\n  { \"id\": 4, \"nome\": \"Administrativo\" }\n]\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "70cab573-8854-488a-a67a-06f9ca2aca44",
+      "type": "http",
+      "documentation": "Get /andares",
+      "method": "get",
+      "endpoint": "andares",
+      "responses": [
+        {
+          "uuid": "4f2e9b94-6d78-41d5-8015-d72ba467f2c6",
+          "body": "[\n  { \"id\": 1, \"nome\": \"1º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 2, \"nome\": \"2º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 3, \"nome\": \"3º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 4, \"nome\": \"4º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 5, \"nome\": \"5º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 6, \"nome\": \"6º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n\n  { \"id\": 7, \"nome\": \"1º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 8, \"nome\": \"2º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 9, \"nome\": \"3º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 10, \"nome\": \"4º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 11, \"nome\": \"5º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } }\n]\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": " (copy) (copy)",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "c15505ee-5f33-4899-834e-a8c1d237f27b",
+          "body": "[\n  { \"id\": 1, \"nome\": \"1º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 2, \"nome\": \"2º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 3, \"nome\": \"3º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 4, \"nome\": \"4º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 5, \"nome\": \"5º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } },\n  { \"id\": 6, \"nome\": \"6º Andar\", \"predio\": { \"id\": 1, \"nome\": \"Prédio Central\", \"endereco\": \"Av. Principal, 100\", \"telefone\": \"81999990001\" } }\n  ]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "predioId",
+              "value": "1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "body",
+              "modifier": "$.predio.id",
+              "value": "1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "ecffdf08-4f52-46d8-b1a1-8c76fd4c9b57",
+          "body": "[\n  { \"id\": 7, \"nome\": \"1º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 8, \"nome\": \"2º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 9, \"nome\": \"3º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 10, \"nome\": \"4º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } },\n  { \"id\": 11, \"nome\": \"5º Andar\", \"predio\": { \"id\": 2, \"nome\": \"Bloco A\", \"endereco\": \"Rua Secundária, 50\", \"telefone\": \"81999990002\" } }\n]\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "predioId",
+              "value": "2",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "body",
+              "modifier": "$.predio.id",
+              "value": "2",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "b8ed13c4-39ad-4353-8b93-fc14ab486c76",
+      "type": "http",
+      "documentation": "POST /login",
+      "method": "post",
+      "endpoint": "login",
+      "responses": [
+        {
+          "uuid": "b14ea3e5-5102-4000-acaa-cd07842e0ac2",
+          "body": "{\n  \"nome\": \"Coordenador Administrativo\",\n  \"email\": \"jose.maranhao@example.com\",\n  \"cpf\": \"12345678900\",\n  \"senha\": \"admin\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "$.login",
+              "value": "jose.maranhao@example.com",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "body",
+              "modifier": "$.senha",
+              "value": "admin",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "69e2ba3e-69c4-4ba9-8b8c-eff3e60ff60c",
+      "type": "http",
+      "documentation": "GET /me",
+      "method": "get",
+      "endpoint": "me",
+      "responses": [
+        {
+          "uuid": "7dfcd29b-9fba-48af-941f-47e411c42714",
+          "body": "{\n  \"id\": 1,\n  \"username\": \"jose.maranhao\",\n  \"first_name\": \"Jose\",\n  \"last_name\": \"Maranhao\",\n  \"email\": \"jose.maranhao@example.com\",\n  \"is_active\": true,\n  \"cargo\": {\n    \"id\": 2,\n    \"nome\": \"Coordenador Administrativo\"\n  },\n  \"curso\": {\n    \"id\": 3,\n    \"nome\": \"Administração Hospitalar\"\n  },\n  \"foto_url\": \"https://example.com/fotos/jose.jpg\",\n  \"data_ultimo_login\": \"2025-05-06T08:30:00Z\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    }
+  ],
+  "uuid": "3adc2d47-de22-428c-a376-7ea33f6737dc",
+  "lastMigration": 32,
+  "endpointPrefix": "",
+  "latency": 0,
+  "hostname": "",
+  "rootChildren": [
+    {
+      "type": "folder",
+      "uuid": "dfb93c5a-4274-433a-ac0f-28f95c1cc9bd"
+    },
+    {
+      "type": "folder",
+      "uuid": "f5b4dedf-2c33-4932-babb-c02e2b3a622c"
+    },
+    {
+      "type": "folder",
+      "uuid": "1f1f9416-a82c-42ab-834d-c54251be6281"
+    },
+    {
+      "type": "folder",
+      "uuid": "45b77b72-14ca-42b8-97b9-8d91eecd8962"
+    },
+    {
+      "type": "folder",
+      "uuid": "1707f4d5-cba1-4e2b-991b-dce6ba32ed19"
+    },
+    {
+      "type": "folder",
+      "uuid": "ac2d2911-25f4-445c-87c8-0abe53133d89"
+    },
+    {
+      "type": "folder",
+      "uuid": "a92e353a-6e9e-4bcf-af97-dbb641655650"
+    },
+    {
+      "type": "folder",
+      "uuid": "f2c79c8a-4670-4f2a-83e0-18b3fbaa1f7e"
+    },
+    {
+      "type": "route",
+      "uuid": "de86c51a-be82-4c5f-a929-b12714f899a2"
+    },
+    {
+      "type": "route",
+      "uuid": "278eb21f-3d83-409f-abd7-a48402c8e29e"
+    },
+    {
+      "type": "folder",
+      "uuid": "f079898d-39cc-4b1e-9490-7fed324a9077"
+    },
+    {
+      "type": "route",
+      "uuid": "b8ed13c4-39ad-4353-8b93-fc14ab486c76"
+    },
+    {
+      "type": "route",
+      "uuid": "69e2ba3e-69c4-4ba9-8b8c-eff3e60ff60c"
+    }
+  ],
+  "folders": [
+    {
+      "uuid": "dfb93c5a-4274-433a-ac0f-28f95c1cc9bd",
+      "name": "kits",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "3cf99ef3-e00d-41d5-80ab-fae3cf8ea2ac"
+        },
+        {
+          "type": "route",
+          "uuid": "4a9c1508-115c-41ad-b6be-d5c08253394f"
+        },
+        {
+          "type": "route",
+          "uuid": "fe001aa8-9b06-4cb1-85ac-5dadbd165567"
+        },
+        {
+          "type": "route",
+          "uuid": "4f336a92-6fad-4f63-a71c-b6343344d98b"
+        }
+      ]
+    },
+    {
+      "uuid": "f5b4dedf-2c33-4932-babb-c02e2b3a622c",
+      "name": "chaves",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "9b3127b7-34c3-4e19-822c-504c4d09f7a2"
+        },
+        {
+          "type": "route",
+          "uuid": "87f3d560-5604-41b2-aaae-794e5bbea687"
+        },
+        {
+          "type": "route",
+          "uuid": "983b37db-1033-4d78-940b-bee88938e9c5"
+        },
+        {
+          "type": "route",
+          "uuid": "5ffd1b61-4440-4cbb-85f8-a82eac05fbde"
+        }
+      ]
+    },
+    {
+      "uuid": "1f1f9416-a82c-42ab-834d-c54251be6281",
+      "name": "salas",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "02a81c2d-99f7-4f9d-af34-f8bc331771e0"
+        },
+        {
+          "type": "route",
+          "uuid": "805236f3-e726-495b-b432-45358e1506c6"
+        },
+        {
+          "type": "route",
+          "uuid": "8c14fdf6-fb35-4b4d-80a0-d6a3724cf455"
+        },
+        {
+          "type": "route",
+          "uuid": "9608e8df-acd9-4be8-9eff-f5b163742577"
+        }
+      ]
+    },
+    {
+      "uuid": "45b77b72-14ca-42b8-97b9-8d91eecd8962",
+      "name": "predios",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "287e96dc-9f73-4000-b93c-79b7fb5d0981"
+        },
+        {
+          "type": "route",
+          "uuid": "63e6382c-6770-495e-b13c-d61d70be185c"
+        },
+        {
+          "type": "route",
+          "uuid": "7cdab75b-c9e0-4555-975f-03a19824b49f"
+        },
+        {
+          "type": "route",
+          "uuid": "7490f05a-6c96-4b78-9734-b71256aee7a2"
+        }
+      ]
+    },
+    {
+      "uuid": "1707f4d5-cba1-4e2b-991b-dce6ba32ed19",
+      "name": "relatorio",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "5f6c1f38-6aac-426b-b0e8-226ca5c36f0c"
+        }
+      ]
+    },
+    {
+      "uuid": "ac2d2911-25f4-445c-87c8-0abe53133d89",
+      "name": "emprestimos",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "068061e3-aac5-4ef4-bbaa-7bacc234312d"
+        },
+        {
+          "type": "route",
+          "uuid": "c40d8e78-0c24-444e-8513-f5508754c7c2"
+        },
+        {
+          "type": "route",
+          "uuid": "b50bcda4-7c53-465b-8dd6-b5cd7ff844dc"
+        }
+      ]
+    },
+    {
+      "uuid": "a92e353a-6e9e-4bcf-af97-dbb641655650",
+      "name": "agendamentos",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "530a3f3c-ded7-48f1-8dad-6c1cab778626"
+        }
+      ]
+    },
+    {
+      "uuid": "f2c79c8a-4670-4f2a-83e0-18b3fbaa1f7e",
+      "name": "usuarios",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "022671ee-5a7c-45ce-b111-cc2a4221a159"
+        },
+        {
+          "type": "route",
+          "uuid": "d242c3c1-2743-428a-a6b0-81b350e6e6c2"
+        },
+        {
+          "type": "route",
+          "uuid": "8dd43fcc-1d3c-442d-a2a8-695093f7b0f8"
+        },
+        {
+          "type": "route",
+          "uuid": "59f5674e-aaf6-45f2-8857-f609dfd628e4"
+        },
+        {
+          "type": "route",
+          "uuid": "750f032d-1737-4ce6-aa8a-80a2995977b0"
+        }
+      ]
+    },
+    {
+      "uuid": "f079898d-39cc-4b1e-9490-7fed324a9077",
+      "name": "andares",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "70cab573-8854-488a-a67a-06f9ca2aca44"
+        }
+      ]
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [],
+  "proxyResHeaders": [],
+  "data": [],
+  "callbacks": []
+}
