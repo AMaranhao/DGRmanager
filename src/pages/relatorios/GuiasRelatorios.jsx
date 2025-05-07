@@ -37,11 +37,11 @@ export default function GuiasRelatorios() {
 
   return (
     <div className="p-8">
-      <h3 className="dashboard-heading mb-4">Relatórios</h3>
+      <h3 className="dashboard-heading">Relatórios</h3>
 
       <div className="mb-6">
         <select
-          className="dashboard-select"
+          className="dashboard-select-relatorio"
           value={relatorioSelecionado}
           onChange={(e) => setRelatorioSelecionado(e.target.value)}
         >

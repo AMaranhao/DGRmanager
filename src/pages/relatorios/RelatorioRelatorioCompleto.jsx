@@ -49,13 +49,7 @@ export default function RelatorioRelatorioCompleto() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="relatorios-titulo">Relatório Geral Completo</h2>
-        <button onClick={handleImprimir} className="btn-imprimir">
-          <Printer size={18} />
-          Imprimir
-        </button>
-      </div>
+      
 
       {/* Filtros */}
       <div className="filtro-container">
@@ -199,8 +193,12 @@ export default function RelatorioRelatorioCompleto() {
             )}
           </div>
 
-
-
+          <div className="flex justify-between items-center">
+            <button onClick={handleImprimir} className="btn-imprimir">
+              <Printer size={18} />
+              Imprimir
+            </button>
+          </div>
 
       </div>
 

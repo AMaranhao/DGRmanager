@@ -16,7 +16,7 @@
     font-size: 1.5rem;
     font-weight: 500;
     color: #1f2937;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
   
   .dashboard-select-label {
@@ -52,7 +52,7 @@
   }
   
   .dashboard-tile:hover {
-    transform: scale(1.03);
+    transform: scale(1.2);
   }
   
   .dashboard-tile-retirado {

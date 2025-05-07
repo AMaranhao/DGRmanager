@@ -55,13 +55,7 @@ export default function RelatorioSalasMaisUtilizadas() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="relatorios-titulo">Salas Mais Utilizadas</h2>
-        <button onClick={handleImprimir} className="btn-imprimir">
-          <Printer size={18} />
-          Imprimir
-        </button>
-      </div>
+      
 
       {/* Filtros */}
       <div className="filtro-container">
@@ -105,6 +99,12 @@ export default function RelatorioSalasMaisUtilizadas() {
             <option value="desc">Mais utilizadas primeiro</option>
             <option value="asc">Menos utilizadas primeiro</option>
           </select>
+        </div>
+        <div className="flex justify-between items-center">
+          <button onClick={handleImprimir} className="btn-imprimir">
+            <Printer size={18} />
+            Imprimir
+          </button>
         </div>
       </div>
 

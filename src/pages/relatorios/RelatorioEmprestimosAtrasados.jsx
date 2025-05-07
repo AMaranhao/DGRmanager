@@ -60,15 +60,7 @@ export default function RelatorioEmprestimosAtrasados() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="relatorios-titulo">
-          Usuários com Empréstimos em Atraso
-        </h2>
-        <button onClick={handlePrint} className="btn-imprimir">
-          <Printer size={18} />
-          Imprimir
-        </button>
-      </div>
+      
 
       {/* Filtros */}
       <div className="filtro-container">
@@ -149,6 +141,12 @@ export default function RelatorioEmprestimosAtrasados() {
             </button>
           )}
         </div>
+        <div className="flex justify-between items-center">
+        <button onClick={handlePrint} className="btn-imprimir">
+          <Printer size={18} />
+          Imprimir
+        </button>
+      </div>
       </div>
 
       {/* Resultado */}

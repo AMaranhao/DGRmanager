@@ -63,13 +63,7 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="relatorios-titulo">Histórico de Utilização por Andar</h2>
-        <button onClick={handleImprimir} className="btn-imprimir">
-          <Printer size={18} />
-          Imprimir
-        </button>
-      </div>
+      
 
       {/* Filtros */}
       <div className="filtro-container">
@@ -134,6 +128,12 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
               <X size={14} />
             </button>
           )}
+        </div>
+        <div className="flex justify-between items-center">
+          <button onClick={handleImprimir} className="btn-imprimir">
+            <Printer size={18} />
+            Imprimir
+          </button>
         </div>
       </div>
 
