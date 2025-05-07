@@ -50,44 +50,47 @@ export default function RelatorioEmprestimosPeriodo() {
 
       {/* Filtros */}
       <div className="filtro-container">
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataInicio && (
-            <button
-              type="button"
-              onClick={() => setDataInicio("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
+        <div className="filtros-esquerda">
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <Input
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataInicio && (
+              <button
+                type="button"
+                onClick={() => setDataInicio("")}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <Input
+              type="date"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataFim && (
+              <button
+                type="button"
+                onClick={() => setDataFim("")}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataFim && (
-            <button
-              type="button"
-              onClick={() => setDataFim("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-        <div className="flex justify-between items-center">
+        <div className="filtro-imprimir">
           <button onClick={handlePrint} className="btn-imprimir">
             <Printer size={18} />
             Imprimir

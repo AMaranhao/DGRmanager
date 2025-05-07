@@ -13,6 +13,7 @@ import { X, Printer } from "lucide-react";
 export default function RelatorioEmprestimosAtrasados() {
   const [atrasados, setAtrasados] = useState([]);
   const [filtroSala, setFiltroSala] = useState("");
+  const [filtroGeral, setFiltroGeral] = useState("");
   const [filtroUsuario, setFiltroUsuario] = useState("");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
@@ -45,10 +46,9 @@ export default function RelatorioEmprestimosAtrasados() {
     const dentroDataFim = fim ? isAfter(fim, horarioRetirada) : true;
 
     return (
-      (filtroSala === "" ||
-        emp.sala?.numero.toLowerCase().includes(filtroSala.toLowerCase())) &&
-      (filtroUsuario === "" ||
-        emp.usuario?.toLowerCase().includes(filtroUsuario.toLowerCase())) &&
+      (filtroGeral === "" ||
+        emp.usuario?.toLowerCase().includes(filtroGeral.toLowerCase()) ||
+        emp.sala?.numero?.toLowerCase().includes(filtroGeral.toLowerCase())) &&
       dentroDataInicio &&
       dentroDataFim
     );
@@ -105,15 +105,15 @@ export default function RelatorioEmprestimosAtrasados() {
         <div className="relatorios-filtro-group relatorios-filtro-text">
           <Input
             type="text"
-            placeholder="Filtrar por Sala"
-            value={filtroSala}
-            onChange={(e) => setFiltroSala(e.target.value)}
+            placeholder="Usuário ou Sala"
+            value={filtroGeral}
+            onChange={(e) => setFiltroGeral(e.target.value)}
             className="dashboard-select dashboard-filtro-usuario-input"
           />
-          {filtroSala && (
+          {filtroGeral && (
             <button
               type="button"
-              onClick={() => setFiltroSala("")}
+              onClick={() => setFiltroGeral("")}
               className="dashboard-filtro-clear"
               title="Limpar"
             >
@@ -122,25 +122,6 @@ export default function RelatorioEmprestimosAtrasados() {
           )}
         </div>
 
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="text"
-            placeholder="Filtrar por Usuário"
-            value={filtroUsuario}
-            onChange={(e) => setFiltroUsuario(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {filtroUsuario && (
-            <button
-              type="button"
-              onClick={() => setFiltroUsuario("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
         <div className="flex justify-between items-center">
         <button onClick={handlePrint} className="btn-imprimir">
           <Printer size={18} />

@@ -115,3 +115,24 @@ padding: 0 0.5rem;
 .relatorios-filtro-text {
 padding-left: 0.5rem;
 }
+
+.filtro-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+}
+
+.filtros-esquerda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filtro-imprimir {
+  margin-left: auto;
+}

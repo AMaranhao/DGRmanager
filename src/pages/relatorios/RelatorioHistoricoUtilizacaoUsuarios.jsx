@@ -107,7 +107,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
         <div className="dashboard-filtro-usuario">
           <Input
             type="text"
-            placeholder="Filtrar por usuário"
+            placeholder="Todos os Usuários"
             value={usuarioSelecionado}
             onChange={(e) => setUsuarioSelecionado(e.target.value)}
             className="dashboard-select dashboard-filtro-usuario-input"

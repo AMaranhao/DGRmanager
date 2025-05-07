@@ -36,11 +36,15 @@ export default function RelatorioRelatorioCompleto() {
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
     const atendeStatus = statusFiltro ? (emp.status ?? "Indefinido") === statusFiltro : true;
-    const atendeUsuario = usuarioFiltro ? emp.usuario?.toLowerCase().includes(usuarioFiltro.toLowerCase()) : true;
-    const atendeSala = salaFiltro ? emp.sala?.numero?.toLowerCase().includes(salaFiltro.toLowerCase()) : true;
+    
+    const atendePesquisaGeral = usuarioFiltro
+      ? (emp.usuario?.toLowerCase().includes(usuarioFiltro.toLowerCase()) ||
+        emp.sala?.numero?.toLowerCase().includes(usuarioFiltro.toLowerCase()))
+      : true;
+
     const atendeAndar = andarFiltro ? emp.sala?.numero?.startsWith(andarFiltro.toUpperCase()) : true;
 
-    return dentroDataInicio && dentroDataFim && atendeStatus && atendeUsuario && atendeSala && atendeAndar;
+    return dentroDataInicio && dentroDataFim && atendeStatus && atendePesquisaGeral && atendeAndar;
   });
 
   const handleImprimir = () => {
@@ -107,27 +111,6 @@ export default function RelatorioRelatorioCompleto() {
           </select>
         </div>
 
-        {/* Usuário */}
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="text"
-            placeholder="Filtrar por Usuário"
-            value={usuarioFiltro}
-            onChange={(e) => setUsuarioFiltro(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {usuarioFiltro && (
-            <button
-              type="button"
-              onClick={() => setUsuarioFiltro("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
         {/* Andar */}
         <div className="relatorios-filtro-group relatorios-filtro-text">
           <select
@@ -157,41 +140,28 @@ export default function RelatorioRelatorioCompleto() {
           )}
         </div>
 
-        {/* Sala */}
-          <div className="relatorios-filtro-group relatorios-filtro-text">
-            <select
-              value={salaFiltro}
-              onChange={(e) => setSalaFiltro(e.target.value)}
-              className="dashboard-select"
+        {/* Usuário */}
+        <div className="relatorios-filtro-group relatorios-filtro-text">
+          <Input
+            type="text"
+            placeholder="Usuário ou Sala"
+            value={usuarioFiltro}
+            onChange={(e) => setUsuarioFiltro(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+          />
+          {usuarioFiltro && (
+            <button
+              type="button"
+              onClick={() => setUsuarioFiltro("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
             >
-              <option value="">Todas as Salas</option>
-              {[...new Set(
-                emprestimos
-                  .filter(emp => {
-                    if (!andarFiltro) return true;
-                    return emp.sala?.numero?.startsWith(andarFiltro.toUpperCase());
-                  })
-                  .map(emp => emp.sala?.numero)
-              )]
-                .filter(Boolean)
-                .sort()
-                .map((sala) => (
-                  <option key={sala} value={sala}>
-                    Sala {sala}
-                  </option>
-                ))}
-            </select>
-            {salaFiltro && (
-              <button
-                type="button"
-                onClick={() => setSalaFiltro("")}
-                className="dashboard-filtro-clear"
-                title="Limpar"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+
 
           <div className="flex justify-between items-center">
             <button onClick={handleImprimir} className="btn-imprimir">

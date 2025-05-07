@@ -45,12 +45,12 @@ export default function GuiasRelatorios() {
           value={relatorioSelecionado}
           onChange={(e) => setRelatorioSelecionado(e.target.value)}
         >
-          <option value="emprestimos">Empréstimos</option>
+          <option value="emprestimos">Empréstimos por Período</option>
           <option value="historico-andar">Histórico de Uso por Andar</option>
           <option value="historico-sala">Histórico de Uso por Sala</option>
           <option value="historico-usuarios">Histórico de Uso por Usuários</option>
           <option value="salas">Salas Mais Utilizadas</option>
-          <option value="emprestimos-atrasados">Empréstimos Atrasados</option>
+          <option value="emprestimos-atrasados">Devoluções Atrasados</option>
           <option value="completo">Relatório Completo</option>
         </select>
       </div>

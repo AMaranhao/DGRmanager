@@ -111,7 +111,7 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
             onChange={(e) => setAndarSelecionado(e.target.value)}
             className="dashboard-select"
           >
-            <option value="">Todos os andares</option>
+            <option value="">Todos os Andares</option>
             {todosAndares.map((andar) => (
               <option key={andar} value={andar}>
                 Andar {andar}
