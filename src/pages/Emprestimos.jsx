@@ -58,6 +58,7 @@ export default function Emprestimos() {
       {/* Filtros */}
       <div className="dashboard-filtro">
         <div className="dashboard-filtro-group dashboard-filtro-text">
+        <label className="relatorio-label">De:</label>
           <Input
             type="date"
             value={dataInicial}
@@ -77,6 +78,7 @@ export default function Emprestimos() {
         </div>
 
         <div className="dashboard-filtro-group dashboard-filtro-text">
+        <label className="relatorio-label">Até:</label>
           <Input
             type="date"
             value={dataFinal}

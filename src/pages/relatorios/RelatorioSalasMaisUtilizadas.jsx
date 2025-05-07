@@ -58,9 +58,10 @@ export default function RelatorioSalasMaisUtilizadas() {
       
 
       {/* Filtros */}
-      <div className="filtro-container">
+      <div className="filtro-container noprint">
         {/* Data Início */}
         <div className="relatorios-filtro-group relatorios-filtro-text">
+        <label className="relatorio-label">De:</label>
           <Input
             type="date"
             value={dataInicio}
@@ -76,6 +77,7 @@ export default function RelatorioSalasMaisUtilizadas() {
 
         {/* Data Fim */}
         <div className="relatorios-filtro-group relatorios-filtro-text">
+        <label className="relatorio-label">Até:</label>
           <Input
             type="date"
             value={dataFim}

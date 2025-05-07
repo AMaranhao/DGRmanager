@@ -66,8 +66,9 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
       
 
       {/* Filtros */}
-      <div className="filtro-container">
+      <div className="filtro-container noprint">
         <div className="relatorios-filtro-group relatorios-filtro-text">
+        <label className="relatorio-label">De:</label>
           <Input
             type="date"
             value={dataInicio}
@@ -87,6 +88,7 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
         </div>
 
         <div className="relatorios-filtro-group relatorios-filtro-text">
+        <label className="relatorio-label">Até:</label>
           <Input
             type="date"
             value={dataFim}
@@ -122,7 +124,7 @@ export default function RelatorioHistoricoUtilizacaoAndar() {
             <button
               type="button"
               onClick={() => setAndarSelecionado("")}
-              className="dashboard-filtro-clear"
+              className="dashboard-filtro-clear relatorio-select-clear"
               title="Limpar"
             >
               <X size={14} />

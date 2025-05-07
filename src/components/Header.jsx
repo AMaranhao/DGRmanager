@@ -3,6 +3,9 @@ import { User, Settings } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+import '@/styles/components.css';
+import '@/styles/pages/buttons.css';
+
 export default function Header() {
   const { logout } = useAuth();
   const navigate = useNavigate(); // 👈 necessário para navegação
@@ -21,7 +24,7 @@ export default function Header() {
       </div>
 
       {/* Ações à direita */}
-      <div className="header-actions">
+      <div className="header-actions noprint">
         <button
           className="header-icon-button"
           onClick={() => navigate('/perfil')}

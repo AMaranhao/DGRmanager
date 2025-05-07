@@ -63,7 +63,7 @@ export default function RelatorioEmprestimosAtrasados() {
       
 
       {/* Filtros */}
-      <div className="filtro-container">
+      <div className="filtro-container noprint">
         <div className="relatorios-filtro-group relatorios-filtro-text">
           <Input
             type="date"
@@ -114,7 +114,7 @@ export default function RelatorioEmprestimosAtrasados() {
             <button
               type="button"
               onClick={() => setFiltroGeral("")}
-              className="dashboard-filtro-clear"
+              className="dashboard-filtro-clear relatorio-select-clear"
               title="Limpar"
             >
               <X size={14} />

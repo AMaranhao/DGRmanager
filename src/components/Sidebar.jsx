@@ -2,9 +2,12 @@
 import { Link } from "react-router-dom";
 import { KeyRound, ClipboardList, BookText, Building2, Users } from "lucide-react";
 
+import '@/styles/components.css';
+import '@/styles/pages/buttons.css';
+
 export default function Sidebar() {
   return (
-    <aside className="sidebar">
+    <aside className="sidebar noprint">
       {/* Logo */}
       <Link to="/dashboard" className="sidebar-logo-container">
         <img src="/logo.png" alt="Logo" className="sidebar-logo" />

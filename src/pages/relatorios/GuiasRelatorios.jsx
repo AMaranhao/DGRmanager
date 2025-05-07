@@ -11,6 +11,9 @@ import RelatorioSalasMaisUtilizadas from "./RelatorioSalasMaisUtilizadas";
 import RelatorioEmprestimosAtrasados from "./RelatorioEmprestimosAtrasados";
 import RelatorioRelatorioCompleto from "./RelatorioRelatorioCompleto";
 
+import "@/styles/pages/relatorios.css";
+
+
 export default function GuiasRelatorios() {
   const [relatorioSelecionado, setRelatorioSelecionado] = useState("emprestimos");
 
@@ -38,6 +41,9 @@ export default function GuiasRelatorios() {
   return (
     <div className="p-8">
       <h3 className="dashboard-heading">Relatórios</h3>
+        <div className='justonprint logoprint'>
+            <img src="/logo.png" alt="Logo" className="sidebar-logo" />
+        </div>
 
       <div className="mb-6">
         <select
@@ -53,6 +59,8 @@ export default function GuiasRelatorios() {
           <option value="emprestimos-atrasados">Devoluções Atrasados</option>
           <option value="completo">Relatório Completo</option>
         </select>
+      </div>
+      <div className='justonprint'>
       </div>
 
       <div>{renderRelatorio()}</div>

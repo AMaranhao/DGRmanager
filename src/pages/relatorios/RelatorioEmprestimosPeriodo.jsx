@@ -49,9 +49,10 @@ export default function RelatorioEmprestimosPeriodo() {
       
 
       {/* Filtros */}
-      <div className="filtro-container">
+      <div className="filtro-container noprint">
         <div className="filtros-esquerda">
           <div className="relatorios-filtro-group relatorios-filtro-text">
+          <label className="relatorio-label">De:</label>
             <Input
               type="date"
               value={dataInicio}
@@ -71,6 +72,7 @@ export default function RelatorioEmprestimosPeriodo() {
           </div>
 
           <div className="relatorios-filtro-group relatorios-filtro-text">
+          <label className="relatorio-label">Até:</label>
             <Input
               type="date"
               value={dataFim}

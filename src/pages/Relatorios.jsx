@@ -8,12 +8,13 @@ import RelatorioSalasMaisUtilizadas from "./relatorios/RelatorioSalasMaisUtiliza
 import RelatorioEmprestimosAtrasados from "./relatorios/RelatorioEmprestimosAtrasados";
 import RelatorioRelatorioCompleto from "./relatorios/RelatorioRelatorioCompleto";
 
+import "@/styles/pages/relatorios.css";
 
 export default function Relatorios() {
   return (
     <div className="p-8">
       <h3 className="dashboard-heading">Relatórios</h3>
-
+      
       <div className="space-y-8">
         <RelatorioEmprestimosPeriodo/>
         <RelatorioHistoricoUtilizacaoAndar/>

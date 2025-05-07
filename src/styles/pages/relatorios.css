@@ -133,6 +133,37 @@ padding-left: 0.5rem;
   align-items: center;
 }
 
+.relatorio-select-clear {
+  right: 1.3rem !important;
+}
+
 .filtro-imprimir {
   margin-left: auto;
+}
+
+
+.justonprint {
+  display: none;
+}
+
+@media print {
+  .justonprint {
+    display: block !important;
+    margin-bottom: 2rem;
+  }
+
+  .logoprint {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 80px;
+    height: auto;
+  }
+}
+
+.relatorio-label {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  display: block;
 }
