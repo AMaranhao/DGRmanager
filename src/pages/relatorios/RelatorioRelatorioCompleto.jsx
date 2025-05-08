@@ -1,12 +1,13 @@
-import "@/styles/pages/relatorios.css";
-import "@/styles/pages/filters.css";
-import "@/styles/pages/buttons.css";
-
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
 import { Input } from "@/components/ui/input";
 import { format, parseISO, isAfter } from "date-fns";
 import { X, Printer } from "lucide-react";
+
+import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/buttons.css";
+import '@/styles/mobile.css';
 
 export default function RelatorioRelatorioCompleto() {
   const [emprestimos, setEmprestimos] = useState([]);

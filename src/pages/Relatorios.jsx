@@ -1,5 +1,3 @@
-// src/pages/Relatorios.jsx
-
 import RelatorioEmprestimosPeriodo from "./relatorios/RelatorioEmprestimosPeriodo";
 import RelatorioHistoricoUtilizacaoAndar from "./relatorios/RelatorioHistoricoUtilizacaoAndar";
 import RelatorioHistoricoUtilizacaoSala from "./relatorios/RelatorioHistoricoUtilizacaoSala";
@@ -9,6 +7,7 @@ import RelatorioEmprestimosAtrasados from "./relatorios/RelatorioEmprestimosAtra
 import RelatorioRelatorioCompleto from "./relatorios/RelatorioRelatorioCompleto";
 
 import "@/styles/pages/relatorios.css";
+import '@/styles/mobile.css';
 
 export default function Relatorios() {
   return (

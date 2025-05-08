@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
   deleteSala, fetchChaves, createChave, updateChave, deleteChave, fetchKits, createKit, updateKit, 
   deleteKit, fetchAndaresPorPredio,} from '../services/apiService';
+import { X } from "lucide-react";
 
 import '@/styles/pages/infraestrutura.css';
 import '@/styles/pages/modals.css';
@@ -13,8 +14,9 @@ import '@/styles/pages/buttons.css';
 import '@/styles/pages/filters.css';
 import '@/styles/pages/status.css';
 import '@/styles/pages/tables.css';
+import '@/styles/mobile.css';
 
-import { X } from "lucide-react";
+
 
 export default function Infraestrutura() {
   const [tab, setTab] = useState('predios');

@@ -10,6 +10,7 @@ import '@/styles/pages/filters.css';
 import '@/styles/pages/modals.css';
 import '@/styles/pages/buttons.css';
 import '@/styles/pages/status.css';
+import '@/styles/mobile.css';
 
 export default function Dashboard() {
   const [agendamentos, setAgendamentos] = useState([]);

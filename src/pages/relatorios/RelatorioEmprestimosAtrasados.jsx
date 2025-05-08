@@ -1,14 +1,14 @@
-import "@/styles/pages/relatorios.css";
-import "@/styles/pages/filters.css";
-import "@/styles/pages/buttons.css";
-import "@/styles/pages/tables.css";
-
-
 import { useState, useEffect } from "react";
 import { fetchEmprestimos } from "@/services/apiService";
 import { Input } from "@/components/ui/input";
 import { format, isAfter, parseISO } from "date-fns";
 import { X, Printer } from "lucide-react";
+
+import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
+import "@/styles/pages/buttons.css";
+import "@/styles/pages/tables.css";
+import '@/styles/mobile.css';
 
 export default function RelatorioEmprestimosAtrasados() {
   const [atrasados, setAtrasados] = useState([]);

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchUsuarioLogado } from '../services/apiService';
-import '@/styles/pages/perfilUsuario.css';
 
+import '@/styles/pages/perfilUsuario.css';
+import '@/styles/mobile.css';
 
 export default function PerfilUsuario() {
   const [usuario, setUsuario] = useState(null);

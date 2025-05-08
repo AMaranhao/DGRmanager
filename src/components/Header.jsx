@@ -1,9 +1,9 @@
-// src/components/Header.jsx
 import { User, Settings } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import '@/styles/components.css';
+import '@/styles/mobile.css';
 import '@/styles/pages/buttons.css';
 
 export default function Header() {

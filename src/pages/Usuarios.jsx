@@ -11,7 +11,7 @@ import "@/styles/pages/tables.css";
 import "@/styles/pages/buttons.css";
 import "@/styles/pages/modals.css";
 import "@/styles/pages/status.css";
-
+import '@/styles/mobile.css';
 
 
 export default function Usuarios() {

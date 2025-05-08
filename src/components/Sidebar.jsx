@@ -1,8 +1,8 @@
-// src/components/Sidebar.jsx
 import { Link } from "react-router-dom";
 import { KeyRound, ClipboardList, BookText, Building2, Users } from "lucide-react";
 
 import '@/styles/components.css';
+import '@/styles/mobile.css';
 import '@/styles/pages/buttons.css';
 
 export default function Sidebar() {

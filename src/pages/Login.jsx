@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+
 import '@/styles/pages/login.css';
+import '@/styles/mobile.css';
 
 export default function LoginPage() {
   const [login, setLogin] = useState('');

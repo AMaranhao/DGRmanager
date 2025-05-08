@@ -1,6 +1,3 @@
-// Estrutura inicial sugerida para o módulo de relatórios:
-
-// src/pages/relatorios/GuiasRelatorios.jsx
 import { useState } from 'react';
 //import { Select } from '@/components/ui/select'; // Se estiver usando um Select customizado
 import RelatorioEmprestimosPeriodo from "./RelatorioEmprestimosPeriodo";
@@ -11,6 +8,7 @@ import RelatorioSalasMaisUtilizadas from "./RelatorioSalasMaisUtilizadas";
 import RelatorioEmprestimosAtrasados from "./RelatorioEmprestimosAtrasados";
 import RelatorioRelatorioCompleto from "./RelatorioRelatorioCompleto";
 
+import '@/styles/mobile.css';
 import "@/styles/pages/relatorios.css";
 import "@/styles/pages/filters.css";
 
