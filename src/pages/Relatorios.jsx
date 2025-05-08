@@ -15,7 +15,7 @@ export default function Relatorios() {
     <div className="p-8">
       <h3 className="dashboard-heading">Relatórios</h3>
       
-      <div className="space-y-8">
+      <div className="dashboard-select-wrapper">
         <RelatorioEmprestimosPeriodo/>
         <RelatorioHistoricoUtilizacaoAndar/>
         <RelatorioHistoricoUtilizacaoSala/>

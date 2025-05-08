@@ -219,11 +219,11 @@ const confirmarExclusaoItem = async () => {
       <h1 className="dashboard-heading">Infraestrutura</h1>
 
       <Tabs defaultValue="predios" value={tab} onValueChange={setTab} className="infraestrutura-tabs">
-      <div className="dashboard-select-wrapper mb-6">
+      <div className="dashboard-select-wrapper">
         <select
           value={tab}
           onChange={(e) => setTab(e.target.value)}
-          className="dashboard-select"
+          className="dashboard-select-relatorio"
         >
           <option value="predios">Prédios</option>
           <option value="salas">Salas</option>
@@ -369,29 +369,35 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Salas */}
         <TabsContent value="salas">
           <div className="infraestrutura-section">
+            
+            <div className="filtros-esquerda">
+              <h2 className="infraestrutura-section-title">Lista de Salas</h2>
+              
 
-            <div className="dashboard-filtro">
-              <div className="dashboard-filtro-usuario">
-                <input
-                  type="text"
-                  placeholder="Buscar por número da sala"
-                  value={buscaSala}
-                  onChange={(e) => setBuscaSala(e.target.value)}
-                  className="dashboard-select dashboard-filtro-usuario-input"
-                />
-                {buscaSala && (
-                  <button
-                    onClick={() => setBuscaSala('')}
-                    className="dashboard-filtro-clear"
-                    title="Limpar"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
+              
+              <div className="dashboard-filtro">
+                <div className="dashboard-filtro-usuario filtro-infraestrutura">
+                  <input
+                    type="text"
+                    placeholder="Buscar por número da sala"
+                    value={buscaSala}
+                    onChange={(e) => setBuscaSala(e.target.value)}
+                    className="dashboard-select dashboard-filtro-usuario-input"
+                  />
+                  {buscaSala && (
+                    <button
+                      onClick={() => setBuscaSala('')}
+                      className="dashboard-filtro-clear"
+                      title="Limpar"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
-            <h2 className="infraestrutura-section-title">Lista de Salas</h2>
+            
             
             <Dialog open={modalSalaAberto} onOpenChange={setModalSalaAberto}>
               <DialogOverlay className="dialog-overlay" />
@@ -538,9 +544,11 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Chaves */}
         <TabsContent value="chaves">
           <div className="infraestrutura-section">
+            <div className="filtros-esquerda">
+            <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
             {/* Filtro por número da sala */}
             <div className="dashboard-filtro">
-              <div className="dashboard-filtro-usuario">
+              <div className="dashboard-filtro-usuario filtro-infraestrutura">
                 <input
                   type="text"
                   placeholder="Buscar por número da sala"
@@ -560,7 +568,8 @@ const confirmarExclusaoItem = async () => {
               </div>
             </div>
 
-            <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
+            
+            </div>
             
             <Dialog open={modalChaveAberto} onOpenChange={setModalChaveAberto}>
               <DialogOverlay className="dialog-overlay" />  
@@ -692,9 +701,11 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Kits */}
         <TabsContent value="kits">
           <div className="infraestrutura-section">
+          <div className="filtros-esquerda">
+          <h2 className="infraestrutura-section-title">Lista de Kits</h2>
             {/* Filtro por número da sala */}
             <div className="dashboard-filtro">
-              <div className="dashboard-filtro-usuario">
+              <div className="dashboard-filtro-usuario filtro-infraestrutura">
                 <input
                   type="text"
                   placeholder="Buscar por número da sala"
@@ -714,7 +725,8 @@ const confirmarExclusaoItem = async () => {
               </div>
             </div>
 
-            <h2 className="infraestrutura-section-title">Lista de Kits</h2>
+            
+            </div>
             
             <Dialog open={modalKitAberto} onOpenChange={setModalKitAberto}>
               <DialogOverlay className="dialog-overlay" />

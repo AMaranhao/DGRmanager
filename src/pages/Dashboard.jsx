@@ -171,7 +171,7 @@ export default function Dashboard() {
         <div className="dashboard-filtro-usuario">
           <input
             type="text"
-            placeholder="Buscar por usuário ou sala"
+            placeholder="Usuário ou Sala"
             value={filtroUsuario}
             onChange={(e) => setFiltroUsuario(e.target.value)}
             className="dashboard-select dashboard-filtro-usuario-input"

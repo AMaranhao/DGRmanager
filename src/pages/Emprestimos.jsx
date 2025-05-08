@@ -123,7 +123,7 @@ export default function Emprestimos() {
         <div className="dashboard-filtro-group dashboard-filtro-text">
           <input
             type="text"
-            placeholder="Buscar por usuário ou sala"
+            placeholder="Usuário ou Sala"
             value={textoPesquisa}
             onChange={(e) => setTextoPesquisa(e.target.value)}
             className="dashboard-select dashboard-filtro-usuario-input"

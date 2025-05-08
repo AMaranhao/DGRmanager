@@ -64,7 +64,9 @@ export default function RelatorioEmprestimosAtrasados() {
 
       {/* Filtros */}
       <div className="filtro-container noprint">
+      <div className="filtros-esquerda">
         <div className="relatorios-filtro-group relatorios-filtro-text">
+         <label className="relatorio-label">Até:</label>
           <Input
             type="date"
             value={dataInicio}
@@ -84,6 +86,7 @@ export default function RelatorioEmprestimosAtrasados() {
         </div>
 
         <div className="relatorios-filtro-group relatorios-filtro-text">
+          <label className="relatorio-label">Até:</label>
           <Input
             type="date"
             value={dataFim}
@@ -121,7 +124,7 @@ export default function RelatorioEmprestimosAtrasados() {
             </button>
           )}
         </div>
-
+        </div>
         <div className="flex justify-between items-center">
         <button onClick={handlePrint} className="btn-imprimir">
           <Printer size={18} />

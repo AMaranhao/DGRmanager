@@ -59,6 +59,7 @@ export default function RelatorioSalasMaisUtilizadas() {
 
       {/* Filtros */}
       <div className="filtro-container noprint">
+      <div className="filtros-esquerda">
         {/* Data Início */}
         <div className="relatorios-filtro-group relatorios-filtro-text">
         <label className="relatorio-label">De:</label>
@@ -96,11 +97,12 @@ export default function RelatorioSalasMaisUtilizadas() {
           <select
             value={ordem}
             onChange={(e) => setOrdem(e.target.value)}
-            className="dashboard-select"
+            className="dashboard-select filtro-salas-utilizadas"
           >
-            <option value="desc">Mais utilizadas primeiro</option>
-            <option value="asc">Menos utilizadas primeiro</option>
+            <option value="desc">Salas Mais Utilizadas Primeiro</option>
+            <option value="asc">Salas Menos Utilizadas Primeiro</option>
           </select>
+        </div>
         </div>
         <div className="flex justify-between items-center">
           <button onClick={handleImprimir} className="btn-imprimir">

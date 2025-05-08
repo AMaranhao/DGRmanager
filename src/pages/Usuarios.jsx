@@ -124,7 +124,7 @@ export default function Usuarios() {
           <div className="dashboard-filtro-group">
             <input
               type="text"
-              placeholder="Buscar por Nome ou Email"
+              placeholder="Nome ou Email"
               value={filtroTexto}
               onChange={(e) => setFiltroTexto(e.target.value)}
               className="dashboard-select dashboard-filtro-usuario-input"

@@ -126,13 +126,6 @@ padding-left: 0.5rem;
   background-color: #f9fafb;
 }
 
-.filtros-esquerda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-}
-
 .relatorio-select-clear {
   right: 1.3rem !important;
 }

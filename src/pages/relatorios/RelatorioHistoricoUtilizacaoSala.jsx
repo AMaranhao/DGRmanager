@@ -59,6 +59,7 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
       {/* Filtros */}
       <div className="filtro-container noprint">
+      <div className="filtros-esquerda">
         <div className="relatorios-filtro-group relatorios-filtro-text">
         <label className="relatorio-label">De:</label>
           <Input
@@ -120,6 +121,7 @@ export default function RelatorioHistoricoUtilizacaoSala() {
               <X size={14} />
             </button>
           )}
+        </div>
         </div>
         <div className="flex justify-between items-center">
           <button onClick={handleImprimir} className="btn-imprimir">

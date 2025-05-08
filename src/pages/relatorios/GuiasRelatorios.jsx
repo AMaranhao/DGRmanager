@@ -12,6 +12,7 @@ import RelatorioEmprestimosAtrasados from "./RelatorioEmprestimosAtrasados";
 import RelatorioRelatorioCompleto from "./RelatorioRelatorioCompleto";
 
 import "@/styles/pages/relatorios.css";
+import "@/styles/pages/filters.css";
 
 
 export default function GuiasRelatorios() {
@@ -45,7 +46,7 @@ export default function GuiasRelatorios() {
             <img src="/logo.png" alt="Logo" className="sidebar-logo" />
         </div>
 
-      <div className="mb-6">
+      <div className="dashboard-select-wrapper">
         <select
           className="dashboard-select-relatorio"
           value={relatorioSelecionado}
