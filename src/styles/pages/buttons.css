@@ -112,3 +112,7 @@
   }
 }
 
+.dark .usuarios-btn-material {
+  background-color: lightgray !important; /* azul */
+  color: #2f4674;
+}

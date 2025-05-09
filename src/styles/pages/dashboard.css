@@ -104,5 +104,94 @@
 
   
   
-  
-  
+  /* ========== MODO ESCURO: DASHBOARD ========== */
+
+/* Fundo geral da página Dashboard */
+.dark .dashboard-container {
+  background-color: #1f2937; /* gray-800 */
+  color: #f9fafb; /* texto branco */
+}
+
+/* Filtros */
+.dark .dashboard-filtros {
+  background-color: #374151; /* gray-700 */
+  border-color: #4b5563;
+}
+
+.dark .dashboard-filtros input,
+.dark .dashboard-filtros select {
+  background-color: #1f2937;
+  color: lightgray;
+  border: 1px solid #4b5563;
+}
+
+.dark .dashboard-filtro-clear {
+  color: #f87171;
+}
+
+/* Seletor de Andares */
+.dark .dashboard-andar-select {
+  background-color: #374151;
+  color: lightgray;
+  border: 1px solid #4b5563;
+}
+.dark .dashboard-heading{
+  color: lightgray;
+}
+
+/* Botão Novo Empréstimo */
+.dark .dashboard-novo-emprestimo-btn {
+  background-color: #2563eb; /* azul-600 */
+  color: lightgray;
+}
+
+.dark .dashboard-novo-emprestimo-btn:hover {
+  background-color: #1d4ed8; /* azul-700 */
+}
+
+/* Modal */
+.dark .dashboard-modal {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: lightgray;
+}
+
+.dark .dashboard-modal h2 {
+  color: lightgray;
+}
+
+.dark .dashboard-modal .modal-description {
+  color: lightgray; /* gray-300 */
+}
+
+/* Tiles (blocos de agendamentos) */
+.dark .dashboard-tile {
+  color: white !important;
+  border: 1px solid #4b5563;
+}
+
+.dark .dashboard-tile-aguardando {
+  background-color: #059669 !important; /* green-600 */
+  color: lightgray;
+}
+
+.dark .dashboard-tile-retirado {
+  background-color: #dc2626 !important; /* red-600 */
+  color: lightgray;
+}
+
+/* Hover nos tiles */
+.dark .dashboard-tile:hover {
+  box-shadow: 0 0 0 2px #60a5fa; /* azul claro */
+}
+
+  /* Fundo da página no modo escuro */
+.dark .dashboard-container {
+  background-color: #1a1e29; /* tom escuro uniforme */
+}
+
+/* Alternativa caso o fundo esteja em outro wrapper */
+.dark main,
+.dark body {
+  background-color: #1a1e29;
+}

@@ -159,3 +159,13 @@ padding: 0 0.5rem;
 .filtro-infraestrutura {
   margin-top: 1.5rem;
 }
+
+
+.dark .dashboard-filtro .dashboard-filtro-group {
+  color: lightgray !important;
+}
+
+.dark .usuarios-modal-select{
+  color: black !important;
+  background-color: lightgray !important;
+}

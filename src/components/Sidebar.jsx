@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { KeyRound, ClipboardList, BookText, Building2, Users } from "lucide-react";
 
+import '@/styles/darkmode-styles.css';
 import '@/styles/components.css';
 import '@/styles/mobile.css';
 import '@/styles/pages/buttons.css';
@@ -16,19 +17,19 @@ export default function Sidebar() {
       {/* Ícones */}
       <div className="sidebar-icons">
         <Link to="/dashboard" title="Chaves">
-          <KeyRound size={28} color="white" />
+          <KeyRound size={28} className="sidebar-icon" />
         </Link>
         <Link to="/emprestimos" title="Empréstimos">
-          <ClipboardList size={28} color="white" />
+          <ClipboardList size={28} className="sidebar-icon" />
         </Link>
         <Link to="/usuarios" title="Usuários">
-          <Users size={28} color="white" />
+          <Users size={28} className="sidebar-icon" />
         </Link>
         <Link to="/infraestrutura" title="Instalações">
-          <Building2 size={28} color="white" />
+          <Building2 size={28} className="sidebar-icon" />
         </Link>
         <Link to="/relatorios" title="Relatórios">
-          <BookText size={28} color="white" />
+          <BookText size={28} className="sidebar-icon" />
         </Link>
       </div>
     </aside>

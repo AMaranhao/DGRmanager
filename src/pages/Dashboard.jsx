@@ -23,9 +23,8 @@ export default function Dashboard() {
   const [erroSenha, setErroSenha] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState('');
   const [modalAvulsoAberto, setModalAvulsoAberto] = useState(false);
-  const [andaresFiltro, setAndaresFiltro] = useState([]); // Para o filtro superior
-  const [andaresModal, setAndaresModal] = useState([]);   // Para o modal avulso
-
+  const [andaresFiltro, setAndaresFiltro] = useState([]); 
+  const [andaresModal, setAndaresModal] = useState([]);  
 
   const [usuarioAvulso, setUsuarioAvulso] = useState('');
   const [tipoSala, setTipoSala] = useState('');
@@ -100,7 +99,7 @@ export default function Dashboard() {
   
     const value = item[valueField];
     const label = item[labelField];
-    const key = `${value}-${label}`; // Combinação segura
+    const key = `${value}-${label}`; 
   
     return (
       <option key={key} value={value}>

@@ -171,3 +171,8 @@
 .dialog-content > button.absolute.top-4.right-4 {
   display: none !important;
 }
+
+.dark .usuarios-modal-input {
+  background-color: lightgray !important;
+  color: black !important;
+}
