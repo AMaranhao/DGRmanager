@@ -176,3 +176,33 @@
   background-color: lightgray !important;
   color: black !important;
 }
+
+.dark .dashboard-modal,
+.dark .usuarios-modal,
+.dark .dashboard-modal-confirm {
+  background-color: #1f2937;
+  color: lightgray;
+  border: 1px solid #4b5563;
+}
+
+.dark .dashboard-modal-title,
+.dark .dashboard-modal-description,
+.dark .usuarios-modal-descricao {
+  color: lightgray;
+}
+
+.dark .dashboard-modal-success-bg {
+  background-color: #14532d !important;
+  border-color: #10b981;
+}
+
+.dark .dashboard-modal-success-message {
+  background-color: #14532d;
+  color: #d1fae5;
+}
+
+.dark .dashboard-btn-cancelar {
+  background-color: #4b5563;
+  color: #f9fafb;
+}
+

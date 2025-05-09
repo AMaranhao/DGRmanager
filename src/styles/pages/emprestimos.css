@@ -12,3 +12,13 @@
     margin-bottom: 1.5rem;
   }
   
+
+  .dark .emprestimos-wrapper {
+    background-color: #1a1e29;
+    color: #f9fafb;
+  }
+  
+  .dark .emprestimos-heading {
+    color: #f9fafb;
+  }
+  

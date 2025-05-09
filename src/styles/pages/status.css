@@ -16,3 +16,17 @@
   color: #16a34a;
   font-weight: 600;
 }
+
+.dark .status-atraso,
+.dark .usuarios-status-inativo {
+  color: #f87171;
+}
+
+.dark .status-andamento {
+  color: #60a5fa;
+}
+
+.dark .status-finalizado {
+  color: #34d399;
+}
+

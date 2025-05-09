@@ -169,3 +169,27 @@ padding: 0 0.5rem;
   color: black !important;
   background-color: lightgray !important;
 }
+
+
+.dark .relatorios-filtros,
+.dark .filtro-container {
+  background-color: #374151;
+  color: lightgray;
+}
+
+.dark .dashboard-select,
+.dark input[type="date"].dashboard-select,
+.dark .dashboard-filtro-usuario-input {
+  background-color: #1f2937;
+  color: black;
+  border: 1px solid #4b5563;
+}
+
+.dark input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+.dark .usuarios-modal-select {
+  background-color: lightgray !important;
+  color: black !important;
+}

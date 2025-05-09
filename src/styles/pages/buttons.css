@@ -116,3 +116,30 @@
   background-color: lightgray !important; /* azul */
   color: #2f4674;
 }
+
+.dark .dashboard-filtro-clear {
+  color: #f87171;
+}
+
+.dark .relatorios-print-button,
+.dark .btn-imprimir {
+  background-color: #2563eb;
+  color: white;
+}
+
+.dark .relatorios-print-button:hover,
+.dark .btn-imprimir:hover {
+  background-color: #1d4ed8;
+}
+
+.dark .btn-limpar {
+  background-color: #374151;
+  color: lightgray;
+  border: 1px solid #4b5563;
+}
+
+.dark .usuarios-btn-material {
+  background-color: lightgray !important;
+  color: #2f4674;
+}
+

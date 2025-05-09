@@ -36,3 +36,18 @@
   width: 100px;
   text-align: center;
 }
+
+.dark .emprestimos-tabela {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.dark .emprestimos-tabela thead {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.dark .emprestimos-tabela th,
+.dark .emprestimos-tabela td {
+  border-color: #4b5563;
+}

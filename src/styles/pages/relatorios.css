@@ -160,3 +160,7 @@ padding-left: 0.5rem;
   margin-bottom: 0.25rem;
   display: block;
 }
+
+.dark .relatorio-label {
+  color: lightgray !important;
+}
