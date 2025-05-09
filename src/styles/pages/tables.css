@@ -38,16 +38,31 @@
 }
 
 .dark .emprestimos-tabela {
-  background-color: #1f2937;
+  background-color: #1f2937 !important;
   color: #f9fafb;
 }
 
 .dark .emprestimos-tabela thead {
-  background-color: #374151;
+  background-color: #374151 !important;
   color: #f9fafb;
 }
 
 .dark .emprestimos-tabela th,
 .dark .emprestimos-tabela td {
-  border-color: #4b5563;
+  border-color: #4b5563 !important;
+}
+
+.dark .usuarios-tabela {
+  background-color: #1f2937 !important;
+  color: #f9fafb;
+}
+
+.dark .usuarios-tabela thead {
+  background-color: #374151 !important;
+  color: #f9fafb;
+}
+
+.dark .usuarios-tabela th,
+.dark .usuarios-tabela td {
+  border-color: #4b5563 !important;
 }

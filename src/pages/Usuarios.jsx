@@ -140,7 +140,7 @@ export default function Usuarios() {
             )}
           </div>
         </div>
-        {modalAberto && (
+        
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
@@ -198,7 +198,7 @@ export default function Usuarios() {
             </div>
           </DialogContent>
         </Dialog>
-        )}
+        
       </div>
 
       <div className="usuarios-tabela-wrapper">

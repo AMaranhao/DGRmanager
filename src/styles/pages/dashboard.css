@@ -94,7 +94,7 @@
   .dashboard-sala-icon {
     width: 20px;
     height: 20px;
-    color: #3b82f6; 
+    color: black; 
   }
   
   .dashboard-filtro-item.right-align {
@@ -135,8 +135,12 @@
   color: lightgray;
   border: 1px solid #4b5563;
 }
-.dark .dashboard-heading{
+.dark .dashboard-heading  {
   color: lightgray;
+}
+
+.dark .dashboard-sala-icon {
+  color: white;
 }
 
 /* Botão Novo Empréstimo */

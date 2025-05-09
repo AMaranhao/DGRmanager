@@ -41,7 +41,7 @@ export default function GuiasRelatorios() {
     <div className="p-8">
       <h3 className="dashboard-heading">Relatórios</h3>
         <div className='justonprint logoprint'>
-            <img src="/logo.png" alt="Logo" className="sidebar-logo" />
+            <img src="/logo2.png" alt="Logo" className="sidebar-logo" />
         </div>
 
       <div className="dashboard-select-wrapper">

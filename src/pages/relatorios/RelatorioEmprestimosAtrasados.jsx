@@ -64,73 +64,73 @@ export default function RelatorioEmprestimosAtrasados() {
 
       {/* Filtros */}
       <div className="filtro-container noprint">
-      <div className="filtros-esquerda">
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-         <label className="relatorio-label">Até:</label>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataInicio && (
-            <button
-              type="button"
-              onClick={() => setDataInicio("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="relatorios-filtro-group relatorios-filtro-text">
+        <div className="filtros-esquerda">
+          <div className="relatorios-filtro-group relatorios-filtro-text">
           <label className="relatorio-label">Até:</label>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataFim && (
-            <button
-              type="button"
-              onClick={() => setDataFim("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
+            <Input
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataInicio && (
+              <button
+                type="button"
+                onClick={() => setDataInicio("")}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
 
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <Input
-            type="text"
-            placeholder="Usuário ou Sala"
-            value={filtroGeral}
-            onChange={(e) => setFiltroGeral(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {filtroGeral && (
-            <button
-              type="button"
-              onClick={() => setFiltroGeral("")}
-              className="dashboard-filtro-clear relatorio-select-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <label className="relatorio-label">Até:</label>
+            <Input
+              type="date"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataFim && (
+              <button
+                type="button"
+                onClick={() => setDataFim("")}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <Input
+              type="text"
+              placeholder="Usuário ou Sala"
+              value={filtroGeral}
+              onChange={(e) => setFiltroGeral(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {filtroGeral && (
+              <button
+                type="button"
+                onClick={() => setFiltroGeral("")}
+                className="dashboard-filtro-clear relatorio-select-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          </div>
+          <div className="flex justify-between items-center">
+          <button onClick={handlePrint} className="btn-imprimir">
+            <Printer size={18} />
+            Imprimir
+          </button>
         </div>
-        </div>
-        <div className="flex justify-between items-center">
-        <button onClick={handlePrint} className="btn-imprimir">
-          <Printer size={18} />
-          Imprimir
-        </button>
-      </div>
       </div>
 
       {/* Resultado */}

@@ -72,8 +72,7 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <img src="/logo.png" alt="Logo HC-UFPE" className="login-logo" />
-          <h1 className="login-title">HC-UFPE</h1>
+          <img src="/logo2.png" alt="Logo HC-UFPE" className="login-logo" />
         </div>
 
         {!mostrarRecuperacao ? (

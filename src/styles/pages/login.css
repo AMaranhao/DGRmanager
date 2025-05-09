@@ -7,6 +7,13 @@
     align-items: center;
     background-color: #f3f4f6; /* Tailwind gray-100 */
   }
+
+.login-container,
+.login-container * {
+  color: #1f2937 !important;
+  background-color: white !important;
+  border-color: #d1d5db !important;
+}
   
   .login-box {
     background-color: white;
@@ -23,8 +30,8 @@
   }
   
   .login-logo {
-    height: 64px;
-    margin-bottom: 0.5rem;
+    height: 22rem;
+    margin-bottom: -5rem;
   }
   
   .login-title {
@@ -41,17 +48,23 @@
   
   .login-input {
     padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid #d1d5db; /* Tailwind gray-300 */
+    border-radius: 9999px !important;
+    border: 1px solid black; 
   }
   
   .login-button {
-    background-color: #1d4ed8; /* Tailwind blue-700 */
-    color: white;
+    background-color: #2f4674 !important; /* azul */
+    color: white !important;
     font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.3s;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 9999px !important;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 25rem;
+    max-height: 2.25rem;
   }
   
   .login-button:hover {
@@ -77,7 +90,7 @@
   }
   
   .login-erro-msg {
-    color: red;
+    color: red !important;
     font-size: 0.875rem;
     min-height: 1.25rem; /* mantém espaço reservado mesmo sem erro */
     margin-bottom: 0.25rem;

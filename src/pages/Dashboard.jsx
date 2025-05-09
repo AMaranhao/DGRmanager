@@ -3,7 +3,7 @@ import { fetchAgendamentos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fet
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, PlusCircle, DoorOpen } from 'lucide-react';
+import { X, DoorOpen } from 'lucide-react';
 
 import '@/styles/pages/dashboard.css';
 import '@/styles/pages/filters.css';

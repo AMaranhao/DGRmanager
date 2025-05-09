@@ -68,3 +68,37 @@
     gap: 0.5rem;
     padding-right: 1rem; /* opcional para afastar um pouco da borda */
   }
+
+
+/* ========== MODO ESCURO: USUÁRIOS ========== */
+
+.dark .usuarios-header {
+  color: #f9fafb;
+}
+
+.dark .usuarios-filtros {
+  color: #f9fafb;
+}
+
+.dark .usuarios-modal {
+  background-color: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #4b5563;
+}
+
+.dark .usuarios-modal-descricao {
+  color: lightgray;
+}
+
+.dark .usuarios-modal-input {
+  background-color: lightgray !important;
+  color: black !important;
+  border-color: #4b5563;
+}
+
+/* Modo escuro para o wrapper da página de usuários */
+.dark .usuarios-wrapper {
+  background-color: #1a1e29;
+  color: #f9fafb;
+}
+
