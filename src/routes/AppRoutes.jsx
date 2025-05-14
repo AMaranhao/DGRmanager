@@ -9,12 +9,25 @@ import Login from '../pages/Login';
 import Usuarios from '../pages/Usuarios';
 import PerfilUsuario from '../pages/PerfilUsuario';
 import PrivateRoute from '../routes/PrivateRoute';
+import Agendamentos from "@/pages/Agendamentos"; // ajuste o caminho conforme a estrutura do seu projeto
+
+
+
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       
+      <Route 
+        path="/agendamentos" 
+        element={
+          <PrivateRoute>
+            <Layout><Agendamentos /></Layout>
+          </PrivateRoute>
+        } 
+      />
+
       <Route
         path="/dashboard"
         element={

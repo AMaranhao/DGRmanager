@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchAgendamentos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
+import { fetchAgendamentos, fetchAgendamentosEmprestimos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -42,13 +42,13 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    const carregarAgendamentos = async () => {
-      const dados = await fetchAgendamentos();
+    const carregarAgendamentosEmprestimos = async () => {
+      const dados = await fetchAgendamentosEmprestimos();
       setAgendamentos(dados);
-      const andares = [...new Set(dados.map(item => String(item.sala?.andarId)).filter(Boolean))];
-      setAndaresFiltro(['Todos', ...andares]);
+      const andares = [...new Map(dados.map(item => [item.sala?.andar?.id, item.sala?.andar?.nome])).entries()];
+      setAndaresFiltro(['Todos', ...andares.map(([id, nome]) => ({ id, nome }))]);
     };
-    carregarAgendamentos();
+    carregarAgendamentosEmprestimos();
   }, []);
 
   useEffect(() => {
@@ -107,23 +107,20 @@ export default function Dashboard() {
       </option>
     );
   };
-  
-  
-  
-  
-  
 
   const agendamentosFiltrados = agendamentos.filter((ag) => {
-    const correspondeAndar = andarSelecionado === 'Todos' || Number(ag.sala?.andarId) === Number(andarSelecionado);
+    const correspondeAndar = andarSelecionado === 'Todos' || Number(ag.sala?.andar?.id) === Number(andarSelecionado);
+    const nomeUsuario = 
+      `${ag.usuario?.firstName || ''} ${ag.usuario?.lastName || ''}`.toLowerCase();
+    const numeroSala = ag.sala?.numero?.toString().toLowerCase() || '';
+    const filtro = filtroUsuario.toLowerCase();
+
     const correspondeTexto =
-      ag.usuario.toLowerCase().includes(filtroUsuario.toLowerCase()) ||
-      ag.sala?.numero.toString().toLowerCase().includes(filtroUsuario.toLowerCase());
+      nomeUsuario.includes(filtro) || numeroSala.includes(filtro);
+
     return correspondeAndar && correspondeTexto;
   });
 
-  
-  
-  
   const abrirModal = (agendamento) => {
     setAgendamentoSelecionado(agendamento);
     setModalAberto(true);
@@ -153,19 +150,18 @@ export default function Dashboard() {
 
       <div className="dashboard-filtro">
         <div className="dashboard-filtro-group">
-        <select value={andarSelecionado} onChange={(e) => setAndarSelecionado(e.target.value)} className="dashboard-select">
-          {andaresFiltro.map((andar, index) => (
-            <option key={andar || index} value={andar}>
-              {andar === 'Todos' ? 'Todos os Andares' : `Andar ${andar}`}
-            </option>
-          ))}
-        </select>
-
-          {andarSelecionado !== 'Todos' && (
-            <button type="button" onClick={() => setAndarSelecionado('Todos')} className="dashboard-filtro-clear" title="Limpar">
-              <X size={14} />
-            </button>
-          )}
+          <select value={andarSelecionado} onChange={(e) => setAndarSelecionado(e.target.value)} className="dashboard-select">
+            {andaresFiltro.map((andar, index) => (
+              <option key={andar.id || index} value={andar.id}>
+                {andar === 'Todos' ? 'Todos os Andares' : andar.nome}
+              </option>
+            ))}
+          </select>
+            {andarSelecionado !== 'Todos' && (
+              <button type="button" onClick={() => setAndarSelecionado('Todos')} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
         </div>
 
         <div className="dashboard-filtro-usuario">
@@ -207,7 +203,10 @@ export default function Dashboard() {
                 <DoorOpen className="dashboard-sala-icon"  /> - {ag.sala?.numero}
               </div>
               
-              <div className="dashboard-usuario">{ag.usuario}</div>
+              <div className="dashboard-usuario">
+                {ag.usuario ? `${ag.usuario.firstName} ${ag.usuario.lastName}` : ''}
+              </div>
+
               <div className="dashboard-acao">{labelAcao}</div>
             </div>
           );

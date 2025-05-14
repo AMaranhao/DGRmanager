@@ -7,7 +7,7 @@ import { X, Printer } from "lucide-react";
 import "@/styles/pages/relatorios.css";
 import "@/styles/pages/filters.css";
 import "@/styles/pages/buttons.css";
-import '@/styles/mobile.css';
+import "@/styles/mobile.css";
 
 export default function RelatorioHistoricoUtilizacaoSala() {
   const [emprestimos, setEmprestimos] = useState([]);
@@ -33,7 +33,9 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
-    const correspondeSala = salaSelecionada ? emp.sala?.numero === salaSelecionada : true;
+
+    const salaNumero = emp.chave?.sala?.numero;
+    const correspondeSala = salaSelecionada ? salaNumero === salaSelecionada : true;
 
     return dentroDataInicio && dentroDataFim && correspondeSala;
   });
@@ -41,89 +43,83 @@ export default function RelatorioHistoricoUtilizacaoSala() {
   const agruparPorSala = () => {
     const agrupado = {};
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.sala?.numero || !emp.usuario) return;
-      const sala = emp.sala.numero;
+      const sala = emp.chave?.sala?.numero;
+      const usuario = emp.usuario
+        ? `${emp.usuario.firstName} ${emp.usuario.lastName}`
+        : "Não informado";
+
+      if (!sala) return;
       agrupado[sala] = agrupado[sala] || {};
-      agrupado[sala][emp.usuario] = (agrupado[sala][emp.usuario] || 0) + 1;
+      agrupado[sala][usuario] = (agrupado[sala][usuario] || 0) + 1;
     });
     return agrupado;
   };
 
   const dadosAgrupados = agruparPorSala();
-  const salasDisponiveis = Array.from(new Set(emprestimos.map(emp => emp.sala?.numero))).filter(Boolean).sort();
+  const salasDisponiveis = Array.from(
+    new Set(emprestimos.map(emp => emp.chave?.sala?.numero))
+  ).filter(Boolean).sort();
 
   const handleImprimir = () => window.print();
 
   return (
     <div className="space-y-6">
-      
-
       {/* Filtros */}
       <div className="filtro-container noprint">
-      <div className="filtros-esquerda">
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-        <label className="relatorio-label">De:</label>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataInicio && (
-            <button
-              type="button"
-              onClick={() => setDataInicio("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
+        <div className="filtros-esquerda">
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <label className="relatorio-label">De:</label>
+            <Input
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataInicio && (
+              <button onClick={() => setDataInicio("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <label className="relatorio-label">Até:</label>
+            <Input
+              type="date"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataFim && (
+              <button onClick={() => setDataFim("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <select
+              value={salaSelecionada}
+              onChange={(e) => setSalaSelecionada(e.target.value)}
+              className="dashboard-select"
             >
-              <X size={14} />
-            </button>
-          )}
+              <option value="">Todas as Salas</option>
+              {salasDisponiveis.map((sala) => (
+                <option key={sala} value={sala}>{sala}</option>
+              ))}
+            </select>
+            {salaSelecionada && (
+              <button
+                onClick={() => setSalaSelecionada("")}
+                className="dashboard-filtro-clear relatorio-select-clear"
+                title="Limpar Sala"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-        <label className="relatorio-label">Até:</label>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataFim && (
-            <button
-              type="button"
-              onClick={() => setDataFim("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-          <select
-            value={salaSelecionada}
-            onChange={(e) => setSalaSelecionada(e.target.value)}
-            className="dashboard-select"
-          >
-            <option value="">Todas as Salas</option>
-            {salasDisponiveis.map((sala) => (
-              <option key={sala} value={sala}>{sala}</option>
-            ))}
-          </select>
-          {salaSelecionada && (
-            <button
-              type="button"
-              onClick={() => setSalaSelecionada("")}
-              className="dashboard-filtro-clear relatorio-select-clear"
-              title="Limpar Sala"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-        </div>
         <div className="flex justify-between items-center">
           <button onClick={handleImprimir} className="btn-imprimir">
             <Printer size={18} />
@@ -134,10 +130,8 @@ export default function RelatorioHistoricoUtilizacaoSala() {
 
       {/* Resultado */}
       {Object.keys(dadosAgrupados).length === 0 ? (
-        <div className="relatorios-sem-dados">
-          Nenhum empréstimo encontrado.
-        </div>
-        ) : (
+        <div className="relatorios-sem-dados">Nenhum empréstimo encontrado.</div>
+      ) : (
         Object.entries(dadosAgrupados).sort().map(([sala, usuarios]) => {
           const total = Object.values(usuarios).reduce((acc, qtd) => acc + qtd, 0);
           return (
@@ -148,16 +142,26 @@ export default function RelatorioHistoricoUtilizacaoSala() {
                   <thead>
                     <tr>
                       <th>Usuário</th>
+                      <th>Tipo de Sala</th>
                       <th>Quantidade de Utilizações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(usuarios).map(([usuario, qtd]) => (
-                      <tr key={usuario}>
-                        <td>{usuario}</td>
-                        <td>{qtd}</td>
-                      </tr>
-                    ))}
+                    {Object.entries(usuarios).map(([usuario, qtd]) => {
+                      const emprestimoExemplo = emprestimos.find((emp) => {
+                        const nomeUsuario = `${emp.usuario?.firstName} ${emp.usuario?.lastName}`;
+                        return nomeUsuario === usuario && emp.chave?.sala?.numero === sala;
+                      });
+                      const tipoSala = emprestimoExemplo?.chave?.sala?.tipo?.tipo_sala || "-";
+
+                      return (
+                        <tr key={usuario}>
+                          <td>{usuario}</td>
+                          <td>{tipoSala}</td>
+                          <td>{qtd}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
                 <div className="text-right text-sm font-medium mt-1">
@@ -168,7 +172,6 @@ export default function RelatorioHistoricoUtilizacaoSala() {
           );
         })
       )}
-
     </div>
   );
 }

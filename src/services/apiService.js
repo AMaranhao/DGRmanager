@@ -1,4 +1,6 @@
 const API_URL = 'http://localhost:3001';
+import { normalizeUsuarioData } from './helpers';
+
 
  // ------------------------
 // EMPRESTIMOS
@@ -34,11 +36,57 @@ export const devolverChave = async (dados) => {
 // AGENDAMENTOS
 // ------------------------
 
+export const fetchAgendamentosEmprestimos = async () => {
+  const res = await fetch(`${API_URL}/agendamentos_emprestimos`);
+  if (!res.ok) throw new Error('Erro ao buscar agendamentos');
+  return await res.json();
+};
+
 export const fetchAgendamentos = async () => {
   const res = await fetch(`${API_URL}/agendamentos`);
   if (!res.ok) throw new Error('Erro ao buscar agendamentos');
   return await res.json();
 };
+
+// Criar agendamento
+export const createAgendamento = async (agendamento) => {
+  const res = await fetch(`${API_URL}/agendamentos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(agendamento),
+  });
+  if (!res.ok) throw new Error('Erro ao criar agendamento');
+  return await res.json();
+};
+
+// Atualizar agendamento
+export const updateAgendamento = async (id, dadosAtualizados) => {
+  const payload = Object.fromEntries(
+    Object.entries(dadosAtualizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== "string" || valor.trim() !== "")
+    )
+  );
+
+  const res = await fetch(`${API_URL}/agendamentos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('Erro ao atualizar agendamento');
+  return res.json();
+};
+
+// Deletar agendamento
+export const deleteAgendamento = async (id) => {
+  const res = await fetch(`${API_URL}/agendamentos/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Erro ao deletar agendamento');
+};
+
 
 // ------------------------
 // RELATÓRIOS
@@ -70,15 +118,26 @@ export const createPredio = async (predio) => {
   return res.json();
 };
 
-export const updatePredio = async (id, predio) => {
+export const updatePredio = async (id, dadosAtualizados) => {
+  const payload = Object.fromEntries(
+    Object.entries(dadosAtualizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== "string" || valor.trim() !== "")
+    )
+  );
+
   const res = await fetch(`${API_URL}/predios/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(predio),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao atualizar prédio');
   return res.json();
 };
+
 
 export const deletePredio = async (id) => {
   const res = await fetch(`${API_URL}/predios/${id}`, {
@@ -97,6 +156,13 @@ export const fetchAndaresPorPredio = async (predioId) => {
   if (!res.ok) throw new Error('Erro ao buscar andares por prédio');
   return await res.json();
 };
+
+export const fetchAndares = async () => {
+  const res = await fetch(`${API_URL}/andares`);
+  if (!res.ok) throw new Error('Erro ao buscar andares');
+  return res.json();
+};
+
 
 // ------------------------
 // 🏫 SALAS
@@ -118,15 +184,26 @@ export const createSala = async (sala) => {
   return res.json();
 };
 
-export const updateSala = async (id, sala) => {
+export const updateSala = async (id, dadosAtualizados) => {
+  const payload = Object.fromEntries(
+    Object.entries(dadosAtualizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== "string" || valor.trim() !== "")
+    )
+  );
+
   const res = await fetch(`${API_URL}/salas/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(sala),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao atualizar sala');
   return res.json();
 };
+
 
 export const deleteSala = async (id) => {
   const res = await fetch(`${API_URL}/salas/${id}`, {
@@ -134,6 +211,13 @@ export const deleteSala = async (id) => {
   });
   if (!res.ok) throw new Error('Erro ao deletar sala');
 };
+
+export const fetchTiposSala = async () => {
+  const res = await fetch(`${API_URL}/tiposala`);
+  if (!res.ok) throw new Error('Erro ao buscar tipos de sala');
+  return res.json();
+};
+
 
 // ------------------------
 // 🔑 CHAVES
@@ -155,15 +239,26 @@ export const createChave = async (chave) => {
   return res.json();
 };
 
-export const updateChave = async (id, chave) => {
+export const updateChave = async (id, dadosAtualizados) => {
+  const payload = Object.fromEntries(
+    Object.entries(dadosAtualizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== "string" || valor.trim() !== "")
+    )
+  );
+
   const res = await fetch(`${API_URL}/chaves/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(chave),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao atualizar chave');
   return res.json();
 };
+
 
 export const deleteChave = async (id) => {
   const res = await fetch(`${API_URL}/chaves/${id}`, {
@@ -192,15 +287,26 @@ export const createKit = async (kit) => {
   return res.json();
 };
 
-export const updateKit = async (id, kit) => {
+export const updateKit = async (id, dadosAtualizados) => {
+  const payload = Object.fromEntries(
+    Object.entries(dadosAtualizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== "string" || valor.trim() !== "")
+    )
+  );
+
   const res = await fetch(`${API_URL}/kits/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(kit),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao atualizar kit');
   return res.json();
 };
+
 
 export const deleteKit = async (id) => {
   const res = await fetch(`${API_URL}/kits/${id}`, {
@@ -220,24 +326,42 @@ export const fetchUsuarios = async () => {
 };
 
 export const criarUsuario = async (usuario) => {
+  const payload = normalizeUsuarioData(usuario);
+
   const res = await fetch(`${API_URL}/usuarios`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(usuario),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao criar usuário');
   return res.json();
 };
 
-export const updateUsuario = async (id, usuarioAtualizado) => {
+
+export const updateUsuario = async (id, dadosAtualizados) => {
+  const normalizados = normalizeUsuarioData(dadosAtualizados);
+
+  const payload = Object.fromEntries(
+    Object.entries(normalizados).filter(
+      ([_, valor]) =>
+        valor !== null &&
+        valor !== undefined &&
+        (typeof valor !== 'string' || valor.trim() !== '')
+    )
+  );
+
   const res = await fetch(`${API_URL}/usuarios/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(usuarioAtualizado),
+    body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('Erro ao atualizar usuário');
   return res.json();
 };
+
+
 
 export const desativarUsuario = async (id, novoStatusAtivo) => {
   const res = await fetch(`${API_URL}/usuarios/${id}`, {

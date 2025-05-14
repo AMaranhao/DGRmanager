@@ -28,28 +28,27 @@ export default function Emprestimos() {
 
   const emprestimosFiltrados = emprestimos.filter((e) => {
     const atendeStatus = statusFiltro ? e.status === statusFiltro : true;
-
-    const dataRetirada = new Date(e.horario_retirada);
-    const dataFormatada = dataRetirada.toISOString().slice(0, 10);
-
+  
+    const dataRetirada = e.horario_retirada ? new Date(e.horario_retirada) : null;
+    const dataFormatada = dataRetirada?.toISOString().slice(0, 10) ?? "";
+  
     let inicio = dataInicial ? new Date(dataInicial) : null;
     let fim = dataFinal ? new Date(dataFinal) : null;
-
-    if (inicio && fim && inicio > fim) {
-      [inicio, fim] = [fim, inicio];
-    }
-
+    if (inicio && fim && inicio > fim) [inicio, fim] = [fim, inicio];
+  
     const atendeDataInicial = inicio ? dataFormatada >= inicio.toISOString().slice(0, 10) : true;
     const atendeDataFinal = fim ? dataFormatada <= fim.toISOString().slice(0, 10) : true;
-
+  
+    const nomeUsuario = `${e.usuario?.firstName || ""} ${e.usuario?.lastName || ""}`.toLowerCase();
+    const numeroSala = e.chave?.sala?.numero?.toLowerCase() || "";
+  
     const atendeTexto = textoPesquisa
-      ? e.usuario.toLowerCase().includes(textoPesquisa.toLowerCase()) ||
-        e.sala.numero.toLowerCase().includes(textoPesquisa.toLowerCase())
+      ? nomeUsuario.includes(textoPesquisa.toLowerCase()) || numeroSala.includes(textoPesquisa.toLowerCase())
       : true;
-
-
+  
     return atendeStatus && atendeDataInicial && atendeDataFinal && atendeTexto;
   });
+  
 
   return (
     <div className="dashboard-wrapper">
@@ -155,8 +154,8 @@ export default function Emprestimos() {
           <tbody>
             {emprestimosFiltrados.map((e) => (
               <tr key={e.id}>
-                <td>{e.sala.numero}</td>
-                <td>{e.usuario}</td>
+                <td>{e.chave?.sala?.numero || "-"}</td>
+                <td>{`${e.usuario?.firstName || ""} ${e.usuario?.lastName || ""}`.trim() || "-"}</td>
                 <td>
                   <span className={
                     e.status === 'Em atraso'

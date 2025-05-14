@@ -3,7 +3,7 @@ import {Tabs,TabsContent,} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
+import { fetchTiposSala, fetchPredios, createPredio, updatePredio, deletePredio, fetchSalas, createSala, updateSala, 
   deleteSala, fetchChaves, createChave, updateChave, deleteChave, fetchKits, createKit, updateKit, 
   deleteKit, fetchAndaresPorPredio,} from '../services/apiService';
 import { X } from "lucide-react";
@@ -33,10 +33,11 @@ export default function Infraestrutura() {
 
   // Estados para Salas
   const [salas, setSalas] = useState([]);
-  const [formSala, setFormSala] = useState({numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andar: null});  
+  const [formSala, setFormSala] = useState({numero: '', tipo: null, lotacao: '', ocupada: false, esta_ativa: true, predioId: '', andar: null});
   const [editandoSala, setEditandoSala] = useState(null);
   const [modalSalaAberto, setModalSalaAberto] = useState(false);
   const [salasFiltradas, setSalasFiltradas] = useState([]);
+  const [tiposSala, setTiposSala] = useState([]);
 
   // Estados para Chaves
   const [chaves, setChaves] = useState([]);
@@ -92,7 +93,9 @@ export default function Infraestrutura() {
     setSalas(await fetchSalas());
     setChaves(await fetchChaves());
     setKits(await fetchKits());
+    setTiposSala(await fetchTiposSala()); 
   };
+  
 
   useEffect(() => {
     const carregarPredios = async () => {
@@ -182,11 +185,11 @@ const confirmarExclusaoItem = async () => {
     setEditandoSala(sala.id);
     setFormSala({
       numero: sala.numero || '',
-      tipo: sala.tipo || '',
+      tipo: sala.tipo || null,
       ocupada: sala.ocupada || false,
       esta_ativa: sala.esta_ativa ?? true,
       predioId: sala.predioId || '',
-      andarId: sala.andarId || ''
+      andar: sala.andar || null
     });
     setModalSalaAberto(true);
   };
@@ -206,7 +209,7 @@ const confirmarExclusaoItem = async () => {
   const handleEditarKit = (kit) => {
     setEditandoKit(kit.id);
     setFormKit({
-      numero: kit.numero || '',
+      numero: kit.sala?.numero || '',
       numeracaoArmario: kit.numeracaoArmario || '',
       predioId: kit.predioId || '',
       andarId: kit.andarId || '',
@@ -440,12 +443,22 @@ const confirmarExclusaoItem = async () => {
                   </div>
 
                   <div className="usuarios-input-wrapper">
-                    <Input
-                      placeholder="Tipo da sala"
-                      value={formSala.tipo}
-                      onChange={(e) => setFormSala({ ...formSala, tipo: e.target.value })}
-                      className="usuarios-modal-input"
-                    />
+                    <select
+                      value={formSala.tipo?.id || ''}
+                      onChange={(e) =>
+                        setFormSala({
+                          ...formSala,
+                          tipo: tiposSala.find((t) => t.id === Number(e.target.value)),
+                        })
+                      }
+                      className="usuarios-modal-select"
+                      >
+                      <option value="">Selecione o tipo de sala</option>
+                      {tiposSala.map((t) => (
+                        <option key={t.id} value={t.id}>{t.tipo_sala}</option>
+                      ))}
+                    </select>
+
                     {formSala.tipo && (
                       <button
                         className="dashboard-filtro-clear"
@@ -490,7 +503,24 @@ const confirmarExclusaoItem = async () => {
                       ))}
                     </select>
                   </div>
-
+                  <div className="usuarios-input-wrapper">
+                    <Input
+                      placeholder="Lotação"
+                      type="number"
+                      value={formSala.lotacao}
+                      onChange={(e) => setFormSala({ ...formSala, lotacao: e.target.value })}
+                      className="usuarios-modal-input"
+                    />
+                    {formSala.lotacao && (
+                      <button
+                        className="dashboard-filtro-clear"
+                        onClick={() => setFormSala({ ...formSala, lotacao: '' })}
+                        title="Limpar"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
                   <div className="usuarios-input-wrapper">
                     <label className="flex items-center gap-2">
                       <input
@@ -529,7 +559,7 @@ const confirmarExclusaoItem = async () => {
                       .map((sala) => (
                         <tr key={sala.id}>
                           <td>{sala.numero}</td>
-                          <td>{sala.tipo}</td>
+                          <td>{sala.tipo?.tipo_sala}</td>
                           <td>{sala.andar?.nome}</td>
                           <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
                           <td className="tabela-col-acoes">
@@ -878,7 +908,7 @@ const confirmarExclusaoItem = async () => {
                   )
                   .map((kit) => (
                     <tr key={kit.id}>
-                      <td>{kit.numero}</td>
+                      <td>{kit.sala?.numero}</td>
                       <td>{kit.numeracaoArmario}</td>
                       <td>{kit.sala?.numero || ''}</td>
                       <td>{kit.tipo}</td>

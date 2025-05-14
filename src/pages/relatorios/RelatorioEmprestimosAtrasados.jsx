@@ -12,9 +12,7 @@ import '@/styles/mobile.css';
 
 export default function RelatorioEmprestimosAtrasados() {
   const [atrasados, setAtrasados] = useState([]);
-  const [filtroSala, setFiltroSala] = useState("");
   const [filtroGeral, setFiltroGeral] = useState("");
-  const [filtroUsuario, setFiltroUsuario] = useState("");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
@@ -25,7 +23,7 @@ export default function RelatorioEmprestimosAtrasados() {
   const carregarUsuariosAtrasados = async () => {
     const emprestimos = await fetchEmprestimos();
     const atrasadosFiltrados = emprestimos.filter(
-      (emp) => (emp.status ?? "Indefinido") === "Em atraso"
+      (emp) => (emp.status?.toLowerCase().trim() || "") === "em atraso"
     );
     setAtrasados(atrasadosFiltrados);
   };
@@ -45,10 +43,13 @@ export default function RelatorioEmprestimosAtrasados() {
     const dentroDataInicio = inicio ? isAfter(horarioRetirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, horarioRetirada) : true;
 
+    const nomeUsuario = `${emp.usuario?.firstName || ''} ${emp.usuario?.lastName || ''}`.toLowerCase();
+    const numeroSala = emp.chave?.sala?.numero?.toString().toLowerCase() || "";
+
     return (
       (filtroGeral === "" ||
-        emp.usuario?.toLowerCase().includes(filtroGeral.toLowerCase()) ||
-        emp.sala?.numero?.toLowerCase().includes(filtroGeral.toLowerCase())) &&
+        nomeUsuario.includes(filtroGeral.toLowerCase()) ||
+        numeroSala.includes(filtroGeral.toLowerCase())) &&
       dentroDataInicio &&
       dentroDataFim
     );
@@ -60,13 +61,10 @@ export default function RelatorioEmprestimosAtrasados() {
 
   return (
     <div className="space-y-6">
-      
-
-      {/* Filtros */}
       <div className="filtro-container noprint">
         <div className="filtros-esquerda">
           <div className="relatorios-filtro-group relatorios-filtro-text">
-          <label className="relatorio-label">Até:</label>
+            <label className="relatorio-label">De:</label>
             <Input
               type="date"
               value={dataInicio}
@@ -124,8 +122,9 @@ export default function RelatorioEmprestimosAtrasados() {
               </button>
             )}
           </div>
-          </div>
-          <div className="flex justify-between items-center">
+        </div>
+
+        <div className="flex justify-between items-center">
           <button onClick={handlePrint} className="btn-imprimir">
             <Printer size={18} />
             Imprimir
@@ -133,22 +132,21 @@ export default function RelatorioEmprestimosAtrasados() {
         </div>
       </div>
 
-      {/* Resultado */}
       {usuariosFiltrados.length === 0 ? (
         <div className="relatorios-sem-dados">
           Nenhum usuário encontrado com esses filtros.
         </div>
-        ) : (
+      ) : (
         <div className="emprestimos-tabela-wrapper">
           <table className="emprestimos-tabela">
-          <thead>
-            <tr>
-              <th>Usuário</th>
-              <th>Sala</th>
-              <th>Horário de Retirada</th>
-              <th>Tempo de Atraso</th>
-            </tr>
-          </thead>
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Sala</th>
+                <th>Horário de Retirada</th>
+                <th>Tempo de Atraso</th>
+              </tr>
+            </thead>
             <tbody>
               {usuariosFiltrados.map((emp) => {
                 const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
@@ -174,11 +172,11 @@ export default function RelatorioEmprestimosAtrasados() {
 
                 return (
                   <tr key={emp.id}>
-                    <td>{emp.usuario}</td>
-                    <td>{emp.sala?.numero}</td>
+                    <td>{`${emp.usuario?.firstName || ""} ${emp.usuario?.lastName || ""}`.trim() || "Não informado"}</td>
+                    <td>{emp.chave?.sala?.numero || "Não informado"}</td>
                     <td>
                       {emp.horario_retirada
-                        ? format(retirada, "dd/MM/yyyy HH:mm")
+                        ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
                         : "Não informado"}
                     </td>
                     <td>{atraso}</td>
@@ -186,13 +184,9 @@ export default function RelatorioEmprestimosAtrasados() {
                 );
               })}
             </tbody>
-
           </table>
         </div>
       )}
-
-
-
     </div>
   );
 }

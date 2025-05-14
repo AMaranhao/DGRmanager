@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { KeyRound, ClipboardList, BookText, Building2, Users } from "lucide-react";
+import { KeyRound, ClipboardList, BookText, Building2, Users, CalendarDays, } from "lucide-react";
 
 import '@/styles/darkmode-styles.css';
 import '@/styles/components.css';
@@ -16,6 +16,9 @@ export default function Sidebar() {
 
       {/* Ícones */}
       <div className="sidebar-icons">
+        <Link to="/agendamentos" title="Agendamentos">
+          <CalendarDays size={28} className="sidebar-icon" />
+        </Link>
         <Link to="/dashboard" title="Chaves">
           <KeyRound size={28} className="sidebar-icon" />
         </Link>

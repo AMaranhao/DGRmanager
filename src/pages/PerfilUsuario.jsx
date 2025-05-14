@@ -36,14 +36,13 @@ export default function PerfilUsuario() {
       <h2 className="perfil-titulo">Perfil do Usuário</h2>
 
       <div className="perfil-box">
-        <img src={usuario.foto_url} alt="Foto do usuário" className="perfil-foto" />
+        <img src={usuario.fotoUrl} alt="Foto do usuário" className="perfil-foto" />
         <div className="perfil-info">
-          <p><strong>Nome:</strong> {usuario.first_name} {usuario.last_name}</p>
+          <p><strong>Nome:</strong> {usuario.firstName} {usuario.lastName}</p>
           <p><strong>Usuário:</strong> {usuario.username}</p>
           <p><strong>Email:</strong> {usuario.email}</p>
           <p><strong>Cargo:</strong> {usuario.cargo?.nome}</p>
           <p><strong>Curso:</strong> {usuario.curso?.nome}</p>
-          <p><strong>Último login:</strong> {new Date(usuario.data_ultimo_login).toLocaleString('pt-BR')}</p>
         </div>
       </div>
 

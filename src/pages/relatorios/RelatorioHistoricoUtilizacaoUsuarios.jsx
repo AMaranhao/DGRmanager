@@ -7,7 +7,7 @@ import { X, Printer } from "lucide-react";
 import "@/styles/pages/relatorios.css";
 import "@/styles/pages/filters.css";
 import "@/styles/pages/buttons.css";
-import '@/styles/mobile.css';
+import "@/styles/mobile.css";
 
 export default function RelatorioHistoricoUtilizacaoUsuarios() {
   const [emprestimos, setEmprestimos] = useState([]);
@@ -24,10 +24,6 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
     setEmprestimos(dados);
   };
 
-  const usuariosUnicos = Array.from(
-    new Set(emprestimos.map(emp => emp.usuario).filter(Boolean))
-  ).sort();
-
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
     let inicio = dataInicio ? parseISO(dataInicio) : null;
@@ -37,10 +33,11 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
     const dentroDataInicio = inicio ? isAfter(retirada, inicio) : true;
     const dentroDataFim = fim ? isAfter(fim, retirada) : true;
+    const nomeUsuario = `${emp.usuario?.firstName || ""} ${emp.usuario?.lastName || ""}`.toLowerCase();
+
     const usuarioFiltrado = usuarioSelecionado
-    ? emp.usuario.toLowerCase().includes(usuarioSelecionado.toLowerCase())
-    : true;
-  
+      ? nomeUsuario.includes(usuarioSelecionado.toLowerCase())
+      : true;
 
     return dentroDataInicio && dentroDataFim && usuarioFiltrado;
   });
@@ -48,9 +45,10 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
   const agruparPorUsuario = () => {
     const agrupado = {};
     emprestimosFiltrados.forEach((emp) => {
-      if (!emp.usuario) return;
-      agrupado[emp.usuario] = agrupado[emp.usuario] || [];
-      agrupado[emp.usuario].push(emp);
+      const nome = `${emp.usuario?.firstName || ""} ${emp.usuario?.lastName || ""}`;
+      if (!nome.trim()) return;
+      agrupado[nome] = agrupado[nome] || [];
+      agrupado[nome].push(emp);
     });
     return agrupado;
   };
@@ -63,74 +61,61 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
 
   return (
     <div className="space-y-6">
-      
-
       {/* Filtros */}
       <div className="filtro-container noprint">
-      <div className="filtros-esquerda">
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-        <label className="relatorio-label">De:</label>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataInicio && (
-            <button
-              type="button"
-              onClick={() => setDataInicio("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="relatorios-filtro-group relatorios-filtro-text">
-        <label className="relatorio-label">Até:</label>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {dataFim && (
-            <button
-              type="button"
-              onClick={() => setDataFim("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="dashboard-filtro-usuario">
-          <Input
-            type="text"
-            placeholder="Todos os Usuários"
-            value={usuarioSelecionado}
-            onChange={(e) => setUsuarioSelecionado(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {usuarioSelecionado && (
-            <button onClick={() => setUsuarioSelecionado("")} className="dashboard-filtro-clear"
-              title="Limpar">
+        <div className="filtros-esquerda">
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <label className="relatorio-label">De:</label>
+            <Input
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataInicio && (
+              <button type="button" onClick={() => setDataInicio("")} className="dashboard-filtro-clear" title="Limpar">
                 <X size={14} />
-            </button>
-          )}
+              </button>
+            )}
+          </div>
+
+          <div className="relatorios-filtro-group relatorios-filtro-text">
+            <label className="relatorio-label">Até:</label>
+            <Input
+              type="date"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {dataFim && (
+              <button type="button" onClick={() => setDataFim("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="dashboard-filtro-usuario">
+            <Input
+              type="text"
+              placeholder="Todos os Usuários"
+              value={usuarioSelecionado}
+              onChange={(e) => setUsuarioSelecionado(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {usuarioSelecionado && (
+              <button onClick={() => setUsuarioSelecionado("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
-        </div>
+
         <div className="flex justify-between items-center">
           <button onClick={handleImprimir} className="btn-imprimir">
             <Printer size={18} />
             Imprimir
           </button>
         </div>
-
       </div>
 
       {/* Resultado */}
@@ -138,7 +123,7 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
         <div className="relatorios-sem-dados">
           Nenhuma utilização encontrada nesse período.
         </div>
-       ) : (
+      ) : (
         Object.keys(dadosAgrupados)
           .sort()
           .map((usuario) => {
@@ -151,20 +136,40 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
                     <thead>
                       <tr>
                         <th>Sala</th>
+                        <th>Tipo de Sala</th>
                         <th>Horário de Retirada</th>
+                        <th>Horário de Devolução</th>
+                        <th>Tempo de Atraso</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {utilizacoes.map((emp) => (
-                        <tr key={emp.id}>
-                          <td>{emp.sala?.numero}</td>
-                          <td>
-                            {emp.horario_retirada
-                              ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
-                              : "Não informado"}
-                          </td>
-                        </tr>
-                      ))}
+                      {utilizacoes.map((emp) => {
+                        const retirada = emp.horario_retirada ? parseISO(emp.horario_retirada) : null;
+                        const devolucao = emp.horario_devolucao ? parseISO(emp.horario_devolucao) : null;
+                        const tipoSala = emp.chave?.sala?.tipo?.tipo_sala || "Não informado";
+
+                        let atraso = "-";
+                        if (retirada && devolucao) {
+                          const diffMs = devolucao - retirada;
+                          const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+                          const diffMin = Math.floor((diffMs / (1000 * 60)) % 60);
+                          const diffDias = Math.floor(diffHoras / 24);
+
+                          if (diffDias > 0) atraso = `${diffDias}d ${diffHoras % 24}h ${diffMin}min`;
+                          else if (diffHoras > 0) atraso = `${diffHoras}h ${diffMin}min`;
+                          else atraso = `${diffMin}min`;
+                        }
+
+                        return (
+                          <tr key={emp.id}>
+                            <td>{emp.chave?.sala?.numero || "-"}</td>
+                            <td>{tipoSala}</td>
+                            <td>{retirada ? format(retirada, "dd/MM/yyyy HH:mm") : "Não informado"}</td>
+                            <td>{devolucao ? format(devolucao, "dd/MM/yyyy HH:mm") : "-"}</td>
+                            <td>{atraso}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                   <div className="text-right text-sm font-medium mt-1">
@@ -175,7 +180,6 @@ export default function RelatorioHistoricoUtilizacaoUsuarios() {
             );
           })
       )}
-
     </div>
   );
 }

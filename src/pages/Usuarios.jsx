@@ -18,7 +18,9 @@ export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [formUsuario, setFormUsuario] = useState({
-    nome: "",
+    firstName: "",
+    lastName: "",
+    username: "",
     email: "",
     cpf: "",
     matricula: "",
@@ -51,10 +53,52 @@ export default function Usuarios() {
   };
 
   const handleSalvarUsuario = async () => {
-    if (!formUsuario.nome.trim() || !formUsuario.email.includes("@")) return;
-    await criarUsuario(formUsuario);
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      cpf,
+      matricula,
+      telefone,
+      senha,
+      senhaAssinatura,
+      curso,
+      cargo,
+    } = formUsuario;
+  
+    if (
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !username.includes('@') ||
+      !email.includes('@') ||
+      !cpf.trim() ||
+      !matricula.trim()
+    ) {
+      alert('Preencha todos os campos obrigatórios corretamente.');
+      return;
+    }
+  
+    const payload = {
+      firstName,
+      lastName,
+      username,
+      email,
+      cpf: cpf.replace(/\D/g, ""), // Apenas números no CPF
+      matricula,
+      telefone,
+      senha,
+      senhaAssinatura,
+      curso: curso ? { id: Number(curso) } : null,
+      cargo: cargo ? { id: Number(cargo) } : null,
+    };
+  
+    await criarUsuario(payload);
+  
     setFormUsuario({
-      nome: "",
+      firstName: "",
+      lastName: "",
+      username: "",
       email: "",
       cpf: "",
       matricula: "",
@@ -64,9 +108,11 @@ export default function Usuarios() {
       curso: "",
       cargo: ""
     });
+  
     setModalAberto(false);
     carregarUsuarios();
   };
+  
 
   const handleAtivarDesativar = (usuario) => {
     setUsuarioSelecionado(usuario);
@@ -84,8 +130,8 @@ export default function Usuarios() {
 
   const usuariosFiltrados = usuarios.filter((usuario) => {
     const atendeTexto =
-      usuario.nome.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-      usuario.email.toLowerCase().includes(filtroTexto.toLowerCase());
+    `${usuario.firstName} ${usuario.lastName}`.toLowerCase().includes(filtroTexto.toLowerCase()) ||
+    usuario.email.toLowerCase().includes(filtroTexto.toLowerCase());
     const atendeStatus = filtroStatus
       ? filtroStatus === "ativo"
         ? usuario.ativo
@@ -144,9 +190,7 @@ export default function Usuarios() {
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
-            <Button className="usuarios-btn-material">
-              Novo Usuário
-            </Button>
+            <Button className="usuarios-btn-material">Novo Usuário</Button>
           </DialogTrigger>
           <DialogContent className="dashboard-modal dashboard-no-close">
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
@@ -155,49 +199,156 @@ export default function Usuarios() {
               Preencha as informações do novo usuário.
             </DialogDescription>
 
-            {["nome", "email", "cpf", "matricula", "telefone", "senha", "senhaAssinatura"].map((campo) => (
-              <div key={campo} className="usuarios-input-wrapper">
-                <Input
-                  type={campo === "email" ? "email" : "text"}
-                  placeholder={campo === "senhaAssinatura" ? "Senha de Assinatura (4 dígitos)" : campo.charAt(0).toUpperCase() + campo.slice(1)}
-                  value={formUsuario[campo]}
-                  onChange={(e) => setFormUsuario({ ...formUsuario, [campo]: e.target.value })}
-                  className="usuarios-modal-input"
-                />
-                {formUsuario[campo] && (
-                  <button
-                    onClick={() => setFormUsuario({ ...formUsuario, [campo]: "" })}
-                    className="dashboard-filtro-clear"
-                    title="Limpar"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            ))}
+            {/* Campos de nome */}
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="text"
+                placeholder="Primeiro Nome"
+                value={formUsuario.firstName}
+                onChange={(e) => setFormUsuario({ ...formUsuario, firstName: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.firstName && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, firstName: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="text"
+                placeholder="Sobrenome"
+                value={formUsuario.lastName}
+                onChange={(e) => setFormUsuario({ ...formUsuario, lastName: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.lastName && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, lastName: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
-            <div>
+            {/* Username e email */}
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="email"
+                placeholder="Usuário (Username)"
+                value={formUsuario.username}
+                onChange={(e) => setFormUsuario({ ...formUsuario, username: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.username && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, username: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={formUsuario.email}
+                onChange={(e) => setFormUsuario({ ...formUsuario, email: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.email && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, email: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* CPF, matrícula, telefone */}
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="text"
+                placeholder="CPF"
+                value={formUsuario.cpf}
+                onChange={(e) => setFormUsuario({ ...formUsuario, cpf: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.cpf && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, cpf: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="text"
+                placeholder="Matrícula"
+                value={formUsuario.matricula}
+                onChange={(e) => setFormUsuario({ ...formUsuario, matricula: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.matricula && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, matricula: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="text"
+                placeholder="Telefone"
+                value={formUsuario.telefone}
+                onChange={(e) => setFormUsuario({ ...formUsuario, telefone: e.target.value })}
+                className="usuarios-modal-input"
+              />
+              {formUsuario.telefone && (
+                <button onClick={() => setFormUsuario({ ...formUsuario, telefone: "" })} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Senhas */}
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="password"
+                placeholder="Senha de Acesso"
+                value={formUsuario.senha}
+                onChange={(e) => setFormUsuario({ ...formUsuario, senha: e.target.value })}
+                className="usuarios-modal-input"
+              />
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="password"
+                placeholder="Senha de Assinatura (4 dígitos)"
+                value={formUsuario.senhaAssinatura}
+                onChange={(e) => setFormUsuario({ ...formUsuario, senhaAssinatura: e.target.value })}
+                className="usuarios-modal-input"
+              />
+            </div>
+
+            {/* Curso e Cargo */}
             <select value={formUsuario.curso} onChange={(e) => setFormUsuario({ ...formUsuario, curso: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Curso</option>
               {cursos.map(c => (
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
-            </div>
-            <div>
+
             <select value={formUsuario.cargo} onChange={(e) => setFormUsuario({ ...formUsuario, cargo: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Cargo</option>
               {cargos.map(c => (
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
-            </div>
+
             <div className="usuarios-modal-actions">
               <Button onClick={handleSalvarUsuario}>Salvar</Button>
             </div>
           </DialogContent>
         </Dialog>
+
         
       </div>
 
@@ -214,7 +365,7 @@ export default function Usuarios() {
           <tbody>
             {usuariosFiltrados.map((usuario) => (
               <tr key={usuario.id}>
-                <td>{usuario.nome}</td>
+                <td>{usuario.firstName} {usuario.lastName}</td>
                 <td>{usuario.email}</td>
                 <td>
                   <span className={usuario.ativo ? "" : "usuarios-status-inativo"}>
@@ -246,9 +397,10 @@ export default function Usuarios() {
           <DialogTitle>Confirmação</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao">
             {usuarioSelecionado?.ativo
-              ? `Tem certeza que deseja desativar ${usuarioSelecionado?.nome}?`
-              : `Tem certeza que deseja ativar ${usuarioSelecionado?.nome}?`}
+              ? `Tem certeza que deseja desativar ${usuarioSelecionado?.firstName} ${usuarioSelecionado?.lastName}?`
+              : `Tem certeza que deseja ativar ${usuarioSelecionado?.firstName} ${usuarioSelecionado?.lastName}?`}
           </DialogDescription>
+
 
           <div className="usuarios-modal-actions">
             <Button variant="outline" onClick={() => setConfirmarModalAberto(false)}>Cancelar</Button>

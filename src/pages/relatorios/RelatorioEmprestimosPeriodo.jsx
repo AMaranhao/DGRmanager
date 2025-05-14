@@ -46,8 +46,6 @@ export default function RelatorioEmprestimosPeriodo() {
 
   return (
     <div className="space-y-6">
-      
-
       {/* Filtros */}
       <div className="filtro-container noprint">
         <div className="filtros-esquerda">
@@ -105,10 +103,10 @@ export default function RelatorioEmprestimosPeriodo() {
         <div className="relatorios-sem-dados">
           Nenhum empréstimo encontrado nesse período.
         </div>
-          ) : (
+      ) : (
         <div className="emprestimos-tabela-wrapper">
           <table className="emprestimos-tabela">
-          <thead> 
+            <thead>
               <tr>
                 <th>Usuário</th>
                 <th>Sala</th>
@@ -119,8 +117,10 @@ export default function RelatorioEmprestimosPeriodo() {
             <tbody>
               {emprestimosFiltrados.map((emp) => (
                 <tr key={emp.id}>
-                  <td>{emp.usuario}</td>
-                  <td>{emp.sala?.numero}</td>
+                  <td>
+                    {`${emp.usuario?.firstName || ""} ${emp.usuario?.lastName || ""}`.trim() || "Não informado"}
+                  </td>
+                  <td>{emp.chave?.sala?.numero || "Não informado"}</td>
                   <td>
                     {emp.horario_retirada
                       ? format(parseISO(emp.horario_retirada), "dd/MM/yyyy HH:mm")
@@ -137,7 +137,6 @@ export default function RelatorioEmprestimosPeriodo() {
           </table>
         </div>
       )}
-
     </div>
   );
 }
