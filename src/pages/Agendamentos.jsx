@@ -2,10 +2,19 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog";
+import {
   fetchAgendamentos,
   fetchSalas,
   fetchAndares,
-  fetchTiposSala
+  fetchTiposSala,
+  fetchUsuarioLogado,
+  createAgendamento
 } from "@/services/apiService";
 import { X } from "lucide-react";
 
@@ -29,6 +38,9 @@ export default function Agendamentos() {
   const [tiposSala, setTiposSala] = useState([]);
   const [predios, setPredios] = useState([]);
   const [selecionados, setSelecionados] = useState([]);
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
 
   const horarios = [
     "08:00", "09:00", "10:00", "11:00", "12:00",
@@ -40,6 +52,7 @@ export default function Agendamentos() {
     carregarFiltros();
     carregarSalas();
     carregarAgendamentos();
+    carregarUsuario();
   }, [dataSelecionada, tipoSalaFiltro, andarFiltro, predioFiltro]);
 
   const carregarFiltros = async () => {
@@ -76,6 +89,11 @@ export default function Agendamentos() {
     setAgendamentos(filtrados);
   };
 
+  const carregarUsuario = async () => {
+    const me = await fetchUsuarioLogado();
+    setUsuarioLogado(me);
+  };
+
   const verificarOcupado = (salaId, horario) => {
     return agendamentos.some(ag =>
       ag.sala?.id === salaId &&
@@ -86,37 +104,72 @@ export default function Agendamentos() {
   const alternarCelula = (salaId, hora) => {
     const chave = `${salaId}-${hora}`;
     const index = selecionados.indexOf(chave);
-  
+
     if (index !== -1) {
-      // desmarcar seleção
       setSelecionados(selecionados.filter(k => k !== chave));
     } else {
-      const [primeiraSelecionada] = selecionados;
-      if (!primeiraSelecionada) {
-        // primeira seleção
-        setSelecionados([chave]);
-      } else {
-        const [salaSelecionada] = primeiraSelecionada.split("-");
-        if (String(salaId) !== salaSelecionada) return; // só permite clicar na mesma sala
-  
-        const horariosSelecionados = selecionados.map(k => k.split("-")[1]);
-        const indexHora = horarios.indexOf(hora);
-        const podeSelecionar = horariosSelecionados.some(h =>
-          Math.abs(horarios.indexOf(h) - indexHora) === 1
-        );
-        if (podeSelecionar) {
-          setSelecionados([...selecionados, chave]);
-        }
+      const selecionadosDaSala = selecionados
+        .filter(k => k.startsWith(`${salaId}-`))
+        .map(k => k.split("-")[1]);
+
+      const todasDaMesmaSala = selecionados.every(k => k.startsWith(`${salaId}-`));
+      const indexHora = horarios.indexOf(hora);
+      const adjacente = selecionadosDaSala.some(h =>
+        Math.abs(horarios.indexOf(h) - indexHora) === 1
+      );
+
+      if (selecionados.length === 0 || (todasDaMesmaSala && (selecionadosDaSala.length === 0 || adjacente))) {
+        setSelecionados([...selecionados, chave]);
       }
     }
   };
-  
+
+  const grupoSelecionado = () => {
+    if (selecionados.length === 0) return null;
+    const [salaId] = selecionados[0].split("-");
+    const sala = salas.find(s => s.id === parseInt(salaId));
+    const horas = selecionados
+      .map(k => k.split("-")[1])
+      .sort((a, b) => horarios.indexOf(a) - horarios.indexOf(b));
+
+    return {
+      sala,
+      inicio: horas[0],
+      fim: horas[horas.length - 1]
+    };
+  };
+
+  const confirmarAgendamento = async () => {
+    const grupo = grupoSelecionado();
+    if (!grupo || !usuarioLogado) return;
+
+    const body = {
+      usuarioId: usuarioLogado.id,
+      salaId: grupo.sala.id,
+      data: dataSelecionada,
+      horario_inicio: `${dataSelecionada}T${grupo.inicio}:00`,
+      horario_fim: `${dataSelecionada}T${grupo.fim}:00`
+    };
+
+    try {
+      await createAgendamento(body);
+      setMensagemSucesso("Agendamento realizado com sucesso!");
+      await carregarAgendamentos();
+      setSelecionados([]);
+
+      setTimeout(() => {
+        setMensagemSucesso("");
+        setModalAberto(false);
+      }, 2000);
+    } catch (err) {
+      alert("Erro ao agendar. Tente novamente.");
+    }
+  };
 
   return (
     <div className="agendamentos-wrapper">
       <h3 className="dashboard-heading">Grade de Agendamentos</h3>
 
-      {/* Filtros + botão */}
       <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
         <Input
           type="date"
@@ -137,12 +190,7 @@ export default function Agendamentos() {
             ))}
           </select>
           {predioFiltro && (
-            <button
-              type="button"
-              onClick={() => setPredioFiltro("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
+            <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
               <X size={14} />
             </button>
           )}
@@ -158,18 +206,11 @@ export default function Agendamentos() {
             {andares
               .filter(a => !predioFiltro || String(a.predio?.id) === predioFiltro)
               .map((a) => (
-                <option key={`andar-${a.id}`} value={a.id}>
-                  {a.nome}
-                </option>
+                <option key={`andar-${a.id}`} value={a.id}>{a.nome}</option>
               ))}
           </select>
           {andarFiltro && (
-            <button
-              type="button"
-              onClick={() => setAndarFiltro("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
+            <button onClick={() => setAndarFiltro("")} className="dashboard-filtro-clear" title="Limpar">
               <X size={14} />
             </button>
           )}
@@ -189,19 +230,20 @@ export default function Agendamentos() {
             ))}
           </select>
           {tipoSalaFiltro && (
-            <button
-              type="button"
-              onClick={() => setTipoSalaFiltro("")}
-              className="dashboard-filtro-clear"
-              title="Limpar"
-            >
+            <button onClick={() => setTipoSalaFiltro("")} className="dashboard-filtro-clear" title="Limpar">
               <X size={14} />
             </button>
           )}
         </div>
 
         <div style={{ marginLeft: "auto" }}>
-          <Button className="usuarios-btn-material">Agendar</Button>
+          <Button
+            className="usuarios-btn-material"
+            onClick={() => setModalAberto(true)}
+            disabled={selecionados.length === 0}
+          >
+            Agendar
+          </Button>
         </div>
       </div>
 
@@ -210,9 +252,7 @@ export default function Agendamentos() {
         <div className="linha-header">
           <div className="celula-hora">Horário</div>
           {salas.map((sala) => (
-            <div key={`coluna-${sala.id}`} className="celula-sala">
-              {sala.numero}
-            </div>
+            <div key={`coluna-${sala.id}`} className="celula-sala">{sala.numero}</div>
           ))}
         </div>
 
@@ -234,6 +274,39 @@ export default function Agendamentos() {
           </div>
         ))}
       </div>
+
+      {/* Modal de confirmação */}
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <DialogTitle>Confirmar Agendamento</DialogTitle>
+          <DialogDescription className="usuarios-modal-descricao">
+            Verifique as informações abaixo antes de confirmar:
+          </DialogDescription>
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
+          {mensagemSucesso ? (
+            <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+          ) : (
+            grupoSelecionado() && (
+              <div className="agendamentos-input-wrapper">
+                <p><strong>Usuário:</strong> {usuarioLogado?.firstName} {usuarioLogado?.lastName}</p>
+                <p><strong>Sala:</strong> {grupoSelecionado().sala.numero}</p>
+                <p><strong>Tipo:</strong> {grupoSelecionado().sala.tipo?.tipo_sala}</p>
+                <p><strong>Data:</strong> {new Date(dataSelecionada).toLocaleDateString("pt-BR")}</p>
+                <p><strong>Horário:</strong> {grupoSelecionado().inicio} às {grupoSelecionado().fim}</p>
+              </div>
+            )
+          )}
+
+          {!mensagemSucesso && (
+            <div className="usuarios-modal-actions">
+              <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+              <Button onClick={confirmarAgendamento}>Confirmar Agendamento</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

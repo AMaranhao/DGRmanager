@@ -34,4 +34,16 @@
     border: 1px solid #4caf50;
     cursor: pointer;
   }
+
+  .agendamentos-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0;
+    margin: 0;
+  }
+  
   

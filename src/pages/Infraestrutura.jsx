@@ -265,7 +265,6 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Prédios */}
         <TabsContent value="predios">
           <div className="infraestrutura-section">
-            <h2 className="infraestrutura-section-title">Lista de Prédios</h2>
             
             <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
               <DialogOverlay className="dialog-overlay" />
@@ -376,7 +375,6 @@ const confirmarExclusaoItem = async () => {
           <div className="infraestrutura-section">
             
             <div className="filtros-esquerda">
-              <h2 className="infraestrutura-section-title">Lista de Salas</h2>
               
 
               
@@ -577,7 +575,6 @@ const confirmarExclusaoItem = async () => {
         <TabsContent value="chaves">
           <div className="infraestrutura-section">
             <div className="filtros-esquerda">
-            <h2 className="infraestrutura-section-title">Lista de Chaves</h2>
             {/* Filtro por número da sala */}
             <div className="dashboard-filtro">
               <div className="dashboard-filtro-usuario filtro-infraestrutura">
@@ -734,7 +731,6 @@ const confirmarExclusaoItem = async () => {
         <TabsContent value="kits">
           <div className="infraestrutura-section">
           <div className="filtros-esquerda">
-          <h2 className="infraestrutura-section-title">Lista de Kits</h2>
             {/* Filtro por número da sala */}
             <div className="dashboard-filtro">
               <div className="dashboard-filtro-usuario filtro-infraestrutura">
