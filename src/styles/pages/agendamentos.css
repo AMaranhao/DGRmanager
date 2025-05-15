@@ -28,4 +28,10 @@
   .celula-sala.livre {
     background-color: white;
   }
+
+  .celula-sala.selecionado {
+    background-color: lightgreen !important;
+    border: 1px solid #4caf50;
+    cursor: pointer;
+  }
   

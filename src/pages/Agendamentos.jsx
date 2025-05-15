@@ -1,23 +1,34 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { fetchAgendamentos, fetchSalas } from "@/services/apiService";
-import { X, } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  fetchAgendamentos,
+  fetchSalas,
+  fetchAndares,
+  fetchTiposSala
+} from "@/services/apiService";
+import { X } from "lucide-react";
 
 import "@/styles/pages/agendamentos.css";
-import '@/styles/pages/filters.css';
-import '@/styles/pages/modals.css';
-import '@/styles/pages/buttons.css';
-import '@/styles/pages/status.css';
-import '@/styles/mobile.css';
+import "@/styles/pages/filters.css";
+import "@/styles/pages/modals.css";
+import "@/styles/pages/buttons.css";
+import "@/styles/pages/status.css";
+import "@/styles/mobile.css";
 
 export default function Agendamentos() {
-  const [dataSelecionada, setDataSelecionada] = useState(() => new Date().toISOString().slice(0, 10));
+  const [dataSelecionada, setDataSelecionada] = useState(() =>
+    new Date().toISOString().slice(0, 10)
+  );
   const [tipoSalaFiltro, setTipoSalaFiltro] = useState("");
   const [andarFiltro, setAndarFiltro] = useState("");
+  const [predioFiltro, setPredioFiltro] = useState("");
   const [salas, setSalas] = useState([]);
   const [agendamentos, setAgendamentos] = useState([]);
-  const [todasSalas, setTodasSalas] = useState([]);
-
+  const [andares, setAndares] = useState([]);
+  const [tiposSala, setTiposSala] = useState([]);
+  const [predios, setPredios] = useState([]);
+  const [selecionados, setSelecionados] = useState([]);
 
   const horarios = [
     "08:00", "09:00", "10:00", "11:00", "12:00",
@@ -26,21 +37,36 @@ export default function Agendamentos() {
   ];
 
   useEffect(() => {
+    carregarFiltros();
     carregarSalas();
     carregarAgendamentos();
-  }, [dataSelecionada, tipoSalaFiltro, andarFiltro]);
+  }, [dataSelecionada, tipoSalaFiltro, andarFiltro, predioFiltro]);
+
+  const carregarFiltros = async () => {
+    const [dadosAndares, dadosTipos, dadosPredios] = await Promise.all([
+      fetchAndares(),
+      fetchTiposSala(),
+      fetchSalas().then(salas => {
+        const prediosUnicos = salas
+          .map(s => s.andar?.predio)
+          .filter((p, i, arr) => p && arr.findIndex(o => o.id === p.id) === i);
+        return prediosUnicos;
+      })
+    ]);
+    setAndares(dadosAndares);
+    setTiposSala(dadosTipos);
+    setPredios(dadosPredios);
+  };
 
   const carregarSalas = async () => {
     const todas = await fetchSalas();
-    setTodasSalas(todas); // para os filtros
     const filtradas = todas.filter(sala =>
       (!tipoSalaFiltro || sala.tipo?.tipo_sala === tipoSalaFiltro) &&
-      (!andarFiltro || String(sala.andar?.id) === String(andarFiltro))
+      (!andarFiltro || String(sala.andar?.id) === String(andarFiltro)) &&
+      (!predioFiltro || String(sala.andar?.predio?.id) === String(predioFiltro))
     );
     setSalas(filtradas);
   };
-  
-  
 
   const carregarAgendamentos = async () => {
     const dados = await fetchAgendamentos();
@@ -57,90 +83,154 @@ export default function Agendamentos() {
     );
   };
 
+  const alternarCelula = (salaId, hora) => {
+    const chave = `${salaId}-${hora}`;
+    const index = selecionados.indexOf(chave);
+  
+    if (index !== -1) {
+      // desmarcar seleção
+      setSelecionados(selecionados.filter(k => k !== chave));
+    } else {
+      const [primeiraSelecionada] = selecionados;
+      if (!primeiraSelecionada) {
+        // primeira seleção
+        setSelecionados([chave]);
+      } else {
+        const [salaSelecionada] = primeiraSelecionada.split("-");
+        if (String(salaId) !== salaSelecionada) return; // só permite clicar na mesma sala
+  
+        const horariosSelecionados = selecionados.map(k => k.split("-")[1]);
+        const indexHora = horarios.indexOf(hora);
+        const podeSelecionar = horariosSelecionados.some(h =>
+          Math.abs(horarios.indexOf(h) - indexHora) === 1
+        );
+        if (podeSelecionar) {
+          setSelecionados([...selecionados, chave]);
+        }
+      }
+    }
+  };
+  
+
   return (
     <div className="agendamentos-wrapper">
       <h3 className="dashboard-heading">Grade de Agendamentos</h3>
 
-      {/* Filtros */}
-      <div className="dashboard-filtro">
-            <Input
-                type="date"
-                value={dataSelecionada}
-                onChange={(e) => setDataSelecionada(e.target.value)}
-                className="dashboard-select dashboard-filtro-usuario-input"
-            />
+      {/* Filtros + botão */}
+      <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
+        <Input
+          type="date"
+          value={dataSelecionada}
+          onChange={(e) => setDataSelecionada(e.target.value)}
+          className="dashboard-select dashboard-filtro-usuario-input"
+        />
 
-            {/* Filtro Andar */}
-            <div className="dashboard-filtro-group dashboard-filtro-text">
-                <select
-                    value={andarFiltro}
-                    onChange={(e) => setAndarFiltro(e.target.value)}
-                    className="dashboard-select"
-                    >
-                    <option value="">Todos os Andares</option>
-                    {[...new Map(todasSalas.map(s => [s.andar?.id, s.andar?.nome]))
-                        .entries()]
-                        .filter(([id, nome]) => id && nome)
-                        .map(([id, nome]) => (
-                        <option key={`andar-${id}`} value={id}>Andar {nome}</option>
-                    ))}
-                </select>
-                {andarFiltro && (
-                <button
-                    type="button"
-                    onClick={() => setAndarFiltro("")}
-                    className="dashboard-filtro-clear"
-                    title="Limpar"
-                >
-                    <X size={14} />
-                </button>
-                )}
-            </div>
-
-            {/* Filtro Tipo Sala */}
-            <div className="dashboard-filtro-group dashboard-filtro-text">
-                <select
-                    value={tipoSalaFiltro}
-                    onChange={(e) => setTipoSalaFiltro(e.target.value)}
-                    className="dashboard-select"
-                    >
-                    <option value="">Tipos de Sala</option>
-                    {[...new Set(todasSalas.map(s => s.tipo?.tipo_sala).filter(Boolean))].map((tipo) => (
-                        <option key={`tipo-${tipo}`} value={tipo}>{tipo}</option>
-                    ))}
-                </select>
-                {tipoSalaFiltro && (
-                <button
-                    type="button"
-                    onClick={() => setTipoSalaFiltro("")}
-                    className="dashboard-filtro-clear"
-                    title="Limpar"
-                >
-                    <X size={14} />
-                </button>
-                )}
-            </div>
+        <div className="dashboard-filtro-group dashboard-filtro-text">
+          <select
+            value={predioFiltro}
+            onChange={(e) => setPredioFiltro(e.target.value)}
+            className="dashboard-select"
+          >
+            <option value="">Todos os Prédios</option>
+            {predios.map((p) => (
+              <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
+            ))}
+          </select>
+          {predioFiltro && (
+            <button
+              type="button"
+              onClick={() => setPredioFiltro("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
+        <div className="dashboard-filtro-group dashboard-filtro-text">
+          <select
+            value={andarFiltro}
+            onChange={(e) => setAndarFiltro(e.target.value)}
+            className="dashboard-select"
+          >
+            <option value="">Todos os Andares</option>
+            {andares
+              .filter(a => !predioFiltro || String(a.predio?.id) === predioFiltro)
+              .map((a) => (
+                <option key={`andar-${a.id}`} value={a.id}>
+                  {a.nome}
+                </option>
+              ))}
+          </select>
+          {andarFiltro && (
+            <button
+              type="button"
+              onClick={() => setAndarFiltro("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-      {/* Grade de Agendamentos */}
+        <div className="dashboard-filtro-group dashboard-filtro-text">
+          <select
+            value={tipoSalaFiltro}
+            onChange={(e) => setTipoSalaFiltro(e.target.value)}
+            className="dashboard-select"
+          >
+            <option value="">Tipos de Sala</option>
+            {tiposSala.map((tipo) => (
+              <option key={`tipo-${tipo.id}`} value={tipo.tipo_sala}>
+                {tipo.tipo_sala}
+              </option>
+            ))}
+          </select>
+          {tipoSalaFiltro && (
+            <button
+              type="button"
+              onClick={() => setTipoSalaFiltro("")}
+              className="dashboard-filtro-clear"
+              title="Limpar"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        <div style={{ marginLeft: "auto" }}>
+          <Button className="usuarios-btn-material">Agendar</Button>
+        </div>
+      </div>
+
+      {/* Grade */}
       <div className="grade-agendamentos">
         <div className="linha-header">
           <div className="celula-hora">Horário</div>
-          {salas.map(sala => (
-            <div key={`coluna-${sala.id}`} className="celula-sala">{sala.numero}</div>
+          {salas.map((sala) => (
+            <div key={`coluna-${sala.id}`} className="celula-sala">
+              {sala.numero}
+            </div>
           ))}
         </div>
 
-        {horarios.map(hora => (
+        {horarios.map((hora) => (
           <div key={`linha-${hora}`} className="linha-horario">
             <div className="celula-hora">{hora}</div>
-            {salas.map(sala => (
-              <div
-                key={`celula-${sala.id}-${hora}`}
-                className={`celula-sala ${verificarOcupado(sala.id, hora) ? "ocupado" : "livre"}`}
-              />
-            ))}
+            {salas.map((sala) => {
+              const ocupado = verificarOcupado(sala.id, hora);
+              const chave = `${sala.id}-${hora}`;
+              const selecionado = selecionados.includes(chave);
+              return (
+                <div
+                  key={chave}
+                  className={`celula-sala ${ocupado ? "ocupado" : selecionado ? "selecionado" : "livre"}`}
+                  onClick={() => !ocupado && alternarCelula(sala.id, hora)}
+                />
+              );
+            })}
           </div>
         ))}
       </div>

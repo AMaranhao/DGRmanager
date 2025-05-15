@@ -25,6 +25,10 @@ export default function Dashboard() {
   const [modalAvulsoAberto, setModalAvulsoAberto] = useState(false);
   const [andaresFiltro, setAndaresFiltro] = useState([]); 
   const [andaresModal, setAndaresModal] = useState([]);  
+  const [predioSelecionado, setPredioSelecionado] = useState('');
+
+
+
 
   const [usuarioAvulso, setUsuarioAvulso] = useState('');
   const [tipoSala, setTipoSala] = useState('');
@@ -45,19 +49,37 @@ export default function Dashboard() {
     const carregarAgendamentosEmprestimos = async () => {
       const dados = await fetchAgendamentosEmprestimos();
       setAgendamentos(dados);
-      const andares = [...new Map(dados.map(item => [item.sala?.andar?.id, item.sala?.andar?.nome])).entries()];
-      setAndaresFiltro(['Todos', ...andares.map(([id, nome]) => ({ id, nome }))]);
+  
+      const andaresUnicos = dados
+        .map(ag => ag.sala?.andar)
+        .filter((a, index, self) =>
+          a && self.findIndex(o => o?.id === a.id) === index
+        )
+        .map(a => ({
+          id: a.id,
+          nome: a.nome,
+          predioId: a.predio?.id || null
+        }));
+  
+      setAndaresFiltro([{ id: 'Todos', nome: 'Todos os Andares' }, ...andaresUnicos]);
     };
     carregarAgendamentosEmprestimos();
   }, []);
+  
 
   useEffect(() => {
     const carregarPredios = async () => {
       const dados = await fetchPredios();
       setPrediosDisponiveis(dados);
+  
+      if (dados.length > 0) {
+        const menorId = Math.min(...dados.map(p => p.id));
+        setPredioSelecionado(menorId.toString());
+      }
     };
     carregarPredios();
   }, []);
+  
 
   useEffect(() => {
     if (usarKit && sala) {
@@ -109,7 +131,12 @@ export default function Dashboard() {
   };
 
   const agendamentosFiltrados = agendamentos.filter((ag) => {
-    const correspondeAndar = andarSelecionado === 'Todos' || Number(ag.sala?.andar?.id) === Number(andarSelecionado);
+    const correspondePredio = predioSelecionado === 'Todos' || 
+      Number(ag.sala?.andar?.predio?.id) === Number(predioSelecionado);
+    
+    const correspondeAndar = andarSelecionado === 'Todos' ||
+      Number(ag.sala?.andar?.id) === Number(andarSelecionado);
+    
     const nomeUsuario = 
       `${ag.usuario?.firstName || ''} ${ag.usuario?.lastName || ''}`.toLowerCase();
     const numeroSala = ag.sala?.numero?.toString().toLowerCase() || '';
@@ -118,7 +145,7 @@ export default function Dashboard() {
     const correspondeTexto =
       nomeUsuario.includes(filtro) || numeroSala.includes(filtro);
 
-    return correspondeAndar && correspondeTexto;
+      return correspondePredio && correspondeAndar && correspondeTexto;
   });
 
   const abrirModal = (agendamento) => {
@@ -150,19 +177,46 @@ export default function Dashboard() {
 
       <div className="dashboard-filtro">
         <div className="dashboard-filtro-group">
-          <select value={andarSelecionado} onChange={(e) => setAndarSelecionado(e.target.value)} className="dashboard-select">
-            {andaresFiltro.map((andar, index) => (
-              <option key={andar.id || index} value={andar.id}>
-                {andar === 'Todos' ? 'Todos os Andares' : andar.nome}
-              </option>
+          <select
+            value={predioSelecionado}
+            onChange={(e) => {
+              setPredioSelecionado(e.target.value);
+              setAndarSelecionado('Todos'); 
+            }}
+            className="dashboard-select"
+          >
+            
+            {prediosDisponiveis.map((p) => (
+              <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
             ))}
           </select>
-            {andarSelecionado !== 'Todos' && (
-              <button type="button" onClick={() => setAndarSelecionado('Todos')} className="dashboard-filtro-clear" title="Limpar">
-                <X size={14} />
-              </button>
-            )}
+
+          
         </div>
+        <div className="dashboard-filtro-group">
+          <select
+            value={andarSelecionado}
+            onChange={(e) => setAndarSelecionado(e.target.value)}
+            className="dashboard-select"
+            disabled={predioSelecionado === 'Todos'}
+            >
+            {andaresFiltro
+              .filter(andar =>
+                andar.id === 'Todos' ||
+                (predioSelecionado !== 'Todos' && Number(andar.predioId) === Number(predioSelecionado))
+              )
+              .map((andar, index) => (
+                <option key={`andar-${andar.id}`} value={andar.id}>
+                  {andar.nome}
+                </option>
+              ))}
+            </select>
+              {andarSelecionado !== 'Todos' && (
+                <button type="button" onClick={() => setAndarSelecionado('Todos')} className="dashboard-filtro-clear" title="Limpar">
+                  <X size={14} />
+                </button>
+              )}
+         </div>
 
         <div className="dashboard-filtro-usuario">
           <input
