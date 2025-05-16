@@ -55,6 +55,31 @@
     background-color: #f0f0f0;
     cursor: pointer;
   }
+
+
+  .dashboard-select-relatorio {
+    padding-right: 2rem;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px !important;
+    background-color: white !important;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1f2937;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    outline: none;
+    width: 20rem;
+    height: 2.5rem !important;
+    max-height: 2.5rem !important;
+    line-height: 2.25rem !important;
+    }
+
+    .celula-sala.ocupado-usuario {
+        background-color: #cce4ff !important;
+        border: 1px solid #3399ff;
+      }
+      
   
   
   
