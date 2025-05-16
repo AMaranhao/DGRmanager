@@ -80,6 +80,13 @@
         border: 1px solid #3399ff;
       }
       
+      .dashboard-paginacao-quinzena {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
   
   
   

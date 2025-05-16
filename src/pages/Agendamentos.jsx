@@ -48,6 +48,7 @@ export default function Agendamentos() {
   const [agendamentoSelecionado, setAgendamentoSelecionado] = useState(null);
   const [abaSelecionada, setAbaSelecionada] = useState("porSala");
   const [salaSelecionada, setSalaSelecionada] = useState("");
+  const [offsetQuinzena, setOffsetQuinzena] = useState(0);
 
 
   useEffect(() => {
@@ -61,20 +62,22 @@ export default function Agendamentos() {
   
   
   function calcularQuinzenaCompleta(dataBase) {
-    const segunda = startOfWeek(new Date(dataBase), { weekStartsOn: 1 }); 
+    const segunda = startOfWeek(new Date(dataBase), { weekStartsOn: 1 });
+    const inicio = addDays(segunda, offsetQuinzena * 12); 
     const dias = [];
   
     for (let i = 0; i < 12; i++) {
-      const dia = addDays(segunda, i);
+      const dia = addDays(inicio, i);
       dias.push({
         data: dia,
-        label: format(dia, "dd/MM", { locale: undefined }), 
+        label: format(dia, "dd/MM"),
         iso: format(dia, "yyyy-MM-dd"),
       });
     }
   
     return dias;
   }
+  
 
   const grupoSelecionadoPorData = () => {
     if (selecionados.length === 0 || !salaSelecionada) return null;
@@ -530,8 +533,11 @@ export default function Agendamentos() {
     )}
 
     {abaSelecionada === "porData" && (
+    
     <div className="grade-agendamentos">
         {/* Filtro de data */}
+        
+
         <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
             <Input
                 type="date"
@@ -559,7 +565,7 @@ export default function Agendamentos() {
 
             <div className="dashboard-filtro-group dashboard-filtro-text">
                 <select
-                value={salaSelecionada} // 👈 lembre de criar esse estado!
+                value={salaSelecionada} 
                 onChange={(e) => setSalaSelecionada(e.target.value)}
                 className="dashboard-select"
                 >
@@ -586,6 +592,19 @@ export default function Agendamentos() {
                 </Button>
             </div>
         </div>
+
+        <div className="dashboard-paginacao-quinzena">
+            <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena - 1)}>
+                ← Quinzena anterior
+            </Button>
+            <Button variant="outline" onClick={() => setOffsetQuinzena(0)}>
+                Atual
+            </Button>
+            <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena + 1)}>
+                Próxima quinzena →
+            </Button>
+        </div>
+
 
         {/* Grade de agendamentos */}
         <div className="grade-agendamentos">
