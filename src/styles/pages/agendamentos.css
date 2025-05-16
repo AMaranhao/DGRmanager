@@ -87,6 +87,11 @@
         margin-bottom: 1rem;
       }
       
+      .celula-sala.selecionado {
+        background-color: #4ade80; /* verde-400 */
+        cursor: pointer;
+      }
+      
   
   
   

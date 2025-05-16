@@ -79,63 +79,43 @@ export default function Agendamentos() {
   }
   
 
-  const grupoSelecionadoPorData = () => {
-    if (selecionados.length === 0 || !salaSelecionada) return null;
+  const grupoSelecionado = () => {
+    if (selecionados.length === 0) return null;
+  
+    const primeiroSplit = selecionados[0].split("-");
+    const isPorData = primeiroSplit.length === 3;
+  
+    const salaId = primeiroSplit[0];
+    const data = isPorData ? primeiroSplit[1] : dataSelecionada;
   
     const chavesValidas = selecionados
-      .filter(k => typeof k === "string" && k.startsWith(`${salaSelecionada}-`) && k.split("-").length === 3);
+      .filter(k => {
+        const partes = k.split("-");
+        return partes[0] === salaId && (isPorData ? partes[1] === data : true);
+      })
+      .sort((a, b) => {
+        const horaA = a.split("-").at(-1);
+        const horaB = b.split("-").at(-1);
+        return horarios.indexOf(horaA) - horarios.indexOf(horaB);
+      });
   
     if (chavesValidas.length === 0) return null;
   
-    const chavesOrdenadas = chavesValidas.sort((a, b) => {
-      const [, dataA, horaA] = a.split("-");
-      const [, dataB, horaB] = b.split("-");
-      return new Date(`${dataA}T${horaA}:00`) - new Date(`${dataB}T${horaB}:00`);
-    });
-  
-    const [, data, horaInicio] = chavesOrdenadas[0].split("-");
-    const [, , horaFimRaw] = chavesOrdenadas[chavesOrdenadas.length - 1].split("-");
-  
-    const sala = salas.find(s => String(s.id) === salaSelecionada);
+    const horaInicio = chavesValidas[0].split("-").at(-1);
+    const horaFimRaw = chavesValidas[chavesValidas.length - 1].split("-").at(-1);
     const indexFim = horarios.indexOf(horaFimRaw);
     const horaFim = horarios[indexFim + 1] || horaFimRaw;
   
-    return {
-      sala,
-      data,
-      inicio: horaInicio,
-      fim: horaFim
-    };
-  };
-  
-  
-  
-
-
-  const alternarCelulaData = (salaId, diaISO, hora) => {
-    const chave = `${salaId}-${diaISO}-${hora}`;
-    const index = selecionados.indexOf(chave);
-  
-    if (index !== -1) {
-      setSelecionados(selecionados.filter(k => k !== chave));
-    } else {
-      const selecionadosDaSala = selecionados
-        .filter(k => k.startsWith(`${salaId}-${diaISO}-`))
-        .map(k => k.split("-")[2]);
-  
-      const todasDaMesmaSalaDia = selecionados.every(k => k.startsWith(`${salaId}-${diaISO}-`));
-      const indexHora = horarios.indexOf(hora);
-      const adjacente = selecionadosDaSala.some(h =>
-        Math.abs(horarios.indexOf(h) - indexHora) === 1
-      );
-  
-      if (selecionados.length === 0 || (todasDaMesmaSalaDia && (selecionadosDaSala.length === 0 || adjacente))) {
-        setSelecionados([...selecionados, chave]);
-      }
+    // Verifica se são horários consecutivos
+    const indices = chavesValidas.map(c => horarios.indexOf(c.split("-").at(-1)));
+    for (let i = 1; i < indices.length; i++) {
+      if (indices[i] - indices[i - 1] !== 1) return null;
     }
+  
+    const sala = salas.find(s => s.id.toString() === salaId.toString());
+    return { sala, data, inicio: horaInicio, fim: horaFim };
   };
   
-
   
   const [formEdicao, setFormEdicao] = useState({
     data: "",
@@ -204,58 +184,84 @@ export default function Agendamentos() {
     setUsuarioLogado(me);
   };
 
-  const verificarOcupado = (salaId, horario) => {
+  const verificarOcupado = (salaId, horario, dataISO) => {
     return agendamentos.some(ag => {
       if (ag.sala?.id !== salaId) return false;
   
-      const horaAtual = new Date(`${dataSelecionada}T${horario}:00`);
+      const horaAtual = new Date(`${dataISO}T${horario}:00`);
       const inicio = new Date(ag.horario_inicio);
       const fim = new Date(ag.horario_fim);
   
       return horaAtual >= inicio && horaAtual < fim;
     });
   };
+
+
+
+
+  
+ const alternarCelulaPorSala = (salaId, hora) => {
+  const chave = `${salaId}-${hora}`;
+  const index = selecionados.indexOf(chave);
+
+  if (index !== -1) {
+    setSelecionados(selecionados.filter(k => k !== chave));
+  } else {
+    const selecionadosDaSala = selecionados
+      .filter(k => k.startsWith(`${salaId}-`))
+      .map(k => k.split("-")[1]);
+
+    const todasDaMesmaSala = selecionados.every(k => k.startsWith(`${salaId}-`));
+    const indexHora = horarios.indexOf(hora);
+
+    const adjacente = selecionadosDaSala.some(h =>
+      Math.abs(horarios.indexOf(h) - indexHora) === 1
+    );
+
+    if (
+      selecionados.length === 0 ||
+      (todasDaMesmaSala && (selecionadosDaSala.length === 0 || adjacente))
+    ) {
+      setSelecionados([...selecionados, chave]);
+    }
+  }
+};
+
   
 
-  const alternarCelula = (salaId, hora) => {
-    const chave = `${salaId}-${hora}`;
-    const index = selecionados.indexOf(chave);
-    if (index !== -1) {
-      setSelecionados(selecionados.filter(k => k !== chave));
-    } else {
-      const selecionadosDaSala = selecionados.filter(k => k.startsWith(`${salaId}-`)).map(k => k.split("-")[1]);
-      const todasDaMesmaSala = selecionados.every(k => k.startsWith(`${salaId}-`));
-      const indexHora = horarios.indexOf(hora);
-      const adjacente = selecionadosDaSala.some(h => Math.abs(horarios.indexOf(h) - indexHora) === 1);
-      if (selecionados.length === 0 || (todasDaMesmaSala && (selecionadosDaSala.length === 0 || adjacente))) {
-        setSelecionados([...selecionados, chave]);
-      }
-    }
-  };
 
-  const grupoSelecionado = () => {
-    if (selecionados.length === 0) return null;
+
+
   
-    if (selecionados.length >= 2) {
-      const indexList = selecionados
-        .map(k => parseInt(k.split("-")[1].replace(":", ""), 10))
-        .sort((a, b) => a - b);
+  const alternarCelulaPorData = (salaId, dataISO, hora) => {
+    const chave = `${salaId}-${dataISO}-${hora}`;
   
-      for (let i = 1; i < indexList.length; i++) {
-        if (indexList[i] - indexList[i - 1] !== 100) {
-          return null; // apenas retorna null sem setMensagemErro
-        }
+    setSelecionados((prev) => {
+
+        if (prev.includes(chave)) {
+        return prev.filter((k) => k !== chave);
       }
-    }
   
-    const [salaId] = selecionados[0].split("-");
-    const sala = salas.find(s => s.id === parseInt(salaId));
-    const horas = selecionados.map(k => k.split("-")[1]).sort((a, b) => horarios.indexOf(a) - horarios.indexOf(b));
-    const fimIndex = horarios.indexOf(horas[horas.length - 1]);
-    const fimHora = horarios[fimIndex + 1] || horas[horas.length - 1];
+      if (prev.length === 0) return [chave];
   
-    return { sala, inicio: horas[0], fim: fimHora };
+      const primeiroSelecionado = prev[0];
+      const partes = primeiroSelecionado.split("-");
+      if (partes.length < 3) return prev; // segurança extra
+  
+      const primeiroDia = partes.slice(1, -1).join("-"); // junta corretamente o dataISO
+  
+      if (dataISO !== primeiroDia) {
+        console.log("⚠️ Dia diferente da seleção inicial.");
+        return prev;
+      }
+  
+      return [...prev, chave];
+    });
   };
+  
+  
+  
+  
   
   
   
@@ -263,9 +269,8 @@ export default function Agendamentos() {
   const confirmarAgendamento = async () => {
     setMensagemErro("");
   
-    const grupo = abaSelecionada === "porSala"
-      ? grupoSelecionado()
-      : grupoSelecionadoPorData();
+    const grupo = grupoSelecionado();
+
   
     if (!grupo) {
       setMensagemErro("Selecione horários consecutivos válidos para agendamento.");
@@ -358,7 +363,7 @@ export default function Agendamentos() {
     const agora = new Date();
   
     if (fim < agora) {
-        setMensagemErro("Texto do erro");
+        setMensagemErro("Não é possível cancelar um angendamento anterior a data atual");
         return;
     }
   
@@ -385,12 +390,12 @@ export default function Agendamentos() {
             onChange={(e) => setAbaSelecionada(e.target.value)}
             className="dashboard-select-relatorio"
         >
-            <option value="porSala">Visualizar por Sala</option>
-            <option value="porData">Visualizar por Data</option>
+            <option value="porSala">Visualização pelas Salas</option>
+            <option value="porData">Visualização pelas Datas</option>
         </select>
-    </div>
-    {abaSelecionada === "porSala" && (
-    <div className="grade-agendamentos">
+        </div>
+            {abaSelecionada === "porSala" && (
+        <div className="grade-agendamentos">
 
         {/* Filtros */}  
         
@@ -482,12 +487,8 @@ export default function Agendamentos() {
             <div key={hora} className="linha-horario">
             <div className="celula-hora">{hora}</div>
             {salas.map(sala => {
-                const ocupado = agendamentos.some(ag => {
-                    return ag.sala?.id === sala.id &&
-                           new Date(`${dataSelecionada}T${hora}:00`) >= new Date(ag.horario_inicio) &&
-                           new Date(`${dataSelecionada}T${hora}:00`) < new Date(ag.horario_fim);
-                  });
-                  
+                const ocupado = verificarOcupado(sala.id, hora, dataSelecionada);
+
                   const agendamentoDoUsuario = agendamentos.some(ag =>
                     ag.sala?.id === sala.id &&
                     ag.usuario?.id === usuarioLogado?.id &&
@@ -497,6 +498,7 @@ export default function Agendamentos() {
                   
                   const chave = `${sala.id}-${hora}`;
                     const selecionado = selecionados.includes(chave);
+
 
                     const classes = ocupado
                     ? agendamentoDoUsuario
@@ -520,7 +522,7 @@ export default function Agendamentos() {
                             );
                             if (ag) abrirModalVisualizar(ag);
                         }else {
-                            alternarCelula(sala.id, hora);
+                            alternarCelulaPorSala(sala.id, hora);
                     }
                     }}
                 />
@@ -565,16 +567,19 @@ export default function Agendamentos() {
 
             <div className="dashboard-filtro-group dashboard-filtro-text">
                 <select
-                value={salaSelecionada} 
-                onChange={(e) => setSalaSelecionada(e.target.value)}
-                className="dashboard-select"
-                >
-                {salas
-                    .filter(sala => !predioFiltro || String(sala.andar?.predio?.id) === predioFiltro)
-                    .map((sala) => (
-                    <option key={`sala-${sala.id}`} value={sala.id}>{sala.numero}</option>
-                    ))}
+                    value={salaSelecionada}
+                    onChange={(e) => setSalaSelecionada(e.target.value)}
+                    className="dashboard-select"
+                    >
+                    {salas
+                        .filter(sala => !predioFiltro || String(sala.andar?.predio?.id) === predioFiltro)
+                        .map((sala) => (
+                        <option key={`sala-${sala.id}`} value={sala.id}>
+                            {sala.numero} - {sala.tipo?.tipo_sala}
+                        </option>
+                        ))}
                 </select>
+
                 {salaSelecionada && (
                 <button onClick={() => setSalaSelecionada("")} className="dashboard-filtro-clear" title="Limpar">
                     <X size={14} />
@@ -658,11 +663,12 @@ export default function Agendamentos() {
                         className={`celula-sala ${classes}`}
                         onClick={() => {
                             if (ocupado) {
-                            if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
+                              if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
                             } else {
-                            alternarCelulaData(salaSelecionada, dia.iso, hora);
+                              alternarCelulaPorData(salaSelecionada, dia.iso, hora); // 👈 use esta
                             }
-                        }}
+                          }}
+                          
                         />
                 );
                 })}
@@ -697,10 +703,8 @@ export default function Agendamentos() {
 
                     {/* Define o grupo fora do JSX */}
                     {(() => {
-                    const grupo =
-                        abaSelecionada === "porSala"
-                        ? grupoSelecionado()
-                        : grupoSelecionadoPorData();
+                    const grupo = grupoSelecionado();
+
 
                     if (mensagemErro) {
                         return <p className="erro-modal">{mensagemErro}</p>;
@@ -711,25 +715,11 @@ export default function Agendamentos() {
                     return (
                         <>
                         <div className="agendamentos-input-wrapper">
-                            <p>
-                            <strong>Usuário:</strong> {usuarioLogado?.firstName}{" "}
-                            {usuarioLogado?.lastName}
-                            </p>
-                            <p>
-                            <strong>Sala:</strong> {grupo.sala.numero}
-                            </p>
-                            <p>
-                            <strong>Tipo:</strong> {grupo.sala.tipo?.tipo_sala}
-                            </p>
-                            <p>
-                            <strong>Data:</strong>{" "}
-                            {new Date(grupo.data || dataSelecionada).toLocaleDateString(
-                                "pt-BR"
-                            )}
-                            </p>
-                            <p>
-                            <strong>Horário:</strong> {grupo.inicio} às {grupo.fim}
-                            </p>
+                            <p><strong>Usuário:</strong> {usuarioLogado?.firstName}{" "}{usuarioLogado?.lastName}</p>
+                            <p><strong>Sala:</strong> {grupo.sala?.numero || "Indefinida"}</p>
+                            <p><strong>Tipo:</strong> {grupo.sala?.tipo?.tipo_sala || "Indefinido"}</p>
+                            <p><strong>Data:</strong>{" "}{new Date(grupo.data || dataSelecionada).toLocaleDateString( "pt-BR" )}</p>
+                            <p><strong>Horário:</strong> {grupo.inicio} às {grupo.fim}</p>
                         </div>
 
                         <div className="usuarios-modal-actions">
