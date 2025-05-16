@@ -45,4 +45,16 @@
     padding: 0;
   }
   
+  .erro-modal {
+    color: #dc2626; /* vermelho */
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+
+  .celula-sala.livre {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+  
+  
   

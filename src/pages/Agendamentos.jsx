@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { startOfWeek, addDays, format } from "date-fns";
 import {
   Dialog,
   DialogOverlay,
@@ -43,7 +44,87 @@ export default function Agendamentos() {
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [mensagemErro, setMensagemErro] = useState("");
   const [agendamentoSelecionado, setAgendamentoSelecionado] = useState(null);
+  const [abaSelecionada, setAbaSelecionada] = useState("porSala");
+  const [salaSelecionada, setSalaSelecionada] = useState("");
+
+
+  useEffect(() => {
+    setSelecionados([]);
+  }, [abaSelecionada, dataSelecionada, salaSelecionada]);
+  
+  
+  function calcularQuinzenaCompleta(dataBase) {
+    const segunda = startOfWeek(new Date(dataBase), { weekStartsOn: 1 }); 
+    const dias = [];
+  
+    for (let i = 0; i < 12; i++) {
+      const dia = addDays(segunda, i);
+      dias.push({
+        data: dia,
+        label: format(dia, "dd/MM", { locale: undefined }), 
+        iso: format(dia, "yyyy-MM-dd"),
+      });
+    }
+  
+    return dias;
+  }
+
+  const grupoSelecionadoPorData = () => {
+    if (selecionados.length === 0 || !salaSelecionada) return null;
+  
+    const chavesOrdenadas = selecionados
+      .filter(k => k.startsWith(`${salaSelecionada}-`))
+      .sort((a, b) => {
+        const [_, dataA, horaA] = a.split("-");
+        const [__, dataB, horaB] = b.split("-");
+        const dateTimeA = new Date(`${dataA}T${horaA}:00`);
+        const dateTimeB = new Date(`${dataB}T${horaB}:00`);
+        return dateTimeA - dateTimeB;
+      });
+  
+    const [_, data, horaInicio] = chavesOrdenadas[0].split("-");
+    const [__, ___, horaFimRaw] = chavesOrdenadas[chavesOrdenadas.length - 1].split("-");
+  
+    const sala = salas.find(s => String(s.id) === salaSelecionada);
+    const indexFim = horarios.indexOf(horaFimRaw);
+    const horaFim = horarios[indexFim + 1] || horaFimRaw;
+  
+    return {
+      sala,
+      data,
+      inicio: horaInicio,
+      fim: horaFim
+    };
+  };
+
+
+  const alternarCelulaData = (salaId, diaISO, hora) => {
+    const chave = `${salaId}-${diaISO}-${hora}`;
+    const index = selecionados.indexOf(chave);
+  
+    if (index !== -1) {
+      setSelecionados(selecionados.filter(k => k !== chave));
+    } else {
+      const selecionadosDaSala = selecionados
+        .filter(k => k.startsWith(`${salaId}-${diaISO}-`))
+        .map(k => k.split("-")[2]);
+  
+      const todasDaMesmaSalaDia = selecionados.every(k => k.startsWith(`${salaId}-${diaISO}-`));
+      const indexHora = horarios.indexOf(hora);
+      const adjacente = selecionadosDaSala.some(h =>
+        Math.abs(horarios.indexOf(h) - indexHora) === 1
+      );
+  
+      if (selecionados.length === 0 || (todasDaMesmaSalaDia && (selecionadosDaSala.length === 0 || adjacente))) {
+        setSelecionados([...selecionados, chave]);
+      }
+    }
+  };
+  
+
+  
   const [formEdicao, setFormEdicao] = useState({
     data: "",
     horario_inicio: "",
@@ -132,19 +213,37 @@ export default function Agendamentos() {
     const [salaId] = selecionados[0].split("-");
     const sala = salas.find(s => s.id === parseInt(salaId));
     const horas = selecionados.map(k => k.split("-")[1]).sort((a, b) => horarios.indexOf(a) - horarios.indexOf(b));
-    return { sala, inicio: horas[0], fim: horas[horas.length - 1] };
-  };
+    const fimIndex = horarios.indexOf(horas[horas.length - 1]);
+    const fimHora = horarios[fimIndex + 1] || horas[horas.length - 1];
+    
+    return { sala, inicio: horas[0], fim: fimHora };
+};
 
-  const confirmarAgendamento = async () => {
-    const grupo = grupoSelecionado();
+const confirmarAgendamento = async () => {
+    setMensagemErro("");
+  
+    const grupo =
+      abaSelecionada === "porSala" ? grupoSelecionado() : grupoSelecionadoPorData();
+  
     if (!grupo || !usuarioLogado) return;
+  
+    const dataAgendamento = grupo.data || dataSelecionada;
+    const horarioFinal = new Date(`${dataAgendamento}T${grupo.fim}:00`);
+    const agora = new Date();
+  
+    if (horarioFinal < agora) {
+      setMensagemErro("Não é possível agendar para data ou horário passado.");
+      return;
+    }
+  
     const body = {
       usuarioId: usuarioLogado.id,
       salaId: grupo.sala.id,
-      data: dataSelecionada,
-      horario_inicio: `${dataSelecionada}T${grupo.inicio}:00`,
-      horario_fim: `${dataSelecionada}T${grupo.fim}:00`
+      data: dataAgendamento,
+      horario_inicio: `${dataAgendamento}T${grupo.inicio}:00`,
+      horario_fim: `${dataAgendamento}T${grupo.fim}:00`
     };
+  
     try {
       await createAgendamento(body);
       setMensagemSucesso("Agendamento realizado com sucesso!");
@@ -155,7 +254,7 @@ export default function Agendamentos() {
         setModalAberto(false);
       }, 2000);
     } catch {
-      alert("Erro ao agendar. Tente novamente.");
+      setMensagemErro("Erro ao agendar. Tente novamente.");
     }
   };
 
@@ -175,6 +274,17 @@ export default function Agendamentos() {
   };
 
   const salvarEdicao = async () => {
+    setMensagemErro("");
+
+    const fimEditado = new Date(`${formEdicao.data}T${formEdicao.horario_fim}:00`);
+    const agora = new Date();
+  
+    if (fimEditado < agora) {
+        setMensagemErro("Não é possível editar para um horário passado.");
+        return;
+    }
+      
+  
     try {
       await updateAgendamento(agendamentoSelecionado.id, {
         data: formEdicao.data,
@@ -191,8 +301,19 @@ export default function Agendamentos() {
       alert("Erro ao editar. Tente novamente.");
     }
   };
+  
 
   const cancelarAgendamento = async () => {
+    setMensagemErro("");
+
+    const fim = new Date(agendamentoSelecionado.horario_fim);
+    const agora = new Date();
+  
+    if (fim < agora) {
+        setMensagemErro("Texto do erro");
+        return;
+    }
+  
     try {
       await deleteAgendamento(agendamentoSelecionado.id);
       setMensagemSucesso("Agendamento cancelado com sucesso!");
@@ -205,212 +326,374 @@ export default function Agendamentos() {
       alert("Erro ao cancelar. Tente novamente.");
     }
   };
+  
 
   return (
   <div className="agendamentos-wrapper">
     <h3 className="dashboard-heading">Grade de Agendamentos</h3>
-
-    {/* Filtros */}  
-      
-      <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
-        <Input
-          type="date"
-          value={dataSelecionada}
-          onChange={(e) => setDataSelecionada(e.target.value)}
-          className="dashboard-select dashboard-filtro-usuario-input"
-        />
-
-        <div className="dashboard-filtro-group dashboard-filtro-text">
-          <select
-            value={predioFiltro}
-            onChange={(e) => setPredioFiltro(e.target.value)}
-            className="dashboard-select"
-          >
-            <option value="">Todos os Prédios</option>
-            {predios.map((p) => (
-              <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
-            ))}
-          </select>
-          {predioFiltro && (
-            <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="dashboard-filtro-group dashboard-filtro-text">
-          <select
-            value={andarFiltro}
-            onChange={(e) => setAndarFiltro(e.target.value)}
-            className="dashboard-select"
-          >
-            <option value="">Todos os Andares</option>
-            {andares
-              .filter(a => !predioFiltro || String(a.predio?.id) === predioFiltro)
-              .map((a) => (
-                <option key={`andar-${a.id}`} value={a.id}>{a.nome}</option>
-              ))}
-          </select>
-          {andarFiltro && (
-            <button onClick={() => setAndarFiltro("")} className="dashboard-filtro-clear" title="Limpar">
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="dashboard-filtro-group dashboard-filtro-text">
-          <select
-            value={tipoSalaFiltro}
-            onChange={(e) => setTipoSalaFiltro(e.target.value)}
-            className="dashboard-select"
-          >
-            <option value="">Tipos de Sala</option>
-            {tiposSala.map((tipo) => (
-              <option key={`tipo-${tipo.id}`} value={tipo.tipo_sala}>
-                {tipo.tipo_sala}
-              </option>
-            ))}
-          </select>
-          {tipoSalaFiltro && (
-            <button onClick={() => setTipoSalaFiltro("")} className="dashboard-filtro-clear" title="Limpar">
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div style={{ marginLeft: "auto" }}>
-          <Button
-            className="usuarios-btn-material"
-            onClick={() => setModalAberto(true)}
-            disabled={selecionados.length === 0}
-          >
-            Agendar
-          </Button>
-        </div>
-      </div>
-
-
-
-    {/* Grade de agendamentos */}
-    <div className="grade-agendamentos">
-      <div className="linha-header">
-        <div className="celula-hora">Horário</div>
-        {salas.map(sala => (
-          <div key={sala.id} className="celula-sala">{sala.numero}</div>
-        ))}
-      </div>
-      {horarios.map(hora => (
-        <div key={hora} className="linha-horario">
-          <div className="celula-hora">{hora}</div>
-          {salas.map(sala => {
-            const ocupado = verificarOcupado(sala.id, hora);
-            const chave = `${sala.id}-${hora}`;
-            const selecionado = selecionados.includes(chave);
-            return (
-              <div
-                key={chave}
-                className={`celula-sala ${ocupado ? "ocupado" : selecionado ? "selecionado" : "livre"}`}
-                onClick={() => {
-                  if (ocupado) {
-                    const ag = agendamentos.find(ag =>
-                      ag.sala?.id === sala.id && ag.horario_inicio.slice(11, 16) === hora
-                    );
-                    if (ag) abrirModalVisualizar(ag);
-                  } else {
-                    alternarCelula(sala.id, hora);
-                  }
-                }}
-              />
-            );
-          })}
-        </div>
-      ))}
+    <div className="dashboard-picklist-wrapper">
+        <select
+            value={abaSelecionada}
+            onChange={(e) => setAbaSelecionada(e.target.value)}
+            className="dashboard-picklist"
+        >
+            <option value="porSala">Visualizar por Sala</option>
+            <option value="porData">Visualizar por Data</option>
+        </select>
     </div>
+    {abaSelecionada === "porSala" && (
+    <div className="grade-agendamentos">
+
+        {/* Filtros */}  
+        
+        <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
+            <Input
+            type="date"
+            value={dataSelecionada}
+            onChange={(e) => setDataSelecionada(e.target.value)}
+            className="dashboard-select dashboard-filtro-usuario-input"
+            />
+
+            <div className="dashboard-filtro-group dashboard-filtro-text">
+            <select
+                value={predioFiltro}
+                onChange={(e) => setPredioFiltro(e.target.value)}
+                className="dashboard-select"
+            >
+                <option value="">Todos os Prédios</option>
+                {predios.map((p) => (
+                <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
+                ))}
+            </select>
+            {predioFiltro && (
+                <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+                </button>
+            )}
+            </div>
+
+            <div className="dashboard-filtro-group dashboard-filtro-text">
+            <select
+                value={andarFiltro}
+                onChange={(e) => setAndarFiltro(e.target.value)}
+                className="dashboard-select"
+            >
+                <option value="">Todos os Andares</option>
+                {andares
+                .filter(a => !predioFiltro || String(a.predio?.id) === predioFiltro)
+                .map((a) => (
+                    <option key={`andar-${a.id}`} value={a.id}>{a.nome}</option>
+                ))}
+            </select>
+            {andarFiltro && (
+                <button onClick={() => setAndarFiltro("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+                </button>
+            )}
+            </div>
+
+            <div className="dashboard-filtro-group dashboard-filtro-text">
+            <select
+                value={tipoSalaFiltro}
+                onChange={(e) => setTipoSalaFiltro(e.target.value)}
+                className="dashboard-select"
+            >
+                <option value="">Tipos de Sala</option>
+                {tiposSala.map((tipo) => (
+                <option key={`tipo-${tipo.id}`} value={tipo.tipo_sala}>
+                    {tipo.tipo_sala}
+                </option>
+                ))}
+            </select>
+            {tipoSalaFiltro && (
+                <button onClick={() => setTipoSalaFiltro("")} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+                </button>
+            )}
+            </div>
+
+            <div style={{ marginLeft: "auto" }}>
+            <Button
+                className="usuarios-btn-material"
+                onClick={() => setModalAberto(true)}
+                disabled={selecionados.length === 0}
+            >
+                Agendar
+            </Button>
+            </div>
+        </div>
+
+        {/* Grade de agendamentos */}
+        <div className="grade-agendamentos">
+        <div className="linha-header">
+            <div className="celula-hora">Horário</div>
+            {salas.map(sala => (
+            <div key={sala.id} className="celula-sala">{sala.numero}</div>
+            ))}
+        </div>
+        {horarios.map(hora => (
+            <div key={hora} className="linha-horario">
+            <div className="celula-hora">{hora}</div>
+            {salas.map(sala => {
+                const ocupado = verificarOcupado(sala.id, hora);
+                const chave = `${sala.id}-${hora}`;
+                const selecionado = selecionados.includes(chave);
+                return (
+                <div
+                    key={chave}
+                    className={`celula-sala ${ocupado ? "ocupado" : selecionado ? "selecionado" : "livre"}`}
+                    onClick={() => {
+                        if (ocupado) {
+                            const horaAtual = new Date(`${dataSelecionada}T${hora}:00`);
+                            const ag = agendamentos.find(ag =>
+                            ag.sala?.id === sala.id &&
+                            horaAtual >= new Date(ag.horario_inicio) &&
+                            horaAtual < new Date(ag.horario_fim)
+                            );
+                            if (ag) abrirModalVisualizar(ag);
+                        }else {
+                            alternarCelula(sala.id, hora);
+                    }
+                    }}
+                />
+                );
+            })}
+            </div>
+        ))}
+        </div>
+    </div>
+    )}
+
+    {abaSelecionada === "porData" && (
+    <div className="grade-agendamentos">
+        {/* Filtro de data */}
+        <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
+            <Input
+                type="date"
+                value={dataSelecionada}
+                onChange={(e) => setDataSelecionada(e.target.value)}
+                className="dashboard-select dashboard-filtro-usuario-input"
+            />
+
+            <div className="dashboard-filtro-group dashboard-filtro-text">
+                <select
+                value={predioFiltro}
+                onChange={(e) => setPredioFiltro(e.target.value)}
+                className="dashboard-select"
+                >
+                <option value="">Todos os Prédios</option>
+                {predios.map((p) => (
+                    <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
+                ))}
+                </select>
+                {predioFiltro && (
+                <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
+                    <X size={14} />
+                </button>
+                )}
+            </div>
+
+            <div className="dashboard-filtro-group dashboard-filtro-text">
+                <select
+                value={salaSelecionada} // 👈 lembre de criar esse estado!
+                onChange={(e) => setSalaSelecionada(e.target.value)}
+                className="dashboard-select"
+                >
+                <option value="">Todas as Salas</option>
+                {salas
+                    .filter(sala => !predioFiltro || String(sala.andar?.predio?.id) === predioFiltro)
+                    .map((sala) => (
+                    <option key={`sala-${sala.id}`} value={sala.id}>{sala.numero}</option>
+                    ))}
+                </select>
+                {salaSelecionada && (
+                <button onClick={() => setSalaSelecionada("")} className="dashboard-filtro-clear" title="Limpar">
+                    <X size={14} />
+                </button>
+                )}
+            </div>
+
+            <div style={{ marginLeft: "auto" }}>
+                <Button
+                className="usuarios-btn-material"
+                onClick={() => setModalAberto(true)}
+                disabled={selecionados.length === 0}
+                >
+                Agendar
+                </Button>
+            </div>
+        </div>
+
+        {/* Grade de agendamentos */}
+        <div className="grade-agendamentos">
+            {/* Cabeçalho com dias da quinzena */}
+            <div className="linha-header">
+            <div className="celula-hora">Horário</div>
+            {calcularQuinzenaCompleta(dataSelecionada).map((dia) => (
+                <div key={dia.iso} className="celula-sala">{dia.label}</div>
+            ))}
+            </div>
+
+            {/* Linhas de horários */}
+            {horarios.map((hora) => (
+            <div key={hora} className="linha-horario">
+                <div className="celula-hora">{hora}</div>
+                {calcularQuinzenaCompleta(dataSelecionada).map((dia) => {
+                const chave = `${salaSelecionada}-${dia.iso}-${hora}`;
+                const selecionado = selecionados.includes(chave);
+
+                const ocupado = agendamentos.some(ag => {
+                    if (String(ag.sala?.id) !== salaSelecionada) return false;
+                    const horaAtual = new Date(`${dia.iso}T${hora}:00`);
+                    return horaAtual >= new Date(ag.horario_inicio) && horaAtual < new Date(ag.horario_fim);
+                });
+
+                const agendamentoClicado = agendamentos.find(ag => {
+                    if (String(ag.sala?.id) !== salaSelecionada) return false;
+                    const horaAtual = new Date(`${dia.iso}T${hora}:00`);
+                    return horaAtual >= new Date(ag.horario_inicio) && horaAtual < new Date(ag.horario_fim);
+                });
+
+                return (
+                    <div
+                    key={chave}
+                    className={`celula-sala ${ocupado ? "ocupado" : selecionado ? "selecionado" : "livre"}`}
+                    onClick={() => {
+                        if (ocupado) {
+                        if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
+                        } else {
+                        alternarCelulaData(salaSelecionada, dia.iso, hora);
+                        }
+                    }}
+                    />
+                );
+                })}
+            </div>
+            ))}
+        </div>
+
+
+
+    </div>
+    )}
+
+
+
+
 
     {/* Modal: Confirmar Agendamento */}
-    <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-      <DialogOverlay className="dialog-overlay" />
-      <DialogContent className="dashboard-modal dashboard-no-close">
-        <DialogTitle>Confirmar Agendamento</DialogTitle>
-        <DialogDescription className="usuarios-modal-descricao">Verifique as informações abaixo:</DialogDescription>
-        <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+        <Dialog open={modalAberto} onOpenChange={(open) => {
+            setModalAberto(open);
+            if (!open) setMensagemErro("");
+            }}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Confirmar Agendamento</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">Verifique as informações abaixo:</DialogDescription>
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-        {mensagemSucesso ? (
-          <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
-        ) : grupoSelecionado() && (
-          <div className="agendamentos-input-wrapper">
-            <p><strong>Usuário:</strong> {usuarioLogado?.firstName} {usuarioLogado?.lastName}</p>
-            <p><strong>Sala:</strong> {grupoSelecionado().sala.numero}</p>
-            <p><strong>Tipo:</strong> {grupoSelecionado().sala.tipo?.tipo_sala}</p>
-            <p><strong>Data:</strong> {new Date(dataSelecionada).toLocaleDateString("pt-BR")}</p>
-            <p><strong>Horário:</strong> {grupoSelecionado().inicio} às {grupoSelecionado().fim}</p>
-          </div>
-        )}
+                {mensagemSucesso ? (
+                <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+                ) : (
+                (() => {
+                    const grupo = abaSelecionada === "porSala" ? grupoSelecionado() : grupoSelecionadoPorData();
+                    if (!grupo) return null;
+                    return (
+                    <div className="agendamentos-input-wrapper">
+                        <p><strong>Usuário:</strong> {usuarioLogado?.firstName} {usuarioLogado?.lastName}</p>
+                        <p><strong>Sala:</strong> {grupo.sala.numero}</p>
+                        <p><strong>Tipo:</strong> {grupo.sala.tipo?.tipo_sala}</p>
+                        <p><strong>Data:</strong> {new Date(grupo.data || dataSelecionada).toLocaleDateString("pt-BR")}</p>
+                        <p><strong>Horário:</strong> {grupo.inicio} às {grupo.fim}</p>
+                    </div>
+                    );
+                })()
+                )}
 
-        {!mensagemSucesso && (
-          <div className="usuarios-modal-actions">
-            <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
-            <Button onClick={confirmarAgendamento}>Confirmar Agendamento</Button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+                {mensagemErro && <p className="erro-modal">{mensagemErro}</p>}
+
+                {!mensagemSucesso && (
+                <div className="usuarios-modal-actions">
+                    <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+                    <Button onClick={confirmarAgendamento}>Confirmar Agendamento</Button>
+                </div>
+                )}
+            </DialogContent>
+        </Dialog>
+
+
+
+
+     {/* Modal: Editar Agendamento */}   
+        <Dialog open={modalEditar} onOpenChange={(open) => {
+            setModalEditar(open);
+            if (!open) setMensagemErro("");
+            }}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Editar Agendamento</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">Atualize os dados abaixo:</DialogDescription>
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
+                {mensagemSucesso ? (
+                <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+                ) : (
+                <div className="agendamentos-input-wrapper">
+                    <Input type="date" value={formEdicao.data} onChange={e => setFormEdicao({ ...formEdicao, data: e.target.value })} />
+                    <Input type="time" value={formEdicao.horario_inicio} onChange={e => setFormEdicao({ ...formEdicao, horario_inicio: e.target.value })} />
+                    <Input type="time" value={formEdicao.horario_fim} onChange={e => setFormEdicao({ ...formEdicao, horario_fim: e.target.value })} />
+                </div>
+                )}
+
+                {mensagemErro && <p className="erro-modal">{mensagemErro}</p>}
+
+                {!mensagemSucesso && (
+                <div className="usuarios-modal-actions">
+                    <Button variant="outline" onClick={() => setModalEditar(false)}>Cancelar</Button>
+                    <Button onClick={salvarEdicao}>Salvar</Button>
+                </div>
+                )}
+            </DialogContent>
+        </Dialog>
+
+
 
     {/* Modal: Visualizar Agendamento */}
-    <Dialog open={modalVisualizar} onOpenChange={setModalVisualizar}>
-      <DialogOverlay className="dialog-overlay" />
-      <DialogContent className="dashboard-modal dashboard-no-close">
-        <DialogTitle>Agendamento</DialogTitle>
-        <DialogDescription className="usuarios-modal-descricao">Dados do Agendamento</DialogDescription>
-        <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+        <Dialog open={modalVisualizar} onOpenChange={(open) => {
+            setModalVisualizar(open);
+            if (!open) setMensagemErro("");
+            }}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Agendamento</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">Dados do Agendamento</DialogDescription>
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-        {mensagemSucesso ? (
-          <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
-        ) : agendamentoSelecionado && (
-          <div className="agendamentos-input-wrapper">
-            <p><strong>Usuário:</strong> {agendamentoSelecionado.usuario?.firstName} {agendamentoSelecionado.usuario?.lastName}</p>
-            <p><strong>Sala:</strong> {agendamentoSelecionado.sala?.numero}</p>
-            <p><strong>Tipo:</strong> {agendamentoSelecionado.sala?.tipo?.tipo_sala}</p>
-            <p><strong>Data:</strong> {new Date(agendamentoSelecionado.horario_inicio).toLocaleDateString("pt-BR")}</p>
-            <p><strong>Horário:</strong> {agendamentoSelecionado.horario_inicio.slice(11, 16)} às {agendamentoSelecionado.horario_fim.slice(11, 16)}</p>
-          </div>
-        )}
+                {mensagemSucesso ? (
+                <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
+                ) : agendamentoSelecionado && (
+                <div className="agendamentos-input-wrapper">
+                    <p><strong>Usuário:</strong> {agendamentoSelecionado.usuario?.firstName} {agendamentoSelecionado.usuario?.lastName}</p>
+                    <p><strong>Sala:</strong> {agendamentoSelecionado.sala?.numero}</p>
+                    <p><strong>Tipo:</strong> {agendamentoSelecionado.sala?.tipo?.tipo_sala}</p>
+                    <p><strong>Data:</strong> {new Date(agendamentoSelecionado.horario_inicio).toLocaleDateString("pt-BR")}</p>
+                    <p><strong>Horário:</strong> {agendamentoSelecionado.horario_inicio.slice(11, 16)} às {agendamentoSelecionado.horario_fim.slice(11, 16)}</p>
+                </div>
+                )}
 
-        {!mensagemSucesso && (
-          <div className="usuarios-modal-actions">
-            <Button onClick={abrirModalEditar}>Editar</Button>
-            <Button variant="destructive" onClick={cancelarAgendamento}>Cancelar Agendamento</Button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+                {mensagemErro && <p className="erro-modal">{mensagemErro}</p>}
 
-    {/* Modal: Editar Agendamento */}
-    <Dialog open={modalEditar} onOpenChange={setModalEditar}>
-      <DialogOverlay className="dialog-overlay" />
-      <DialogContent className="dashboard-modal dashboard-no-close">
-        <DialogTitle>Editar Agendamento</DialogTitle>
-        <DialogDescription className="usuarios-modal-descricao">Atualize os dados abaixo:</DialogDescription>
-        <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+                {!mensagemSucesso && (
+                <div className="usuarios-modal-actions">
+                    <Button onClick={abrirModalEditar}>Editar</Button>
+                    <Button variant="destructive" onClick={cancelarAgendamento}>Cancelar Agendamento</Button>
+                </div>
+                )}
+            </DialogContent>
+        </Dialog>
 
-        {mensagemSucesso ? (
-          <div className="dashboard-modal-success-message">{mensagemSucesso}</div>
-        ) : (
-          <div className="agendamentos-input-wrapper">
-            <Input type="date" value={formEdicao.data} onChange={e => setFormEdicao({ ...formEdicao, data: e.target.value })} />
-            <Input type="time" value={formEdicao.horario_inicio} onChange={e => setFormEdicao({ ...formEdicao, horario_inicio: e.target.value })} />
-            <Input type="time" value={formEdicao.horario_fim} onChange={e => setFormEdicao({ ...formEdicao, horario_fim: e.target.value })} />
-          </div>
-        )}
 
-        {!mensagemSucesso && (
-          <div className="usuarios-modal-actions">
-            <Button variant="outline" onClick={() => setModalEditar(false)}>Cancelar</Button>
-            <Button onClick={salvarEdicao}>Salvar</Button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+
   </div>
 );
 
