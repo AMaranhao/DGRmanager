@@ -57,8 +57,11 @@ export default function Agendamentos() {
   
   useEffect(() => {
     carregarSalas();
+  }, [dataSelecionada, tipoSalaFiltro, andarFiltro, predioFiltro, abaSelecionada]);
+  
+  useEffect(() => {
     carregarAgendamentos();
-  }, [dataSelecionada, tipoSalaFiltro, andarFiltro, predioFiltro]);
+  }, [dataSelecionada]);
   
   
   function calcularQuinzenaCompleta(dataBase) {
@@ -82,16 +85,22 @@ export default function Agendamentos() {
   const grupoSelecionado = () => {
     if (selecionados.length === 0) return null;
   
-    const primeiroSplit = selecionados[0].split("-");
-    const isPorData = primeiroSplit.length === 3;
+    const primeiro = selecionados[0];
+    const partes = primeiro.split("-");
   
-    const salaId = primeiroSplit[0];
-    const data = isPorData ? primeiroSplit[1] : dataSelecionada;
+    const isPorData = partes.length === 3;
+  
+    const salaId = isPorData ? salaSelecionada : partes[0];
+    const data = isPorData ? partes[1] : dataSelecionada;
+  
+    if (!salaId || !salas.length) return null;
   
     const chavesValidas = selecionados
-      .filter(k => {
+      .filter((k) => {
         const partes = k.split("-");
-        return partes[0] === salaId && (isPorData ? partes[1] === data : true);
+        const chaveSala = partes[0];
+        const chaveData = isPorData ? partes[1] : dataSelecionada;
+        return chaveSala === salaId && (!isPorData || partes[1] === chaveData);
       })
       .sort((a, b) => {
         const horaA = a.split("-").at(-1);
@@ -106,15 +115,22 @@ export default function Agendamentos() {
     const indexFim = horarios.indexOf(horaFimRaw);
     const horaFim = horarios[indexFim + 1] || horaFimRaw;
   
-    // Verifica se são horários consecutivos
-    const indices = chavesValidas.map(c => horarios.indexOf(c.split("-").at(-1)));
+    const indices = chavesValidas.map((c) => horarios.indexOf(c.split("-").at(-1)));
     for (let i = 1; i < indices.length; i++) {
       if (indices[i] - indices[i - 1] !== 1) return null;
     }
   
-    const sala = salas.find(s => s.id.toString() === salaId.toString());
+    const sala = salas.find((s) => String(s.id) === String(salaId));
+    if (!sala) return null;
+  
     return { sala, data, inicio: horaInicio, fim: horaFim };
   };
+  
+  
+  
+  
+  
+  
   
   
   const [formEdicao, setFormEdicao] = useState({
@@ -227,31 +243,78 @@ export default function Agendamentos() {
   }
 };
 
+
+const grupoSelecionadoPorSala = () => {
+    if (selecionados.length === 0) return null;
+  
+    const [salaId, hora] = selecionados[0].split("-");
+    const data = dataSelecionada;
+  
+    const chavesValidas = selecionados
+      .filter(k => k.startsWith(`${salaId}-`))
+      .sort((a, b) => horarios.indexOf(a.split("-")[1]) - horarios.indexOf(b.split("-")[1]));
+  
+    const horaInicio = chavesValidas[0].split("-")[1];
+    const horaFimRaw = chavesValidas[chavesValidas.length - 1].split("-")[1];
+    const indexFim = horarios.indexOf(horaFimRaw);
+    const horaFim = horarios[indexFim + 1] || horaFimRaw;
+  
+    const indices = chavesValidas.map(c => horarios.indexOf(c.split("-")[1]));
+    for (let i = 1; i < indices.length; i++) {
+      if (indices[i] - indices[i - 1] !== 1) return null;
+    }
+  
+    const sala = salas.find(s => String(s.id) === String(salaId));
+    if (!sala) return null;
+  
+    return { sala, data, inicio: horaInicio, fim: horaFim };
+  };
   
 
 
+//estou alterando o codigo aqui
+
 
 
   
-  const alternarCelulaPorData = (salaId, dataISO, hora) => {
-    const chave = `${salaId}-${dataISO}-${hora}`;
+const alternarCelulaPorData = (dataISO, hora) => {
+    const chave = `${salaSelecionada}-${dataISO}-${hora}`;
   
     setSelecionados((prev) => {
-
-        if (prev.includes(chave)) {
+      if (prev.includes(chave)) {
         return prev.filter((k) => k !== chave);
       }
   
       if (prev.length === 0) return [chave];
   
-      const primeiroSelecionado = prev[0];
-      const partes = primeiroSelecionado.split("-");
-      if (partes.length < 3) return prev; // segurança extra
+      // Extrai o dia de cada chave no formato completo: yyyy-mm-dd
+      const mesmoDia = prev.every((k) => {
+        const partes = k.split("-");
+        const dia = `${partes[1]}-${partes[2]}-${partes[3]}`;
+        return dia === dataISO;
+      });
   
-      const primeiroDia = partes.slice(1, -1).join("-"); // junta corretamente o dataISO
-  
-      if (dataISO !== primeiroDia) {
+      if (!mesmoDia) {
         console.log("⚠️ Dia diferente da seleção inicial.");
+        return prev;
+      }
+  
+      // Verifica se é adjacente
+      const horasSelecionadas = prev
+        .filter((k) => {
+          const partes = k.split("-");
+          const dia = `${partes[1]}-${partes[2]}-${partes[3]}`;
+          return dia === dataISO;
+        })
+        .map((k) => k.split("-").at(-1));
+  
+      const indexHoraAtual = horarios.indexOf(hora);
+      const algumAdjacente = horasSelecionadas.some((h) => {
+        const idx = horarios.indexOf(h);
+        return Math.abs(idx - indexHoraAtual) === 1;
+      });
+  
+      if (horasSelecionadas.length > 0 && !algumAdjacente) {
         return prev;
       }
   
@@ -259,17 +322,54 @@ export default function Agendamentos() {
     });
   };
   
+  const grupoSelecionadoPorData = () => {
+    if (selecionados.length === 0) return null;
   
+    const partes = selecionados[0].split("-");
+    if (partes.length < 4) return null; // CORRETO agora
   
+    const salaId = partes[0];
+    const data = `${partes[1]}-${partes[2]}-${partes[3]}`;
+    
+    const chavesValidas = selecionados
+      .filter(k => k.startsWith(`${salaId}-${data}-`))
+      .sort((a, b) => {
+        const horaA = a.split("-")[4];
+        const horaB = b.split("-")[4];
+        return horarios.indexOf(horaA) - horarios.indexOf(horaB);
+      });
   
+    if (chavesValidas.length === 0) return null;
+  
+    const horaInicio = chavesValidas[0].split("-")[4];
+    const horaFimRaw = chavesValidas[chavesValidas.length - 1].split("-")[4];
+    const indexFim = horarios.indexOf(horaFimRaw);
+    const horaFim = horarios[indexFim + 1] || horaFimRaw;
+  
+    const indices = chavesValidas.map(c => horarios.indexOf(c.split("-")[4]));
+    for (let i = 1; i < indices.length; i++) {
+      if (indices[i] - indices[i - 1] !== 1) return null;
+    }
+  
+    const sala = salas.find(s => String(s.id) === String(salaId));
+    if (!sala) return null;
+  
+    return { sala, data, inicio: horaInicio, fim: horaFim };
+  };
   
   
   
 
+
+  
   const confirmarAgendamento = async () => {
     setMensagemErro("");
   
-    const grupo = grupoSelecionado();
+    const grupo =
+        abaSelecionada === "porSala"
+            ? grupoSelecionadoPorSala()
+            : grupoSelecionadoPorData();
+
 
   
     if (!grupo) {
@@ -526,7 +626,8 @@ export default function Agendamentos() {
                     }
                     }}
                 />
-                );
+
+            );
             })}
             </div>
         ))}
@@ -541,13 +642,7 @@ export default function Agendamentos() {
         
 
         <div className="dashboard-filtro" style={{ alignItems: "flex-end" }}>
-            <Input
-                type="date"
-                value={dataSelecionada}
-                onChange={(e) => setDataSelecionada(e.target.value)}
-                className="dashboard-select dashboard-filtro-usuario-input"
-            />
-
+            
             <div className="dashboard-filtro-group dashboard-filtro-text">
                 <select
                 value={predioFiltro}
@@ -558,13 +653,9 @@ export default function Agendamentos() {
                     <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
                 ))}
                 </select>
-                {predioFiltro && (
-                <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
-                    <X size={14} />
-                </button>
-                )}
+               
             </div>
-
+{/*alterando essa parte do codigo*/}
             <div className="dashboard-filtro-group dashboard-filtro-text">
                 <select
                     value={salaSelecionada}
@@ -580,11 +671,18 @@ export default function Agendamentos() {
                         ))}
                 </select>
 
-                {salaSelecionada && (
-                <button onClick={() => setSalaSelecionada("")} className="dashboard-filtro-clear" title="Limpar">
-                    <X size={14} />
-                </button>
-                )}
+            </div>
+
+            <div className="dashboard-paginacao-quinzena">
+                <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena - 1)}>
+                    ← Quinzena anterior
+                </Button>
+                <Button variant="outline" onClick={() => setOffsetQuinzena(0)}>
+                    Atual
+                </Button>
+                <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena + 1)}>
+                    Próxima quinzena →
+                </Button>
             </div>
 
             <div style={{ marginLeft: "auto" }}>
@@ -598,17 +696,7 @@ export default function Agendamentos() {
             </div>
         </div>
 
-        <div className="dashboard-paginacao-quinzena">
-            <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena - 1)}>
-                ← Quinzena anterior
-            </Button>
-            <Button variant="outline" onClick={() => setOffsetQuinzena(0)}>
-                Atual
-            </Button>
-            <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena + 1)}>
-                Próxima quinzena →
-            </Button>
-        </div>
+        
 
 
         {/* Grade de agendamentos */}
@@ -665,7 +753,7 @@ export default function Agendamentos() {
                             if (ocupado) {
                               if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
                             } else {
-                              alternarCelulaPorData(salaSelecionada, dia.iso, hora); // 👈 use esta
+                                alternarCelulaPorData(dia.iso, hora);
                             }
                           }}
                           
@@ -703,7 +791,10 @@ export default function Agendamentos() {
 
                     {/* Define o grupo fora do JSX */}
                     {(() => {
-                    const grupo = grupoSelecionado();
+                    const grupo = abaSelecionada === "porSala"
+                        ? grupoSelecionadoPorSala()
+                        : grupoSelecionadoPorData();
+                    
 
 
                     if (mensagemErro) {
