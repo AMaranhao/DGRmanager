@@ -517,11 +517,7 @@ const alternarCelulaPorData = (dataISO, hora) => {
                 <option key={`predio-${p.id}`} value={p.id}>{p.nome}</option>
                 ))}
             </select>
-            {predioFiltro && (
-                <button onClick={() => setPredioFiltro("")} className="dashboard-filtro-clear" title="Limpar">
-                <X size={14} />
-                </button>
-            )}
+            
             </div>
 
             <div className="dashboard-filtro-group dashboard-filtro-text">
@@ -655,7 +651,7 @@ const alternarCelulaPorData = (dataISO, hora) => {
                 </select>
                
             </div>
-{/*alterando essa parte do codigo*/}
+
             <div className="dashboard-filtro-group dashboard-filtro-text">
                 <select
                     value={salaSelecionada}
