@@ -61,10 +61,9 @@ export default function Agendamentos() {
   
   useEffect(() => {
     carregarAgendamentos();
-  }, [dataSelecionada]);
-  
-  
-  function calcularQuinzenaCompleta(dataBase) {
+  }, [dataSelecionada, abaSelecionada, offsetQuinzena]);
+
+ function calcularQuinzenaCompleta(dataBase) {
     const segunda = startOfWeek(new Date(dataBase), { weekStartsOn: 1 });
     const inicio = addDays(segunda, offsetQuinzena * 12); 
     const dias = [];
@@ -80,59 +79,7 @@ export default function Agendamentos() {
   
     return dias;
   }
-  
-
-  const grupoSelecionado = () => {
-    if (selecionados.length === 0) return null;
-  
-    const primeiro = selecionados[0];
-    const partes = primeiro.split("-");
-  
-    const isPorData = partes.length === 3;
-  
-    const salaId = isPorData ? salaSelecionada : partes[0];
-    const data = isPorData ? partes[1] : dataSelecionada;
-  
-    if (!salaId || !salas.length) return null;
-  
-    const chavesValidas = selecionados
-      .filter((k) => {
-        const partes = k.split("-");
-        const chaveSala = partes[0];
-        const chaveData = isPorData ? partes[1] : dataSelecionada;
-        return chaveSala === salaId && (!isPorData || partes[1] === chaveData);
-      })
-      .sort((a, b) => {
-        const horaA = a.split("-").at(-1);
-        const horaB = b.split("-").at(-1);
-        return horarios.indexOf(horaA) - horarios.indexOf(horaB);
-      });
-  
-    if (chavesValidas.length === 0) return null;
-  
-    const horaInicio = chavesValidas[0].split("-").at(-1);
-    const horaFimRaw = chavesValidas[chavesValidas.length - 1].split("-").at(-1);
-    const indexFim = horarios.indexOf(horaFimRaw);
-    const horaFim = horarios[indexFim + 1] || horaFimRaw;
-  
-    const indices = chavesValidas.map((c) => horarios.indexOf(c.split("-").at(-1)));
-    for (let i = 1; i < indices.length; i++) {
-      if (indices[i] - indices[i - 1] !== 1) return null;
-    }
-  
-    const sala = salas.find((s) => String(s.id) === String(salaId));
-    if (!sala) return null;
-  
-    return { sala, data, inicio: horaInicio, fim: horaFim };
-  };
-  
-  
-  
-  
-  
-  
-  
-  
+ 
   const [formEdicao, setFormEdicao] = useState({
     data: "",
     horario_inicio: "",
@@ -189,11 +136,25 @@ export default function Agendamentos() {
     }
   };
   
-
-  const carregarAgendamentos = async () => {
-    const dados = await fetchAgendamentos();
-    setAgendamentos(dados.filter(ag => ag.horario_inicio?.startsWith(dataSelecionada)));
+const carregarAgendamentos = async () => {
+    const todos = await fetchAgendamentos();
+  
+    if (abaSelecionada === "porSala") {
+      setAgendamentos(todos.filter(ag =>
+        ag.horario_inicio?.startsWith(dataSelecionada)
+      ));
+    } else {
+      const dias = calcularQuinzenaCompleta(dataSelecionada).map(d => d.iso);
+  
+      const agsFiltrados = todos.filter(ag =>
+        dias.includes(ag.horario_inicio?.slice(0, 10))
+      );
+  
+      setAgendamentos(agsFiltrados);
+    }
   };
+  
+  
 
   const carregarUsuario = async () => {
     const me = await fetchUsuarioLogado();
@@ -270,13 +231,6 @@ const grupoSelecionadoPorSala = () => {
     return { sala, data, inicio: horaInicio, fim: horaFim };
   };
   
-
-
-//estou alterando o codigo aqui
-
-
-
-  
 const alternarCelulaPorData = (dataISO, hora) => {
     const chave = `${salaSelecionada}-${dataISO}-${hora}`;
   
@@ -287,7 +241,6 @@ const alternarCelulaPorData = (dataISO, hora) => {
   
       if (prev.length === 0) return [chave];
   
-      // Extrai o dia de cada chave no formato completo: yyyy-mm-dd
       const mesmoDia = prev.every((k) => {
         const partes = k.split("-");
         const dia = `${partes[1]}-${partes[2]}-${partes[3]}`;
@@ -299,7 +252,6 @@ const alternarCelulaPorData = (dataISO, hora) => {
         return prev;
       }
   
-      // Verifica se é adjacente
       const horasSelecionadas = prev
         .filter((k) => {
           const partes = k.split("-");
@@ -326,7 +278,7 @@ const alternarCelulaPorData = (dataISO, hora) => {
     if (selecionados.length === 0) return null;
   
     const partes = selecionados[0].split("-");
-    if (partes.length < 4) return null; // CORRETO agora
+    if (partes.length < 4) return null; 
   
     const salaId = partes[0];
     const data = `${partes[1]}-${partes[2]}-${partes[3]}`;
@@ -484,6 +436,7 @@ const alternarCelulaPorData = (dataISO, hora) => {
   return (
   <div className="agendamentos-wrapper">
     <h3 className="dashboard-heading">Grade de Agendamentos</h3>
+
     <div className="dashboard-picklist-wrapper">
         <select
             value={abaSelecionada}
@@ -571,62 +524,78 @@ const alternarCelulaPorData = (dataISO, hora) => {
             </div>
         </div>
 
+        
+        {/* Grade de agendamentos */}
         {/* Grade de agendamentos */}
         <div className="grade-agendamentos">
-        <div className="linha-header">
-            <div className="celula-hora">Horário</div>
-            {salas.map(sala => (
-            <div key={sala.id} className="celula-sala">{sala.numero}</div>
-            ))}
-        </div>
-        {horarios.map(hora => (
-            <div key={hora} className="linha-horario">
-            <div className="celula-hora">{hora}</div>
-            {salas.map(sala => {
-                const ocupado = verificarOcupado(sala.id, hora, dataSelecionada);
+            <div className="linha-header">
+                <div className="celula-hora">Horário</div>
+                {salas.map(sala => (
+                <div key={sala.id} className="celula-sala">{sala.numero}</div>
+                ))}
+            </div>
 
-                  const agendamentoDoUsuario = agendamentos.some(ag =>
+            {horarios.map(hora => (
+                <div key={hora} className="linha-horario">
+                <div className="celula-hora">{hora}</div>
+
+                {salas.map(sala => {
+                    const chave = `${sala.id}-${hora}`;
+                    const selecionado = selecionados.includes(chave);
+
+                    const ocupado = verificarOcupado(sala.id, hora, dataSelecionada);
+
+                    const agendamentoDoUsuario = agendamentos.some(ag =>
                     ag.sala?.id === sala.id &&
                     ag.usuario?.id === usuarioLogado?.id &&
                     new Date(`${dataSelecionada}T${hora}:00`) >= new Date(ag.horario_inicio) &&
                     new Date(`${dataSelecionada}T${hora}:00`) < new Date(ag.horario_fim)
-                  );
-                  
-                  const chave = `${sala.id}-${hora}`;
-                    const selecionado = selecionados.includes(chave);
+                    );
 
+                    const agendamentoClicado = agendamentos.find(ag => {
+                    if (String(ag.sala?.id) !== String(sala.id)) return false;
+                    const horaAtual = new Date(`${dataSelecionada}T${hora}:00`);
+                    return horaAtual >= new Date(ag.horario_inicio) &&
+                            horaAtual < new Date(ag.horario_fim);
+                    });
 
+                    const agora = new Date();
+                    const dataHoraCelula = new Date(`${dataSelecionada}T${hora}:00`);
+                    const isPassadoSemAgendamento = dataHoraCelula < new Date() && !ocupado;
                     const classes = ocupado
+
                     ? agendamentoDoUsuario
                         ? "ocupado-usuario"
                         : "ocupado"
                     : selecionado
                         ? "selecionado"
+                        : isPassadoSemAgendamento
+                        ? "passado"
                         : "livre";
 
-                return (
-                <div
-                    key={chave}
-                    className={`celula-sala ${classes}`}
+                    return (
+                    <div
+                        key={chave}
+                        className={`celula-sala ${classes}`}
                         onClick={() => {
                         if (ocupado) {
-                            const horaAtual = new Date(`${dataSelecionada}T${hora}:00`);
-                            const ag = agendamentos.find(ag =>
-                            ag.sala?.id === sala.id &&
-                            horaAtual >= new Date(ag.horario_inicio) &&
-                            horaAtual < new Date(ag.horario_fim)
-                            );
-                            if (ag) abrirModalVisualizar(ag);
-                        }else {
+                            if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
+                        } else if (!isPassadoSemAgendamento) {
                             alternarCelulaPorSala(sala.id, hora);
-                    }
-                    }}
-                />
-
-            );
-            })}
-            </div>
-        ))}
+                        }
+                        }}
+                    />
+                    );
+                })}
+                </div>
+            ))}
+        </div>
+        <div className="agendamentos-legenda">
+            <span className="legenda-item"><span className="legenda-cor ocupado"></span> Horário Ocupado</span>
+            <span className="legenda-item"><span className="legenda-cor ocupado-usuario"></span> Agendamentos do Usuário</span>
+            <span className="legenda-item"><span className="legenda-cor selecionada"></span> Horário Selecionado</span>
+            <span className="legenda-item"><span className="legenda-cor livre"></span> Horário Disponível</span>
+            <span className="legenda-item"><span className="legenda-cor passado"></span> Horário Indisponível</span>
         </div>
     </div>
     )}
@@ -669,17 +638,21 @@ const alternarCelulaPorData = (dataISO, hora) => {
 
             </div>
 
-            <div className="dashboard-paginacao-quinzena">
-                <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena - 1)}>
+                <Button className="dashboard-btn-quinzena" 
+                    onClick={() => setOffsetQuinzena(offsetQuinzena - 1)}>
                     ← Quinzena anterior
                 </Button>
-                <Button variant="outline" onClick={() => setOffsetQuinzena(0)}>
+                <Button className="dashboard-btn-quinzena" 
+                    onClick={() => setOffsetQuinzena(0)}>
                     Atual
                 </Button>
-                <Button variant="outline" onClick={() => setOffsetQuinzena(offsetQuinzena + 1)}>
+                <Button className="dashboard-btn-quinzena" 
+                    onClick={() => setOffsetQuinzena(offsetQuinzena + 1)}>
                     Próxima quinzena →
                 </Button>
-            </div>
+ 
+
+     
 
             <div style={{ marginLeft: "auto" }}>
                 <Button
@@ -700,68 +673,78 @@ const alternarCelulaPorData = (dataISO, hora) => {
             {/* Cabeçalho com dias da quinzena */}
             <div className="linha-header">
             <div className="celula-hora">Horário</div>
+
+                {/* ALTERANDO CODIGO AQUI */}            
             {calcularQuinzenaCompleta(dataSelecionada).map((dia) => (
                 <div key={dia.iso} className="celula-sala">{dia.label}</div>
             ))}
             </div>
 
-            {/* Linhas de horários */}
             {horarios.map((hora) => (
-            <div key={hora} className="linha-horario">
-                <div className="celula-hora">{hora}</div>
-                {calcularQuinzenaCompleta(dataSelecionada).map((dia) => {
-                const chave = `${salaSelecionada}-${dia.iso}-${hora}`;
-                const selecionado = selecionados.includes(chave);
+                <div key={hora} className="linha-horario">
+                    <div className="celula-hora">{hora}</div>
+                    {calcularQuinzenaCompleta(dataSelecionada).map((dia) => {
+                    const chave = `${salaSelecionada}-${dia.iso}-${hora}`;
+                    const selecionado = selecionados.includes(chave);
 
-                const ocupado = agendamentos.some(ag => {
-                    return ag.sala?.id === parseInt(salaSelecionada) &&
-                           new Date(`${dia.iso}T${hora}:00`) >= new Date(ag.horario_inicio) &&
-                           new Date(`${dia.iso}T${hora}:00`) < new Date(ag.horario_fim);
-                  });
-                  
-                  const agendamentoDoUsuario = agendamentos.some(ag => {
-                    return ag.sala?.id === parseInt(salaSelecionada) &&
-                           ag.usuario?.id === usuarioLogado?.id &&
-                           new Date(`${dia.iso}T${hora}:00`) >= new Date(ag.horario_inicio) &&
-                           new Date(`${dia.iso}T${hora}:00`) < new Date(ag.horario_fim);
-                  });
-                  
-                  const classes = ocupado
-                    ? agendamentoDoUsuario
-                      ? "ocupado-usuario"
-                      : "ocupado"
-                    : selecionado
-                      ? "selecionado"
-                      : "livre";
-                  
+                    const ocupado = agendamentos.some(ag => {
+                        return ag.sala?.id === parseInt(salaSelecionada) &&
+                            new Date(`${dia.iso}T${hora}:00`) >= new Date(ag.horario_inicio) &&
+                            new Date(`${dia.iso}T${hora}:00`) < new Date(ag.horario_fim);
+                    });
 
-                const agendamentoClicado = agendamentos.find(ag => {
-                    if (String(ag.sala?.id) !== salaSelecionada) return false;
-                    const horaAtual = new Date(`${dia.iso}T${hora}:00`);
-                    return horaAtual >= new Date(ag.horario_inicio) && horaAtual < new Date(ag.horario_fim);
-                });
+                    const agendamentoDoUsuario = agendamentos.some(ag => {
+                        return ag.sala?.id === parseInt(salaSelecionada) &&
+                            ag.usuario?.id === usuarioLogado?.id &&
+                            new Date(`${dia.iso}T${hora}:00`) >= new Date(ag.horario_inicio) &&
+                            new Date(`${dia.iso}T${hora}:00`) < new Date(ag.horario_fim);
+                    });
 
-                return (
-                    <div
+                    const agendamentoClicado = agendamentos.find(ag => {
+                        if (String(ag.sala?.id) !== salaSelecionada) return false;
+                        const horaAtual = new Date(`${dia.iso}T${hora}:00`);
+                        return horaAtual >= new Date(ag.horario_inicio) && horaAtual < new Date(ag.horario_fim);
+                    });
+
+                    const agora = new Date();
+                    const dataHoraCelula = new Date(`${dia.iso || dataSelecionada}T${hora}:00`);
+                    const isPassadoSemAgendamento = dataHoraCelula < new Date() && !ocupado;
+
+                    const classes = ocupado
+                        ? agendamentoDoUsuario
+                        ? "ocupado-usuario"
+                        : "ocupado"
+                        : selecionado
+                        ? "selecionado"
+                        : isPassadoSemAgendamento
+                            ? "passado"
+                            : "livre";
+
+                    return (
+                        <div
                         key={chave}
                         className={`celula-sala ${classes}`}
                         onClick={() => {
                             if (ocupado) {
-                              if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
-                            } else {
-                                alternarCelulaPorData(dia.iso, hora);
+                            if (agendamentoClicado) abrirModalVisualizar(agendamentoClicado);
+                            } else if (!isPassadoSemAgendamento) {
+                            alternarCelulaPorData(dia.iso, hora);
                             }
-                          }}
-                          
-                        />
-                );
-                })}
-            </div>
-            ))}
+                        }}
+                        ></div>
+                    );
+                    })}
+                </div>
+                ))}
+
         </div>
-
-
-
+        <div className="agendamentos-legenda">
+            <span className="legenda-item"><span className="legenda-cor ocupado"></span> Horário Ocupado</span>
+            <span className="legenda-item"><span className="legenda-cor ocupado-usuario"></span> Agendamentos do Usuário</span>
+            <span className="legenda-item"><span className="legenda-cor selecionada"></span> Horário Selecionado</span>
+            <span className="legenda-item"><span className="legenda-cor livre"></span> Horário Disponível</span>
+            <span className="legenda-item"><span className="legenda-cor passado"></span> Horário Indisponível</span>
+        </div>
     </div>
     )}
 
@@ -805,6 +788,7 @@ const alternarCelulaPorData = (dataISO, hora) => {
                             <p><strong>Usuário:</strong> {usuarioLogado?.firstName}{" "}{usuarioLogado?.lastName}</p>
                             <p><strong>Sala:</strong> {grupo.sala?.numero || "Indefinida"}</p>
                             <p><strong>Tipo:</strong> {grupo.sala?.tipo?.tipo_sala || "Indefinido"}</p>
+                            <p><strong>Lotação máxima:</strong> {grupo.sala?.lotacao || "Não informada"}</p>
                             <p><strong>Data:</strong>{" "}{new Date(grupo.data || dataSelecionada).toLocaleDateString( "pt-BR" )}</p>
                             <p><strong>Horário:</strong> {grupo.inicio} às {grupo.fim}</p>
                         </div>
@@ -895,10 +879,21 @@ const alternarCelulaPorData = (dataISO, hora) => {
                 {mensagemErro && <p className="erro-modal">{mensagemErro}</p>}
 
                 {!mensagemSucesso && (
-                <div className="usuarios-modal-actions">
-                    <Button onClick={abrirModalEditar}>Editar</Button>
-                    <Button variant="destructive" onClick={cancelarAgendamento}>Cancelar Agendamento</Button>
-                </div>
+                    <div className="usuarios-modal-actions">
+                        <Button
+                        onClick={abrirModalEditar}
+                        disabled={!agendamentoSelecionado || new Date(agendamentoSelecionado.horario_fim) < new Date()}
+                        >
+                        Editar
+                        </Button>
+                        <Button
+                        variant="destructive"
+                        onClick={cancelarAgendamento}
+                        disabled={!agendamentoSelecionado || new Date(agendamentoSelecionado.horario_fim) < new Date()}
+                        >
+                        Cancelar Agendamento
+                        </Button>
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

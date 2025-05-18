@@ -16,7 +16,7 @@
     font-size: 1.5rem;
     font-weight: 500;
     color: #1f2937;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   
   .dashboard-select-label {
@@ -198,4 +198,53 @@
 .dark main,
 .dark body {
   background-color: #1a1e29;
+}
+
+
+/*====================================*/
+   
+.dashboard-legenda {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 5rem; 
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legenda-cor {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.legenda-cor.livre {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+}
+
+.legenda-cor.ocupado {
+  background-color: #e74c3c;
+}
+
+.legenda-cor.ocupado-usuario {
+  background-color: #a7d0ff;
+}
+
+.legenda-cor.passado {
+  background-color: #999999;
+  opacity: 0.6;
+}
+
+.legenda-cor.selecionada {
+  background-color: #4ade80;
+  opacity: 0.6;
 }

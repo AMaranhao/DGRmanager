@@ -100,3 +100,10 @@
     text-align: center;
   }
   
+  .botoes-alinhados-direita {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  

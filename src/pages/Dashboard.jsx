@@ -267,6 +267,12 @@ export default function Dashboard() {
         })}
       </div>
 
+        <div className="dashboard-legenda">
+            <span className="legenda-item"><span className="legenda-cor ocupado"></span> Emprestimo Aguardando Devolução</span>
+            <span className="legenda-item"><span className="legenda-cor selecionada"></span> Agendamento Aguardando Retirada</span>
+            <span className="legenda-item"><span className="legenda-cor passado"></span> Sala Disponível para Empréstimo</span>
+        </div>
+
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
           <DialogOverlay className="dialog-overlay" />
           <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>

@@ -265,82 +265,83 @@ const confirmarExclusaoItem = async () => {
         {/* Aba de Prédios */}
         <TabsContent value="predios">
           <div className="infraestrutura-section">
-            
-            <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
-              <DialogOverlay className="dialog-overlay" />
-              <DialogTrigger asChild>
-                <Button className="usuarios-btn-material" onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
-                  Cadastrar Predio
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="usuarios-modal">
-                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-                <DialogTitle>{editandoPredio ? 'Editar Prédio' : 'Novo Prédio'}</DialogTitle>
-                <DialogDescription className="usuarios-modal-descricao">
-                  Preencha os dados do prédio para {editandoPredio ? 'editar' : 'cadastrar'}.
-                </DialogDescription>
+            <div className="botoes-alinhados-direita">
+              <Dialog open={modalPredioAberto} onOpenChange={setModalPredioAberto}>
+                <DialogOverlay className="dialog-overlay" />
+                <DialogTrigger asChild>
+                  <Button className="usuarios-btn-material" onClick={() => { setEditandoPredio(null); setFormPredio({ nome: '', endereco: '', telefone: '' }); }}>
+                    Cadastrar Predio
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="usuarios-modal">
+                  <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+                  <DialogTitle>{editandoPredio ? 'Editar Prédio' : 'Novo Prédio'}</DialogTitle>
+                  <DialogDescription className="usuarios-modal-descricao">
+                    Preencha os dados do prédio para {editandoPredio ? 'editar' : 'cadastrar'}.
+                  </DialogDescription>
 
-                <div className="usuarios-input-wrapper">
-                  <Input
-                    placeholder="Nome do prédio"
-                    value={formPredio.nome}
-                    onChange={(e) => setFormPredio({ ...formPredio, nome: e.target.value })}
-                    className="usuarios-modal-input"
-                  />
-                  {formPredio.nome && (
-                    <button
-                      className="dashboard-filtro-clear"
-                      onClick={() => setFormPredio({ ...formPredio, nome: '' })}
-                      title="Limpar"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
+                  <div className="usuarios-input-wrapper">
+                    <Input
+                      placeholder="Nome do prédio"
+                      value={formPredio.nome}
+                      onChange={(e) => setFormPredio({ ...formPredio, nome: e.target.value })}
+                      className="usuarios-modal-input"
+                    />
+                    {formPredio.nome && (
+                      <button
+                        className="dashboard-filtro-clear"
+                        onClick={() => setFormPredio({ ...formPredio, nome: '' })}
+                        title="Limpar"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
 
-                <div className="usuarios-input-wrapper">
-                  <Input
-                    placeholder="Endereço"
-                    value={formPredio.endereco}
-                    onChange={(e) => setFormPredio({ ...formPredio, endereco: e.target.value })}
-                    className="usuarios-modal-input"
-                  />
-                  {formPredio.endereco && (
-                    <button
-                      className="dashboard-filtro-clear"
-                      onClick={() => setFormPredio({ ...formPredio, endereco: '' })}
-                      title="Limpar"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
+                  <div className="usuarios-input-wrapper">
+                    <Input
+                      placeholder="Endereço"
+                      value={formPredio.endereco}
+                      onChange={(e) => setFormPredio({ ...formPredio, endereco: e.target.value })}
+                      className="usuarios-modal-input"
+                    />
+                    {formPredio.endereco && (
+                      <button
+                        className="dashboard-filtro-clear"
+                        onClick={() => setFormPredio({ ...formPredio, endereco: '' })}
+                        title="Limpar"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
 
-                <div className="usuarios-input-wrapper">
-                  <Input
-                    placeholder="Telefone"
-                    value={formPredio.telefone}
-                    onChange={(e) => setFormPredio({ ...formPredio, telefone: e.target.value })}
-                    className="usuarios-modal-input"
-                  />
-                  {formPredio.telefone && (
-                    <button
-                      className="dashboard-filtro-clear"
-                      onClick={() => setFormPredio({ ...formPredio, telefone: '' })}
-                      title="Limpar"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
+                  <div className="usuarios-input-wrapper">
+                    <Input
+                      placeholder="Telefone"
+                      value={formPredio.telefone}
+                      onChange={(e) => setFormPredio({ ...formPredio, telefone: e.target.value })}
+                      className="usuarios-modal-input"
+                    />
+                    {formPredio.telefone && (
+                      <button
+                        className="dashboard-filtro-clear"
+                        onClick={() => setFormPredio({ ...formPredio, telefone: '' })}
+                        title="Limpar"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
 
-                <div className="usuarios-modal-actions">
-                  <Button onClick={() => salvarOuEditar('predio')}>Salvar</Button>
-                </div>
-              </DialogContent>
+                  <div className="usuarios-modal-actions">
+                    <Button onClick={() => salvarOuEditar('predio')}>Salvar</Button>
+                  </div>
+                </DialogContent>
 
-            </Dialog>
-            
+              </Dialog>
+
+            </div>
           </div>
 
           <div className="usuarios-tabela-wrapper">

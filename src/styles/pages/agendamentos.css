@@ -1,3 +1,7 @@
+/* ======================== */
+/*      Agendamentos        */
+/* ======================== */
+
 .grade-agendamentos {
     display: flex;
     flex-direction: column;
@@ -59,39 +63,116 @@
 
   .dashboard-select-relatorio {
     padding-right: 2rem;
-    border: 1px solid #d1d5db;
-    padding: 0.5rem 0.75rem;
-    border-radius: 9999px !important;
-    background-color: white !important;
-    font-size: 1.1rem;
     font-weight: 800;
     color: #1f2937;
     text-align: center;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     outline: none;
     width: 20rem;
-    height: 2.5rem !important;
-    max-height: 2.5rem !important;
-    line-height: 2.25rem !important;
     }
 
     .celula-sala.ocupado-usuario {
-        background-color: #cce4ff !important;
-        border: 1px solid #3399ff;
+        background-color: #a7d0ff !important;
       }
       
       .dashboard-paginacao-quinzena {
         display: flex;
         justify-content: center;
+        align-items: center;
         gap: 0.5rem;
+        margin-top: 1rem;
         margin-bottom: 1rem;
+        width: 100%;
       }
+
+      .dashboard-filtros-e-botoes {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+      
+    
+
+      
+      
+      
+      .dashboard-btn-quinzena {
+        padding-right: 2rem;
+        border: 1px solid #d1d5db;
+        padding: 0.5rem 0.75rem;
+        border-radius: 9999px !important;
+        background-color: white !important;
+        color: black !important;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1f2937;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        outline: none;
+        height: 2.25rem !important;
+        max-height: 2.25rem !important;
+        line-height: 2.25rem !important;
+        }
       
       .celula-sala.selecionado {
         background-color: #4ade80; /* verde-400 */
         cursor: pointer;
       }
       
-  
-  
+      .celula-sala.passado {
+        background-color: #999999;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      
+    /*====================================*/
+   
+    .agendamentos-legenda {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: #374151;
+      }
+      
+      .legenda-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .legenda-cor {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        display: inline-block;
+      }
+      
+      .legenda-cor.livre {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+      }
+      
+      .legenda-cor.ocupado {
+        background-color: #e74c3c;
+      }
+      
+      .legenda-cor.ocupado-usuario {
+        background-color: #a7d0ff;
+      }
+      
+      .legenda-cor.passado {
+        background-color: #999999;
+        opacity: 0.6;
+      }
+      
+      .legenda-cor.selecionada {
+        background-color: #4ade80;
+        opacity: 0.6;
+      }
+      
+      
   
