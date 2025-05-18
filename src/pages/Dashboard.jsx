@@ -268,9 +268,9 @@ export default function Dashboard() {
       </div>
 
         <div className="dashboard-legenda">
-            <span className="legenda-item"><span className="legenda-cor ocupado"></span> Emprestimo Aguardando Devolução</span>
-            <span className="legenda-item"><span className="legenda-cor selecionada"></span> Agendamento Aguardando Retirada</span>
-            <span className="legenda-item"><span className="legenda-cor passado"></span> Sala Disponível para Empréstimo</span>
+            <span className="legenda-item"><span className="legenda-cor ocupado"></span> Aguardando Devolução</span>
+            <span className="legenda-item"><span className="legenda-cor selecionada"></span> Aguardando Retirada</span>
+            <span className="legenda-item"><span className="legenda-cor passado"></span> Sala Disponível</span>
         </div>
 
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
