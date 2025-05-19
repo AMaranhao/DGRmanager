@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchAgendamentos, fetchAgendamentosEmprestimos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
+import { fetchTiposSala, fetchAgendamentos, fetchAgendamentosEmprestimos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -26,8 +26,10 @@ export default function Dashboard() {
   const [andaresFiltro, setAndaresFiltro] = useState([]); 
   const [andaresModal, setAndaresModal] = useState([]);  
   const [predioSelecionado, setPredioSelecionado] = useState('');
-
-
+  const [salasDisponiveis, setSalasDisponiveis] = useState([]);
+  const [tiposSala, setTiposSala] = useState([]);
+  const [modalStatus, setModalStatus] = useState(''); 
+  const [tipoSalaSelecionado, setTipoSalaSelecionado] = useState('Todos');
 
 
   const [usuarioAvulso, setUsuarioAvulso] = useState('');
@@ -44,6 +46,62 @@ export default function Dashboard() {
   const [kitsFiltrados, setKitsFiltrados] = useState([]);
   const [formAvulso, setFormAvulso] = useState({ predioId: '', andarId: '', sala: null });
 
+
+
+//ESSE CODIGO VAI SAIR
+
+const agora = new Date();
+console.log("Hora atual (debug):", agora.toLocaleTimeString());
+
+
+useEffect(() => {
+  const agora = new Date();
+  console.log("Hora atual do sistema:", agora.toLocaleTimeString());
+}, []);
+
+useEffect(() => {
+  const intervalo = setInterval(() => {
+    const agora = new Date();
+    console.log("Hora atual (loop):", agora.toLocaleTimeString());
+  }, 60000); // a cada 60 segundos
+
+  return () => clearInterval(intervalo); // limpar no unmount
+}, []);
+
+//ESSE CODIGO VAI SAIR
+
+
+
+useEffect(() => {
+  if (modalAvulsoAberto && formAvulso.andarId) {
+    carregarSalasPorAndar(formAvulso.andarId);
+  }
+}, [modalAvulsoAberto, formAvulso.andarId]);
+
+
+
+useEffect(() => {
+  const carregarTiposSala = async () => {
+    try {
+      const dados = await fetchTiposSala();
+      setTiposSala(dados);
+    } catch (erro) {
+      console.error("Erro ao carregar tipos de sala:", erro);
+    }
+  };
+  carregarTiposSala();
+}, []);
+
+
+  useEffect(() => {
+    const carregarSalas = async () => {
+      const dados = await fetchSalas();
+      setSalasDisponiveis(dados);
+    };
+    carregarSalas();
+  }, []);
+
+  
 
   useEffect(() => {
     const carregarAgendamentosEmprestimos = async () => {
@@ -96,6 +154,89 @@ export default function Dashboard() {
     }
   }, [modalAvulsoAberto]);
   
+
+  const abrirModalNovoEmprestimo = async (sala, status) => {
+    setModalStatus(status);
+    const now = new Date();
+    const horarioAtual = now.toTimeString().slice(0, 5); // ex: "14:28"
+  
+    // Define tipo de sala, prédio, andar, sala
+    setTipoSala(sala.tipo?.tipo_sala || '');
+    setPredio(sala.andar?.predio?.id || '');
+    setAndar(sala.andar?.id || '');
+    setSala(sala.id);
+    setHorarioRetirada(horarioAtual);
+  
+    // Preenche campos no formulário do modal
+    setFormAvulso({
+      predioId: sala.andar?.predio?.id || '',
+      andarId: sala.andar?.id || '',
+      sala: sala
+    });
+  
+    // Para salas com agendamento futuro: "Indisponível"
+    if (status === 'futuro') {
+      const minutos = now.getMinutes();
+      const proximaHoraCheia = new Date(now);
+      proximaHoraCheia.setMinutes(0, 0, 0);
+      if (minutos > 0) {
+        proximaHoraCheia.setHours(proximaHoraCheia.getHours() + 1);
+      }
+      const horarioFinal = proximaHoraCheia.toTimeString().slice(0, 5); // "08:00"
+
+      setHorarioDevolucao(horarioFinal);
+  
+      setModalAvulsoAberto(true);
+      setTimeout(() => {
+        // desativa input manual
+        const inputFim = document.querySelector('input[type="time"][name="horario_fim"]');
+        if (inputFim) inputFim.setAttribute('disabled', 'true');
+      }, 50);
+  
+    } else {
+      // Caso "Disponível" → buscar agendamentos futuros
+      try {
+        const ags = await fetchAgendamentosEmprestimos();
+        const dataHoje = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+        const proxAg = ags
+          .filter(ag =>
+            ag.sala?.id === sala.id &&
+            ag.horario_inicio.startsWith(dataHoje) &&
+            new Date(ag.horario_inicio) > now
+          )
+          .sort((a, b) => new Date(a.horario_inicio) - new Date(b.horario_inicio))[0];
+  
+        const horarioFinal = proxAg
+          ? new Date(proxAg.horario_inicio).toTimeString().slice(0, 5)
+          : '19:00';
+  
+        setHorarioDevolucao(horarioFinal);
+  
+        setTimeout(() => {
+          const inputFim = document.querySelector('input[type="time"][name="horario_fim"]');
+          if (inputFim) inputFim.removeAttribute('disabled');
+        }, 50);
+  
+      } catch {
+        setHorarioDevolucao('19:00');
+      }
+  
+      setModalAvulsoAberto(true);
+    }
+  };
+  
+
+
+
+  const now = new Date();
+  const inicioHoraAtual = new Date(now.setMinutes(0, 0, 0));
+  const fimHoraAtual = new Date(inicioHoraAtual.getTime() + 60 * 60 * 1000);
+  const inicioProximaHora = new Date(fimHoraAtual);
+  const fimProximaHora = new Date(inicioProximaHora.getTime() + 60 * 60 * 1000);
+
+
+  
+
 
   const carregarAndaresPorPredio = async (predioId) => {
     const dados = await fetchAndaresPorPredio(predioId);
@@ -217,60 +358,162 @@ export default function Dashboard() {
                 </button>
               )}
          </div>
+         <div className="dashboard-filtro-group">
+            <select
+              value={tipoSalaSelecionado}
+              onChange={(e) => setTipoSalaSelecionado(e.target.value)}
+              className="dashboard-select"
+            >
+              <option value="Todos">Todos os Tipos</option>
+              {tiposSala.map((tipo) => (
+                <option key={`tipo-${tipo.id}`} value={tipo.tipo_sala}>
+                  {tipo.tipo_sala}
+                </option>
+              ))}
+            </select>
+            {tipoSalaSelecionado !== 'Todos' && (
+              <button
+                type="button"
+                onClick={() => setTipoSalaSelecionado('Todos')}
+                className="dashboard-filtro-clear"
+                title="Limpar"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <div className="dashboard-filtro-usuario">
+            <input
+              type="text"
+              placeholder="Usuário ou Sala"
+              value={filtroUsuario}
+              onChange={(e) => setFiltroUsuario(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {filtroUsuario && (
+              <button onClick={() => setFiltroUsuario('')} className="dashboard-filtro-clear" title="Limpar">
+                <X size={14} />
+              </button>
+            )}
+          </div>
 
-        <div className="dashboard-filtro-usuario">
-          <input
-            type="text"
-            placeholder="Usuário ou Sala"
-            value={filtroUsuario}
-            onChange={(e) => setFiltroUsuario(e.target.value)}
-            className="dashboard-select dashboard-filtro-usuario-input"
-          />
-          {filtroUsuario && (
-            <button onClick={() => setFiltroUsuario('')} className="dashboard-filtro-clear" title="Limpar">
-              <X size={14} />
-            </button>
-          )}
-        </div>
 
-
-        <div className="dashboard-filtro-item" style={{ marginLeft: 'auto' }}>
-          <Button className="usuarios-btn-material w-full" onClick={() => setModalAvulsoAberto(true)}>
-            Novo Empréstimo
-          </Button>
-        </div>
+          <div className="dashboard-filtro-item" style={{ marginLeft: 'auto' }}>
+            <Button className="usuarios-btn-material w-full" onClick={() => setModalAvulsoAberto(true)}>
+              Novo Empréstimo
+            </Button>
+          </div>
 
 
 
         
       </div>
 
-      <div className="dashboard-grid">
-        {agendamentosFiltrados.map((ag) => {
-          const retirado = ag.retirado === true || ag.retirado === 'true';
-          const tileClass = retirado ? 'dashboard-tile dashboard-tile-retirado' : 'dashboard-tile dashboard-tile-aguardando';
-          const labelAcao = retirado ? 'Receber' : 'Emprestar';
+          {/*alterando o codigo aqui*/ }
 
-          return (
-            <div key={ag.id} onClick={() => abrirModal(ag)} className={tileClass}>
-              <div className="dashboard-sala">
-                <DoorOpen className="dashboard-sala-icon"  /> - {ag.sala?.numero}
-              </div>
+          <div className="dashboard-grid">
+            {salasDisponiveis
+              .filter((sala) => {
+                const andarCorresponde = andarSelecionado === 'Todos' ||
+                  sala.andar?.id === Number(andarSelecionado);
               
-              <div className="dashboard-usuario">
-                {ag.usuario ? `${ag.usuario.firstName} ${ag.usuario.lastName}` : ''}
-              </div>
+                const predioCorresponde = predioSelecionado === 'Todos' ||
+                  sala.andar?.predio?.id === Number(predioSelecionado);
+              
+                const tipoCorresponde = tipoSalaSelecionado === 'Todos' ||
+                  sala.tipo?.tipo_sala === tipoSalaSelecionado;
+              
+                  const nomeSala = sala.numero?.toString().toLowerCase() || '';
+                  const filtro = filtroUsuario.toLowerCase();
+                  
+                  const agendamentoAtual = agendamentos.find((ag) =>
+                    ag.sala?.id === sala.id &&
+                    new Date(ag.horario_inicio) >= new Date(inicioHoraAtual) &&
+                    new Date(ag.horario_inicio) < new Date(fimHoraAtual)
+                  );
+                  
+                  const nomeUsuario = agendamentoAtual?.usuario
+                    ? `${agendamentoAtual.usuario.firstName} ${agendamentoAtual.usuario.lastName}`.toLowerCase()
+                    : '';
+                  
+                  const textoCorresponde =
+                    nomeSala.includes(filtro) || nomeUsuario.includes(filtro);
+                  
+              
+                return andarCorresponde && predioCorresponde && tipoCorresponde && textoCorresponde;
+              })
+              
+              .map((sala) => {
+                const agHoraAtual = agendamentos.filter((ag) =>
+                  ag.sala?.id === sala.id &&
+                  new Date(ag.horario_inicio) >= new Date(inicioHoraAtual) &&
+                  new Date(ag.horario_inicio) < new Date(fimHoraAtual)
+                );
 
-              <div className="dashboard-acao">{labelAcao}</div>
-            </div>
-          );
-        })}
-      </div>
+                const agProximaHora = agendamentos.filter((ag) =>
+                  ag.sala?.id === sala.id &&
+                  new Date(ag.horario_inicio) >= new Date(inicioProximaHora) &&
+                  new Date(ag.horario_inicio) < new Date(fimProximaHora)
+                );
+
+                let tileClass = 'dashboard-tile dashboard-tile-passado';
+                let labelAcao = '';
+                let infoSecundaria = ''; // Nome do usuário ou tipo de sala
+
+                if (agHoraAtual.length > 0) {
+                  const agendamento = agHoraAtual[0];
+                  const retirado = agendamento.retirado === true || agendamento.retirado === 'true';
+
+                  tileClass = retirado
+                    ? 'dashboard-tile dashboard-tile-retirado'
+                    : 'dashboard-tile dashboard-tile-aguardando';
+
+                  labelAcao = retirado ? 'Receber' : 'Emprestar';
+
+                  infoSecundaria = agendamento.usuario
+                    ? `${agendamento.usuario.firstName} ${agendamento.usuario.lastName}`
+                    : '';
+                } else {
+                  if (agProximaHora.length > 0) {
+                    tileClass = 'dashboard-tile dashboard-tile-futuro';
+                    labelAcao = 'Indisponível';
+                  } else {
+                    tileClass = 'dashboard-tile dashboard-tile-passado';
+                    labelAcao = 'Disponível';
+                  }
+
+                  infoSecundaria = sala.tipo?.tipo_sala || '';
+                }
+
+                return (
+                  <div
+                    key={sala.id}
+                    onClick={() => {
+                      if (agHoraAtual.length > 0) {
+                        abrirModal(agHoraAtual[0]);
+                      } else {
+                        abrirModalNovoEmprestimo(sala, agProximaHora.length > 0 ? 'futuro' : 'livre');
+                      }
+                    }}
+                    className={tileClass}
+                  >
+                    <div className="dashboard-sala">
+                      <DoorOpen className="dashboard-sala-icon" /> - {sala.numero}
+                    </div>
+                    <div className="dashboard-usuario">{infoSecundaria}</div>
+                    <div className="dashboard-acao">{labelAcao}</div>
+                  </div>
+                );
+              })}
+          </div>
+
+
 
         <div className="dashboard-legenda">
             <span className="legenda-item"><span className="legenda-cor ocupado"></span> Aguardando Devolução</span>
             <span className="legenda-item"><span className="legenda-cor selecionada"></span> Aguardando Retirada</span>
             <span className="legenda-item"><span className="legenda-cor passado"></span> Sala Disponível</span>
+            <span className="legenda-item"><span className="legenda-cor futuro"></span> Sala Disponível apenas até próximo horário</span>
         </div>
 
         <Dialog open={modalAberto} onOpenChange={setModalAberto}>
@@ -325,21 +568,43 @@ export default function Dashboard() {
             </div>
 
             <div className="usuarios-input-wrapper">
-              <select value={tipoSala} onChange={(e) => setTipoSala(e.target.value)} className="usuarios-modal-select">
+              <select
+                value={tipoSala}
+                onChange={(e) => setTipoSala(e.target.value)}
+                className="usuarios-modal-select"
+                disabled={modalStatus === 'futuro' || modalStatus === 'livre'}
+              >
                 <option value="">Selecione o tipo de sala</option>
-                <option value="auditório">Auditório</option>
-                <option value="sala de aula">Sala de Aula</option>
-                <option value="laboratório">Laboratório</option>
+                {tiposSala.map((tipo) => (
+                  <option key={tipo.id} value={tipo.tipo_sala}>
+                    {tipo.tipo_sala}
+                  </option>
+                ))}
               </select>
             </div>
 
-            <div className="usuarios-input-wrapper">
-              <Input type="time" value={horarioRetirada} onChange={(e) => setHorarioRetirada(e.target.value)} className="usuarios-modal-input" />
-            </div>
 
             <div className="usuarios-input-wrapper">
-              <Input type="time" value={horarioDevolucao} onChange={(e) => setHorarioDevolucao(e.target.value)} className="usuarios-modal-input" />
+              <Input
+                type="time"
+                value={horarioRetirada}
+                onChange={(e) => setHorarioRetirada(e.target.value)}
+                className="usuarios-modal-input"
+                disabled={modalStatus === 'futuro' || modalStatus === 'livre'}
+              />
             </div>
+
+
+            <div className="usuarios-input-wrapper">
+              <Input
+                type="time"
+                value={horarioDevolucao}
+                onChange={(e) => setHorarioDevolucao(e.target.value)}
+                className="usuarios-modal-input"
+                disabled={modalStatus === 'futuro'}
+              />
+            </div>
+
 
             <select
               value={formAvulso.predioId}
@@ -349,12 +614,14 @@ export default function Dashboard() {
                 carregarAndaresPorPredio(id);
               }}
               className="usuarios-modal-select"
-            >
+              disabled={modalStatus === 'futuro' || modalStatus === 'livre'}
+              >
               <option value="">Selecione o Prédio</option>
               {prediosDisponiveis.map(p => (
                 <option key={p.id} value={p.id}>{p.nome}</option>
               ))}
             </select>
+
 
 
             <select
@@ -365,13 +632,14 @@ export default function Dashboard() {
                 carregarSalasPorAndar(id);
               }}
               className="usuarios-modal-select"
-              disabled={!formAvulso.predioId}
-            >
+              disabled={!formAvulso.predioId || modalStatus === 'futuro' || modalStatus === 'livre'}
+              >
               <option value="">Selecione o Andar</option>
               {andaresModal.map(a => (
                 <option key={a.id} value={a.id}>{a.nome}</option>
               ))}
             </select>
+
 
 
 
@@ -382,13 +650,14 @@ export default function Dashboard() {
                 sala: salasFiltradas.find(s => s.id === Number(e.target.value))
               })}
               className="usuarios-modal-select"
-              disabled={!formAvulso.andarId}
-            >
+              disabled={!formAvulso.andarId || modalStatus === 'futuro' || modalStatus === 'livre'}
+              >
               <option value="">Selecione a Sala</option>
               {salasFiltradas.map(s => (
                 <option key={s.id} value={s.id}>{s.numero}</option>
               ))}
             </select>
+
 
 
             <div className="usuarios-input-wrapper mt-2">

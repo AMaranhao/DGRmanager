@@ -165,14 +165,16 @@
       }
       
       .legenda-cor.passado {
-        background-color: #999999;
-        opacity: 0.6;
+        background-color: darkgray !important;
       }
+      
       
       .legenda-cor.selecionada {
         background-color: #4ade80;
         opacity: 0.6;
       }
       
+      .dark .agendamentos-legenda {
+        color: #f9fafb; 
+      }
       
-  
