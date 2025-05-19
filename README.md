@@ -6,16 +6,16 @@ Sistema web para gerenciamento de empréstimo de chaves e controle de salas em u
 
 ## 📋 Funcionalidades
 
-- Integração com Microsoft Bookings para agendamentos de salas
-- Login com verificação de email e senha (Mockoon)
+- Login com verificação de email e senha (Mockoon, com autenticação planejada via JWT)
 - Visualização de agendamentos em tempo real com status visual
-- Empréstimos e devoluções por senha de 4 dígitos
-- Filtros por andar, sala e usuário
+- Empréstimos e devoluções por senha de 4 dígitos (PIN)
+- Filtros por andar, sala, data e usuário
 - Dashboard:
   - Agendamentos do horário vigente por andar
-  - Status visual (verde = aguardando retirada, vermelho = já retirada, aguardando devolução)
+  - Status visual (verde = aguardando retirada, vermelho = já retirada, aguardando devolução, azul = agendamento próprio)
   - Filtro dinâmico de andares
-  - Novo Emprestimo Avulso(sem agendamento prévio)
+  - Novo Empréstimo Avulso (sem agendamento prévio)
+  - Tooltip com legenda de status
 - Módulo de Empréstimos:
   - Histórico completo de empréstimos
   - Filtros por:
@@ -23,12 +23,23 @@ Sistema web para gerenciamento de empréstimo de chaves e controle de salas em u
     - Usuário
     - Sala
     - Status (Em andamento, Finalizado, Em atraso)
-- Módulo de infraestrutura:
-  - Prédios, Salas, Andares, Chaves e Kits
-  - Cadastro, edição e exclusão com modais personalizados
+  - Visualização com status colorido por situação
+- Módulo de Infraestrutura:
+  - CRUD de Prédios, Salas, Andares, Chaves e Kits
+  - Edição inline de campos como "andar", "ativa", "tipo de kit"
+  - Filtros por sala em abas Chaves e Kits
+  - Modais personalizados para criação e edição
 - Módulo de Usuários:
-  - Criação e desativação de contas
+  - Criação, edição e desativação de contas
+  - Campos obrigatórios com validação
   - Filtros por ativo/inativo
+  - Permissões por tipo de usuário
+- Módulo de Agendamentos:
+  - Aba "Por Sala" com horários diários
+  - Aba "Por Data" com grade de 15 dias úteis
+  - Seleção múltipla de horários contínuos
+  - Validação e modal de confirmação de agendamento
+  - Visualização de agendamentos do próprio usuário
 - Relatórios:
   - Relatório de Empréstimos por Período
   - Relatório de Devoluções em Atraso
@@ -36,14 +47,15 @@ Sistema web para gerenciamento de empréstimo de chaves e controle de salas em u
   - Relatório de Utilização por Sala
   - Relatório de Utilização por Usuário
   - Relatório de Salas Mais Utilizadas
-  - Relatório Completo com Filtros Avançados
+  - Relatório Geral com Filtros Avançados
   - Impressão rápida dos relatórios
 - Tela de Perfil do Usuário:
   - Dados carregados do endpoint `/me` (Mockoon)
   - Alteração de senha e senha de assinatura (layout e campos)
 - Interface responsiva com layout moderno
-- Integração planejada com envio de alertas por SMS (alerta de atraso)
-
+- Modo escuro implementado
+- Integração futura com envio de alertas por SMS (alerta de atraso)
+- Estrutura preparada para controle de permissões por perfil (`admin`, `portaria`, `GEP`, `comum`)
 
 ---
 
@@ -54,11 +66,11 @@ Sistema web para gerenciamento de empréstimo de chaves e controle de salas em u
 - **Roteamento:** React Router DOM
 - **Formulários:** React Hook Form + Zod (em módulos específicos)
 - **Mock Backend:** [Mockoon](https://mockoon.com/) (Simulação de API REST)
- **PostgreSQL** (planejado): banco de dados real
-- **Backend:** (planejado): implementação em Python com Django Rest Framework
+- **PostgreSQL (planejado):** banco de dados real
+- **Backend (planejado):** Python com Django Rest Framework
 - **Ícones:** Lucide-react
 - **Gerenciamento de autenticação:** React Context
-- **date-fns**: manipulação de datas
+- **Manipulação de datas:** date-fns
 
 ---
 
@@ -75,6 +87,7 @@ src/
 ├── styles/
 │   ├── pages/           # CSS modularizado por página
 │   └── components.css   # Estilos reutilizáveis (header/sidebar/layout)
+├── helpers.js           # Normalização e limpeza de dados antes do envio
 ├── App.jsx
 └── main.jsx
 ```
@@ -89,8 +102,7 @@ git clone https://github.com/seu-usuario/emprestimo-chaves-hc.git
 cd emprestimo-chaves-hc
 ```
 
-2. **Acesse a pasta do projeto
-
+2. **Acesse a pasta do projeto**
 ```bash
 cd emprestimo-chaves-hc-FrontEnd
 ```
@@ -100,18 +112,17 @@ cd emprestimo-chaves-hc-FrontEnd
 npm install
 ```
 
-3. **Rode o servidor mockado (Mockoon)**
+4. **Rode o servidor mockado (Mockoon)**
 - Instale o [Mockoon](https://mockoon.com/)
 - Importe o arquivo `Server-Mockoon.json` (incluso no repositório)
 - Inicie o servidor na porta `3001`
 
-
-4. **Execute o frontend**
+5. **Execute o frontend**
 ```bash
 npm run dev
 ```
 
-5. **Acesse no navegador**
+6. **Acesse no navegador**
 ```
 http://localhost:5173
 ```
@@ -122,14 +133,18 @@ http://localhost:5173
 
 ✅ Módulos concluídos:
 - Dashboard (com filtro por andar e modal de senha)
-- Emprestimos
+- Empréstimos
 - Infraestrutura (Prédios, Salas, Chaves, Kits)
-- Usuários
+- Usuários (CRUD completo com filtros e validações)
+- Agendamentos (visualização por sala e por data, modal de confirmação)
+- Relatórios (7 modelos com filtros)
 - Perfil do Usuário
+- Modo escuro (dark mode)
 - Integração com servidor Mockoon
 - Modal de criação de empréstimo avulso
 
 🧪 Em testes:
+- Permissões por tipo de usuário
 - Edição de perfil
 
 🔒 Acesso com autenticação via Mockoon (com futura migração para JWT no Django Rest Framework)
@@ -138,22 +153,19 @@ http://localhost:5173
 
 ## 🔥 Próximos Passos
 
-- [ ] Implementar backend real com Django Rest Framework
-- [ ] Autenticação com JWT
+- [ ] Implementar backend real com Django Rest Framework + PostgreSQL
+- [ ] Autenticação com JWT persistente
 - [ ] Tela de configurações (horários, bloqueios)
 - [ ] Relatório de acessos de usuários
-- [ ] Notificações visuais (devoluções pendentes)
-- [ ] Modo escuro/claro
-- [ ] Integração com Microsoft Bookings
+- [ ] Notificações visuais (devoluções pendentes, erros)
 - [ ] Página de login e recuperação de senha finalizadas
-- [ ] Backend real com Django Rest Framework + PostgreSQL
-- [ ] Aplicativo Mobile para controle de chaves e acesso a horários
+- [ ] Aplicativo Mobile (PWA ou nativo) para controle de chaves
+- [ ] Exportação real de relatórios (CSV/PDF)
+- [ ] Controle visual de permissões no frontend por cargo/perfil
+- [ ] Proteção de rotas (redirect se não autenticado)
 
 ---
 
 ## 👩‍💻 Desenvolvido por:
 
 **José Alexandre Maranhão**
-
----
-
