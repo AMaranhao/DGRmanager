@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchEmprestimos } from "../services/apiService";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { Dialog, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
 
 import "@/styles/pages/emprestimos.css";
 import "@/styles/pages/filters.css";
@@ -17,6 +20,13 @@ export default function Emprestimos() {
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [textoPesquisa, setTextoPesquisa] = useState("");
+  const [modalConfirmacao, setModalConfirmacao] = useState(false);
+  const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
+  const [modalSenhaAberto, setModalSenhaAberto] = useState(false);
+  const [senha, setSenha] = useState('');
+  const [erroSenha, setErroSenha] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState('');
+
 
   useEffect(() => {
     const carregarEmprestimos = async () => {
@@ -25,6 +35,26 @@ export default function Emprestimos() {
     };
     carregarEmprestimos();
   }, []);
+
+  const abrirModalConfirmacao = (emprestimo) => {
+    setEmprestimoSelecionado(emprestimo);
+    setModalConfirmacao(true);
+  };
+  
+  const calcularTempoAtraso = (horarioEsperado) => {
+    const fim = new Date();
+    const esperado = new Date(horarioEsperado);
+    const diffMs = fim - esperado;
+  
+    if (diffMs <= 0) return 'Nenhum';
+  
+    const minutos = Math.floor(diffMs / 60000);
+    const horas = Math.floor(minutos / 60);
+    const minRest = minutos % 60;
+  
+    return `${horas}h ${minRest}min`;
+  };
+  
 
   const emprestimosFiltrados = emprestimos.filter((e) => {
     const atendeStatus = statusFiltro ? e.status === statusFiltro : true;
@@ -149,6 +179,7 @@ export default function Emprestimos() {
               <th>Status</th>
               <th>Horário Retirada</th>
               <th>Horário Devolução</th>
+              <th>Tempo de Atraso</th>
             </tr>
           </thead>
           <tbody>
@@ -157,23 +188,127 @@ export default function Emprestimos() {
                 <td>{e.chave?.sala?.numero || "-"}</td>
                 <td>{`${e.usuario?.firstName || ""} ${e.usuario?.lastName || ""}`.trim() || "-"}</td>
                 <td>
-                  <span className={
-                    e.status === 'Em atraso'
-                      ? 'status-atraso'
-                      : e.status === 'Em andamento'
-                      ? 'status-andamento'
-                      : 'status-finalizado'
-                  }>
-                    {e.status}
-                  </span>
+                  {e.status === 'Em atraso' ? (
+                    <div className="status-com-acao">
+                      <span className="status-atraso">{e.status}</span>
+                      <button
+                        className="btn-devolver"
+                        onClick={() => abrirModalConfirmacao(e)}
+                      >
+                        Devolver
+                      </button>
+                    </div>
+                  ) : (
+                    <span className={
+                      e.status === 'Em andamento'
+                        ? 'status-andamento'
+                        : 'status-finalizado'
+                    }>
+                      {e.status}
+                    </span>
+                  )}
                 </td>
                 <td>{new Date(e.horario_retirada).toLocaleString()}</td>
                 <td>{e.horario_devolucao ? new Date(e.horario_devolucao).toLocaleString() : '-'}</td>
+                <td>
+                  {(() => {
+                    const esperado = new Date(e.horario_esperado_devolucao);
+                    let atraso = null;
+
+                    if (e.status === "Finalizado" && e.horario_devolucao) {
+                      const devolucao = new Date(e.horario_devolucao);
+                      atraso = devolucao - esperado;
+                    } else if (e.status === "Em atraso") {
+                      atraso = new Date() - esperado;
+                    }
+
+                    if (atraso && atraso > 0) {
+                      const horas = Math.floor(atraso / (1000 * 60 * 60));
+                      const minutos = Math.floor((atraso % (1000 * 60 * 60)) / (1000 * 60));
+                      return `${horas}h ${minutos}min`;
+                    }
+
+                    return "-";
+                  })()}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+       {/* Modal de confirmação de devolução atrasada */}
+       {modalConfirmacao && (
+        <Dialog open={modalConfirmacao} onOpenChange={setModalConfirmacao}>
+          <DialogOverlay className="dialog-overlay" />
+          <DialogContent className="dashboard-modal dashboard-no-close">
+            <DialogTitle>Confirmar Devolução Atrasada</DialogTitle>
+            <DialogDescription className="usuarios-modal-descricao">
+              Verifique as informações do empréstimo:
+            </DialogDescription>
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
+            <div className="modal-linhas">
+              <p><strong>Sala:</strong> {emprestimoSelecionado?.chave?.sala?.numero || '-'}</p>
+              <p><strong>Usuário:</strong> {`${emprestimoSelecionado?.usuario?.firstName || ''} ${emprestimoSelecionado?.usuario?.lastName || ''}`}</p>
+              <p><strong>Tempo de Atraso:</strong> {calcularTempoAtraso(emprestimoSelecionado?.horario_esperado_devolucao)}</p>
+            </div>
+
+
+            <div className="usuarios-modal-actions mt-4">
+              <Button variant="outline" onClick={() => setModalConfirmacao(false)}>Cancelar</Button>
+              <Button onClick={() => {
+                setModalConfirmacao(false);
+                setModalSenhaAberto(true);
+              }}>
+                Confirmar Devolução
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+          {/* Modal de senha para finalizar devolução */}
+          {modalSenhaAberto && (
+            <Dialog open={modalSenhaAberto} onOpenChange={setModalSenhaAberto}>
+              <DialogOverlay className="dialog-overlay" />
+              <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Digite a Senha</DialogTitle>
+                <DialogDescription>Insira a senha de 4 dígitos para confirmar a devolução.</DialogDescription>
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
+                <Input
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  maxLength={4}
+                  placeholder="Senha de 4 dígitos"
+                  className="dashboard-modal-input"
+                />
+                {erroSenha && <div className="dashboard-modal-error">Senha inválida.</div>}
+                {mensagemSucesso && <div className="dashboard-modal-success-message">{mensagemSucesso}</div>}
+
+                <div className="dashboard-modal-actions">
+                  <Button variant="outline" onClick={() => setModalSenhaAberto(false)}>Cancelar</Button>
+                  <Button onClick={() => {
+                    if (senha.length === 4) {
+                      setMensagemSucesso('Devolução registrada com sucesso!');
+                      setErroSenha(false);
+                      setTimeout(() => {
+                        setModalSenhaAberto(false);
+                        setMensagemSucesso('');
+                        setSenha('');
+                      }, 2000);
+                    } else {
+                      setErroSenha(true);
+                    }
+                  }}>Confirmar</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+        )}  
+
     </div>
+
+    
   );
 }

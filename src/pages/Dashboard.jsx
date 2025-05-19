@@ -30,7 +30,7 @@ export default function Dashboard() {
   const [tiposSala, setTiposSala] = useState([]);
   const [modalStatus, setModalStatus] = useState(''); 
   const [tipoSalaSelecionado, setTipoSalaSelecionado] = useState('Todos');
-
+  const [opcoesHoraDevolucao, setOpcoesHoraDevolucao] = useState([]);
 
   const [usuarioAvulso, setUsuarioAvulso] = useState('');
   const [tipoSala, setTipoSala] = useState('');
@@ -47,7 +47,7 @@ export default function Dashboard() {
   const [formAvulso, setFormAvulso] = useState({ predioId: '', andarId: '', sala: null });
 
 
-
+/*
 //ESSE CODIGO VAI SAIR
 
 const agora = new Date();
@@ -70,7 +70,9 @@ useEffect(() => {
 
 //ESSE CODIGO VAI SAIR
 
+*/
 
+//MODIFICANDO O CODIGO A PARTIR DE AGORA
 
 useEffect(() => {
   if (modalAvulsoAberto && formAvulso.andarId) {
@@ -140,13 +142,15 @@ useEffect(() => {
   
 
   useEffect(() => {
-    if (usarKit && sala) {
-      carregarKitsPorSala(sala);
+    if (usarKit && formAvulso.sala?.id) {
+      console.log("Sala atual para buscar kits:", formAvulso.sala?.id);
+      carregarKitsPorSala(formAvulso.sala.id);
     } else {
       setKitsFiltrados([]);
       setKitSelecionado('');
     }
-  }, [usarKit, sala]);
+  }, [usarKit, formAvulso.sala]);
+  
 
   useEffect(() => {
     if (modalAvulsoAberto && formAvulso.predioId) {
@@ -155,10 +159,32 @@ useEffect(() => {
   }, [modalAvulsoAberto]);
   
 
+  const gerarHorasRedondas = (inicioRaw, fimRaw) => {
+    const inicio = new Date(inicioRaw);
+    const fim = new Date(fimRaw);
+  
+    const opcoes = [];
+    const atual = new Date(inicio);
+    atual.setMinutes(0, 0, 0);
+  
+    if (inicio.getMinutes() > 0) {
+      atual.setHours(atual.getHours() + 1);
+    }
+  
+    while (atual <= fim) {
+      opcoes.push(atual.toTimeString().slice(0, 5));
+      atual.setHours(atual.getHours() + 1);
+    }
+  
+    return opcoes;
+  };
+  
+  
+  
   const abrirModalNovoEmprestimo = async (sala, status) => {
     setModalStatus(status);
     const now = new Date();
-    const horarioAtual = now.toTimeString().slice(0, 5); // ex: "14:28"
+    const horarioAtual = now.toTimeString().slice(0, 5);
   
     // Define tipo de sala, prédio, andar, sala
     setTipoSala(sala.tipo?.tipo_sala || '');
@@ -174,7 +200,7 @@ useEffect(() => {
       sala: sala
     });
   
-    // Para salas com agendamento futuro: "Indisponível"
+    // Se for "Indisponível", calcula apenas a próxima hora cheia
     if (status === 'futuro') {
       const minutos = now.getMinutes();
       const proximaHoraCheia = new Date(now);
@@ -182,48 +208,45 @@ useEffect(() => {
       if (minutos > 0) {
         proximaHoraCheia.setHours(proximaHoraCheia.getHours() + 1);
       }
-      const horarioFinal = proximaHoraCheia.toTimeString().slice(0, 5); // "08:00"
-
-      setHorarioDevolucao(horarioFinal);
   
+      const horaFinal = proximaHoraCheia.toTimeString().slice(0, 5);
+      setOpcoesHoraDevolucao([horaFinal]);
+      setHorarioDevolucao(horaFinal);
       setModalAvulsoAberto(true);
-      setTimeout(() => {
-        // desativa input manual
-        const inputFim = document.querySelector('input[type="time"][name="horario_fim"]');
-        if (inputFim) inputFim.setAttribute('disabled', 'true');
-      }, 50);
+      return;
+    }
   
-    } else {
-      // Caso "Disponível" → buscar agendamentos futuros
-      try {
-        const ags = await fetchAgendamentosEmprestimos();
-        const dataHoje = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-        const proxAg = ags
-          .filter(ag =>
-            ag.sala?.id === sala.id &&
-            ag.horario_inicio.startsWith(dataHoje) &&
-            new Date(ag.horario_inicio) > now
-          )
-          .sort((a, b) => new Date(a.horario_inicio) - new Date(b.horario_inicio))[0];
+    // Se for "Disponível", calcula todas as horas redondas até o próximo agendamento ou até 19:00
+    try {
+      const ags = await fetchAgendamentosEmprestimos();
+      const hoje = new Date().toISOString().slice(0, 10);
   
-        const horarioFinal = proxAg
-          ? new Date(proxAg.horario_inicio).toTimeString().slice(0, 5)
-          : '19:00';
+      const proxAg = ags
+        .filter(ag =>
+          ag.sala?.id === sala.id &&
+          ag.horario_inicio.startsWith(hoje) &&
+          new Date(ag.horario_inicio) > now
+        )
+        .sort((a, b) => new Date(a.horario_inicio) - new Date(b.horario_inicio))[0];
   
-        setHorarioDevolucao(horarioFinal);
+      const fimLimite = proxAg
+        ? new Date(proxAg.horario_inicio)
+        : new Date(new Date().setHours(19, 0, 0, 0));
   
-        setTimeout(() => {
-          const inputFim = document.querySelector('input[type="time"][name="horario_fim"]');
-          if (inputFim) inputFim.removeAttribute('disabled');
-        }, 50);
-  
-      } catch {
-        setHorarioDevolucao('19:00');
-      }
-  
+      // Gerar opções como ["08:00", "09:00", ...]
+      const opcoes = gerarHorasRedondas(now, fimLimite);
+      setOpcoesHoraDevolucao(opcoes);
+      setHorarioDevolucao(opcoes[0]);
+      setModalAvulsoAberto(true);
+    } catch (erro) {
+      console.error("Erro ao buscar agendamentos futuros:", erro);
+      const fallback = gerarHorasRedondas(now, new Date(new Date().setHours(19, 0, 0, 0)));
+      setOpcoesHoraDevolucao(fallback);
+      setHorarioDevolucao(fallback[0]);
       setModalAvulsoAberto(true);
     }
   };
+  
   
 
 
@@ -237,6 +260,7 @@ useEffect(() => {
 
   
 
+  
 
   const carregarAndaresPorPredio = async (predioId) => {
     const dados = await fetchAndaresPorPredio(predioId);
@@ -253,7 +277,9 @@ useEffect(() => {
 
   const carregarKitsPorSala = async (salaId) => {
     const dados = await fetchKits();
+    console.log("Todos os kits retornados:", dados);
     const filtrados = dados.filter(k => k.sala?.id === Number(salaId));
+    console.log("Kits filtrados para sala", salaId, ":", filtrados);
     setKitsFiltrados(filtrados);
   };
 
@@ -397,14 +423,13 @@ useEffect(() => {
             )}
           </div>
 
-
+          {/*}
           <div className="dashboard-filtro-item" style={{ marginLeft: 'auto' }}>
             <Button className="usuarios-btn-material w-full" onClick={() => setModalAvulsoAberto(true)}>
               Novo Empréstimo
             </Button>
           </div>
-
-
+          {*/}
 
         
       </div>
@@ -596,14 +621,18 @@ useEffect(() => {
 
 
             <div className="usuarios-input-wrapper">
-              <Input
-                type="time"
-                value={horarioDevolucao}
-                onChange={(e) => setHorarioDevolucao(e.target.value)}
-                className="usuarios-modal-input"
-                disabled={modalStatus === 'futuro'}
-              />
-            </div>
+  <select
+    value={horarioDevolucao}
+    onChange={(e) => setHorarioDevolucao(e.target.value)}
+    className="usuarios-modal-select"
+    disabled={modalStatus === 'futuro'}
+  >
+    {opcoesHoraDevolucao.map((hora) => (
+      <option key={hora} value={hora}>{hora}</option>
+    ))}
+  </select>
+</div>
+
 
 
             <select
@@ -667,19 +696,23 @@ useEffect(() => {
               </label>
             </div>
 
-            {usarKit && (
-              <div className="usuarios-input-wrapper mt-2">
-                <select
-                  value={kitSelecionado}
-                  onChange={(e) => setKitSelecionado(e.target.value)}
-                  className="usuarios-modal-select"
-                >
-                  <option value="">Selecione o Kit</option>
-                  {kitsFiltrados.map((k) => renderOptionWithKey(k, 'id', 'nome'))}
+              {usarKit && (
+                <div className="usuarios-input-wrapper mt-2">
+                  <select
+                    value={kitSelecionado}
+                    onChange={(e) => setKitSelecionado(e.target.value)}
+                    className="usuarios-modal-select"
+                  >
+                    <option value="">Selecione o Kit</option>
+                    {kitsFiltrados.map((kit) => (
+                      <option key={kit.id} value={kit.id}>
+                        {kit.numero}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-                </select>
-              </div>
-            )}
 
             <div className="usuarios-modal-actions mt-4">
               <Button variant="outline" onClick={() => setModalAvulsoAberto(false)}>Cancelar</Button>
