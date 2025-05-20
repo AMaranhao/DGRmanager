@@ -299,3 +299,17 @@
   color: #f9fafb; 
 }
 
+.dashboard-modal-success-bg {
+  background-color: #e6ffed;
+  border: 1px solid #b7e4c7;
+}
+
+.dashboard-modal-success-message {
+  background-color: #d1f7d6;
+  color: #1a4d1a;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+}

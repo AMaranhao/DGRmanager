@@ -49,6 +49,8 @@ export default function Agendamentos() {
   const [abaSelecionada, setAbaSelecionada] = useState("porSala");
   const [salaSelecionada, setSalaSelecionada] = useState("");
   const [offsetQuinzena, setOffsetQuinzena] = useState(0);
+  const [modalConfirmacaoAberto, setModalConfirmacaoAberto] = useState(false);
+
 
 
   useEffect(() => {
@@ -897,9 +899,18 @@ const alternarCelulaPorData = (dataISO, hora) => {
                 )}
             </DialogContent>
         </Dialog>
-
-
-
+        <Dialog open={modalConfirmacaoAberto} onOpenChange={setModalConfirmacaoAberto}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close dashboard-modal-success-bg">
+                <DialogTitle>Empréstimo Realizado</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao">
+                O empréstimo foi registrado com sucesso!
+                </DialogDescription>
+                <div className="usuarios-modal-actions mt-4">
+                <Button onClick={() => setModalConfirmacaoAberto(false)}>Fechar</Button>
+                </div>
+            </DialogContent>
+        </Dialog>
   </div>
 );
 

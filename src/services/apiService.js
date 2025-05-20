@@ -32,6 +32,45 @@ export const devolverChave = async (dados) => {
   return await res.json();
 };
 
+export async function createEmprestimo(dados) {
+  const body = {
+    usuarioCPF: dados.cpf,
+    salaId: dados.salaId,
+    agendamentoId: dados.agendamentoId || null,
+    horario_recepcao: dados.horario_recepcao,
+    horario_esperado_devolucao: dados.horario_esperado_devolucao,
+    kitId: dados.kitId || null
+  };
+
+  console.log("📦 Corpo da requisição POST /emprestimos:", body);
+
+
+  const response = await fetch(`${API_URL}/emprestimos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao criar empréstimo");
+  }
+
+  return await response.json();
+}
+
+
+export async function updateEmprestimo(id, dados) {
+  const response = await fetch(`${API_BASE_URL}/emprestimos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados),
+  });
+  if (!response.ok) throw new Error("Erro ao atualizar empréstimo");
+  return response.json();
+}
+
+
+
 // ------------------------
 // AGENDAMENTOS
 // ------------------------
