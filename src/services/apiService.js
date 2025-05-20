@@ -60,14 +60,20 @@ export async function createEmprestimo(dados) {
 
 
 export async function updateEmprestimo(id, dados) {
+  const payload = {
+    horario_devolucao: dados.horario_devolucao,
+  };
+
   const response = await fetch(`${API_URL}/emprestimos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados),
+    body: JSON.stringify(payload),
   });
+
   if (!response.ok) throw new Error("Erro ao atualizar empréstimo");
   return response.json();
 }
+
 
 
 
@@ -427,12 +433,11 @@ export async function validarSenhaAssinatura(cpf, senha) {
   const resposta = await fetch(`${API_URL}/senhaassinatura`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cpf, senha })
+    body: JSON.stringify({ cpf, senha_assinatura: senha })  // <- ESSA LINHA É CRUCIAL
   });
 
   return resposta;
 }
-
 
 
 // ------------------------

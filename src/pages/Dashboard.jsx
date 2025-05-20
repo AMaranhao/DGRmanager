@@ -82,14 +82,6 @@ useEffect(() => {
 //MODIFICANDO O CODIGO A PARTIR DE AGORA
 
 useEffect(() => {
-  if (modalSenhaEmprestimoAberto) {
-    setSenhaDigitada('');
-    setErroSenhaEmprestimo(false);
-  }
-}, [modalSenhaEmprestimoAberto]);
-
-
-useEffect(() => {
   if (modalConfirmacaoAberto) {
     const timeout = setTimeout(() => {
       setModalConfirmacaoAberto(false);
@@ -203,7 +195,6 @@ useEffect(() => {
 
   useEffect(() => {
     if (usarKit && formAvulso.sala?.id) {
-      console.log("Sala atual para buscar kits:", formAvulso.sala?.id);
       carregarKitsPorSala(formAvulso.sala.id);
     } else {
       setKitsFiltrados([]);
@@ -217,36 +208,46 @@ useEffect(() => {
       carregarAndaresPorPredio(formAvulso.predioId);
     }
   }, [modalAvulsoAberto]);
-  //alterando codigo aqui
-  const validarSenhaERegistrarEmprestimo = async () => {
-    setErroSenhaEmprestimo(false);
-  
-    if (!senhaDigitada || senhaDigitada.length !== 4) {
+  //alterando codigo aqui mais uma vez agora mais uma vez
+// substitui todo o bloco pela versão abaixo
+
+const validarSenhaERegistrarEmprestimo = async () => {
+  setErroSenhaEmprestimo(false);
+  if (!senhaDigitada || senhaDigitada.length !== 4) {
+    setErroSenhaEmprestimo(true);
+    return;
+  }
+
+  try {
+    // Detecta se é um agendamento real (com `usuario`) ou um avulso
+    const cpf =
+      agendamentoParaEmprestimo?.usuario?.cpf || agendamentoParaEmprestimo?.cpf;
+
+    const resposta = await validarSenhaAssinatura(cpf, senhaDigitada);
+
+    if (resposta.status !== 200 && resposta.status !== 201) {
       setErroSenhaEmprestimo(true);
       return;
     }
-  
-    try {
-      const resposta = await validarSenhaAssinatura(
-        agendamentoParaEmprestimo.cpf,
-        senhaDigitada
-      );
-  
-      if (resposta.status !== 200 && resposta.status !== 201) {
-        setErroSenhaEmprestimo(true);
-        return;
-      }
-  
+
+    const isDevolucao = agendamentoParaEmprestimo?.retirado === true;
+
+    if (isDevolucao) {
+      await updateEmprestimo(agendamentoParaEmprestimo.id, {
+        horario_devolucao: new Date().toISOString(),
+      });
+    } else {
       await createEmprestimo(agendamentoParaEmprestimo);
-  
-      setModalSenhaEmprestimoAberto(false);
-      setModalConfirmacaoAberto(true);
-    } catch (erro) {
-      console.error("Erro na verificação de senha ou criação do empréstimo:", erro);
-      setErroSenhaEmprestimo(true);
     }
-  };
-  
+
+    setModalSenhaEmprestimoAberto(false);
+    setModalConfirmacaoAberto(true);
+  } catch (erro) {
+    console.error("Erro ao validar senha ou registrar empréstimo:", erro);
+    setErroSenhaEmprestimo(true);
+  }
+};
+
 
   const gerarHorasRedondas = (inicioRaw, fimRaw) => {
     const inicio = new Date(inicioRaw);
@@ -366,9 +367,7 @@ useEffect(() => {
 
   const carregarKitsPorSala = async (salaId) => {
     const dados = await fetchKits();
-    console.log("Todos os kits retornados:", dados);
     const filtrados = dados.filter(k => k.sala?.id === Number(salaId));
-    console.log("Kits filtrados para sala", salaId, ":", filtrados);
     setKitsFiltrados(filtrados);
   };
 
@@ -619,18 +618,19 @@ useEffect(() => {
                         const agendamento = agHoraAtual[0];
                         const retirado = agendamento.retirado === true || agendamento.retirado === 'true';
                       
-                        if (retirado) {
-                          abrirModal(agendamento); // PUT - Receber
-                        } else {
-                          // POST - Emprestar com senha
-                          setAgendamentoParaEmprestimo(agendamento);
-                          setModalSenhaEmprestimoAberto(true);
-                        }
-                      } else {
+                        const payload = {
+                          ...agendamento,
+                          retirado: retirado, // usado para decidir se é PUT ou POST
+                        };
+                      
+                        setAgendamentoParaEmprestimo(payload);
+                        setModalSenhaEmprestimoAberto(true);
+                      }
+                      else {
                         abrirModalNovoEmprestimo(sala, agProximaHora.length > 0 ? 'futuro' : 'livre');
                       }
-                      
                     }}
+                    
                     className={tileClass}
                   >
                     <div className="dashboard-sala">
@@ -651,38 +651,8 @@ useEffect(() => {
             <span className="legenda-item"><span className="legenda-cor passado"></span> Sala Disponível</span>
             <span className="legenda-item"><span className="legenda-cor futuro"></span> Sala Disponível apenas até próximo horário</span>
         </div>
-
-        <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-          <DialogOverlay className="dialog-overlay" />
-          <DialogContent className={`dashboard-modal dashboard-no-close ${mensagemSucesso ? 'dashboard-modal-success-bg' : ''}`}>
-            <DialogTitle>Confirmação de Senha</DialogTitle>
-            <DialogDescription>Digite a senha de 4 dígitos.</DialogDescription>
-            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-
-            {!mensagemSucesso && (
-              <>
-                <Input
-                  type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Senha de 4 dígitos"
-                  maxLength={4}
-                  className="dashboard-modal-input"
-                />
-                {erroSenha && <div className="dashboard-modal-error">Senha inválida. Digite exatamente 4 dígitos.</div>}
-              </>
-            )}
-
-            {mensagemSucesso && <div className="dashboard-modal-success-message">{mensagemSucesso}</div>}
-
-            {!mensagemSucesso && (
-              <div className="dashboard-modal-actions">
-                <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+{/* alterando codigo*/}
+        
       
 
       {/* Modal de Empréstimo Avulso */}
