@@ -42,7 +42,7 @@ export async function createEmprestimo(dados) {
     kitId: dados.kitId || null
   };
 
-  console.log("📦 Corpo da requisição POST /emprestimos:", body);
+  //console.log("📦 Corpo da requisição POST /emprestimos:", body);
 
 
   const response = await fetch(`${API_URL}/emprestimos`, {
@@ -60,7 +60,7 @@ export async function createEmprestimo(dados) {
 
 
 export async function updateEmprestimo(id, dados) {
-  const response = await fetch(`${API_BASE_URL}/emprestimos/${id}`, {
+  const response = await fetch(`${API_URL}/emprestimos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dados),
@@ -422,6 +422,16 @@ export const fetchUsuarioLogado = async () => {
   return res.json();
 };
 
+
+export async function validarSenhaAssinatura(cpf, senha) {
+  const resposta = await fetch(`${API_URL}/senhaassinatura`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cpf, senha })
+  });
+
+  return resposta;
+}
 
 
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createEmprestimo, updateEmprestimo, fetchTiposSala, fetchAgendamentos, fetchAgendamentosEmprestimos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
+import { validarSenhaAssinatura, createEmprestimo, updateEmprestimo, fetchTiposSala, fetchAgendamentos, fetchAgendamentosEmprestimos, fetchPredios, fetchAndaresPorPredio, fetchSalas, fetchKits } from '../services/apiService';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,11 @@ export default function Dashboard() {
   const [opcoesHoraDevolucao, setOpcoesHoraDevolucao] = useState([]);
   const [mensagemErroEmprestimo, setMensagemErroEmprestimo] = useState('');
   const [modalConfirmacaoAberto, setModalConfirmacaoAberto] = useState(false);
+  const [modalSenhaEmprestimoAberto, setModalSenhaEmprestimoAberto] = useState(false);
+  const [senhaDigitada, setSenhaDigitada] = useState('');
+  const [erroSenhaEmprestimo, setErroSenhaEmprestimo] = useState(false);
+  const [agendamentoParaEmprestimo, setAgendamentoParaEmprestimo] = useState(null);
+
 
   const [usuarioAvulso, setUsuarioAvulso] = useState('');
   const [tipoSala, setTipoSala] = useState('');
@@ -77,6 +82,14 @@ useEffect(() => {
 //MODIFICANDO O CODIGO A PARTIR DE AGORA
 
 useEffect(() => {
+  if (modalSenhaEmprestimoAberto) {
+    setSenhaDigitada('');
+    setErroSenhaEmprestimo(false);
+  }
+}, [modalSenhaEmprestimoAberto]);
+
+
+useEffect(() => {
   if (modalConfirmacaoAberto) {
     const timeout = setTimeout(() => {
       setModalConfirmacaoAberto(false);
@@ -85,6 +98,19 @@ useEffect(() => {
     return () => clearTimeout(timeout); // limpa se desmontar antes do tempo
   }
 }, [modalConfirmacaoAberto]);
+
+useEffect(() => {
+  if (modalSenhaEmprestimoAberto) {
+    setSenhaDigitada('');
+    setErroSenhaEmprestimo(false);
+  }
+}, [modalSenhaEmprestimoAberto]);
+
+useEffect(() => {
+  if (modalAvulsoAberto && formAvulso.predioId) {
+    carregarAndaresPorPredio(formAvulso.predioId);
+  }
+}, [modalAvulsoAberto]);
 
 
 useEffect(() => {
@@ -191,6 +217,35 @@ useEffect(() => {
       carregarAndaresPorPredio(formAvulso.predioId);
     }
   }, [modalAvulsoAberto]);
+  //alterando codigo aqui
+  const validarSenhaERegistrarEmprestimo = async () => {
+    setErroSenhaEmprestimo(false);
+  
+    if (!senhaDigitada || senhaDigitada.length !== 4) {
+      setErroSenhaEmprestimo(true);
+      return;
+    }
+  
+    try {
+      const resposta = await validarSenhaAssinatura(
+        agendamentoParaEmprestimo.cpf,
+        senhaDigitada
+      );
+  
+      if (resposta.status !== 200 && resposta.status !== 201) {
+        setErroSenhaEmprestimo(true);
+        return;
+      }
+  
+      await createEmprestimo(agendamentoParaEmprestimo);
+  
+      setModalSenhaEmprestimoAberto(false);
+      setModalConfirmacaoAberto(true);
+    } catch (erro) {
+      console.error("Erro na verificação de senha ou criação do empréstimo:", erro);
+      setErroSenhaEmprestimo(true);
+    }
+  };
   
 
   const gerarHorasRedondas = (inicioRaw, fimRaw) => {
@@ -561,10 +616,20 @@ useEffect(() => {
                     key={sala.id}
                     onClick={() => {
                       if (agHoraAtual.length > 0) {
-                        abrirModal(agHoraAtual[0]);
+                        const agendamento = agHoraAtual[0];
+                        const retirado = agendamento.retirado === true || agendamento.retirado === 'true';
+                      
+                        if (retirado) {
+                          abrirModal(agendamento); // PUT - Receber
+                        } else {
+                          // POST - Emprestar com senha
+                          setAgendamentoParaEmprestimo(agendamento);
+                          setModalSenhaEmprestimoAberto(true);
+                        }
                       } else {
                         abrirModalNovoEmprestimo(sala, agProximaHora.length > 0 ? 'futuro' : 'livre');
                       }
+                      
                     }}
                     className={tileClass}
                   >
@@ -766,43 +831,69 @@ useEffect(() => {
             <div className="usuarios-modal-actions mt-4">
               <Button variant="outline" onClick={() => setModalAvulsoAberto(false)}>Cancelar</Button>
               <Button
-                onClick={async () => {
+                onClick={() => {
                   setMensagemErroEmprestimo('');
-                  try {
-                    await createEmprestimo({
-                      cpf: usuarioAvulso,
-                      salaId: sala,
-                      kitId: usarKit ? kitSelecionado : null,
-                      agendamentoId: modalStatus === 'emprestar' ? agendamentoSelecionado?.id || null : null,
-                      horario_recepcao: `${new Date().toISOString().slice(0,10)}T${horarioRetirada}:00`,
-                      horario_esperado_devolucao: `${new Date().toISOString().slice(0,10)}T${horarioDevolucao}:00`
-                    });
-                    setModalAvulsoAberto(false);
-                    setModalConfirmacaoAberto(true);
-                  } catch (e) {
-                    console.error("Erro ao criar empréstimo:", e);
-                    setMensagemErroEmprestimo("Erro ao criar empréstimo. Verifique os campos e tente novamente.");
-                  }
-                }}
-               >
+
+                  const payload = {
+                    cpf: usuarioAvulso,
+                    salaId: sala,
+                    kitId: usarKit ? kitSelecionado : null,
+                    agendamentoId: modalStatus === 'emprestar' ? agendamentoSelecionado?.id || null : null,
+                    horario_recepcao: `${new Date().toISOString().slice(0,10)}T${horarioRetirada}:00`,
+                    horario_esperado_devolucao: `${new Date().toISOString().slice(0,10)}T${horarioDevolucao}:00`
+                  };
+
+                  setAgendamentoParaEmprestimo(payload);
+                  setModalAvulsoAberto(false);
+                  setModalSenhaEmprestimoAberto(true);
+                  }}
+                  >
                 Confirmar Empréstimo
               </Button>
+
 
 
             </div>
           </DialogContent>
 
-        </Dialog>
-        <Dialog open={modalConfirmacaoAberto} onOpenChange={setModalConfirmacaoAberto}>
-          <DialogOverlay className="dialog-overlay" />
-          <DialogContent className="dashboard-modal dashboard-no-close">
-            <DialogTitle>Empréstimo Confirmado</DialogTitle>
-            <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">
-            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-                O empréstimo foi registrado com sucesso!
-            </DialogDescription>
-          </DialogContent>
-        </Dialog>
+          <Dialog open={modalSenhaEmprestimoAberto} onOpenChange={setModalSenhaEmprestimoAberto}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close">
+              <DialogTitle>Confirmação de Senha</DialogTitle>
+              <DialogDescription>Digite a senha de 4 dígitos</DialogDescription>
+              <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+
+              <Input
+                type="password"
+                value={senhaDigitada}
+                onChange={(e) => setSenhaDigitada(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    validarSenhaERegistrarEmprestimo();
+                  }
+                }}
+                maxLength={4}
+                className="dashboard-modal-input"
+              />
+
+              {erroSenhaEmprestimo && (
+                <div className="dashboard-modal-error">
+                  Senha inválida. Tente novamente.
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+          </Dialog>
+            <Dialog open={modalConfirmacaoAberto} onOpenChange={setModalConfirmacaoAberto}>
+              <DialogOverlay className="dialog-overlay" />
+              <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Empréstimo Confirmado</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">
+                <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+                    O empréstimo foi registrado com sucesso!
+                </DialogDescription>
+            </DialogContent>
+          </Dialog>
 
       
     </div>
