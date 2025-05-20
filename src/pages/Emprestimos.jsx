@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchEmprestimos } from "../services/apiService";
+import { validarSenhaAssinatura, updateEmprestimo, fetchEmprestimos } from "../services/apiService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -28,13 +28,16 @@ export default function Emprestimos() {
   const [mensagemSucesso, setMensagemSucesso] = useState('');
 
 
+  const carregarEmprestimos = async () => {
+    const dados = await fetchEmprestimos();
+    setEmprestimos(dados);
+  };
+  
   useEffect(() => {
-    const carregarEmprestimos = async () => {
-      const dados = await fetchEmprestimos();
-      setEmprestimos(dados);
-    };
     carregarEmprestimos();
   }, []);
+  
+    
 
   const abrirModalConfirmacao = (emprestimo) => {
     setEmprestimoSelecionado(emprestimo);
@@ -257,10 +260,12 @@ export default function Emprestimos() {
             <div className="usuarios-modal-actions mt-4">
               <Button variant="outline" onClick={() => setModalConfirmacao(false)}>Cancelar</Button>
               <Button onClick={() => {
-                setModalConfirmacao(false);
-                setModalSenhaAberto(true);
-              }}>
-                Confirmar Devolução
+                  setModalConfirmacao(false);
+                  setErroSenha(false);
+                  setSenha('');
+                  setModalSenhaAberto(true);
+                }}>
+                  Confirmar
               </Button>
             </div>
           </DialogContent>
@@ -276,37 +281,60 @@ export default function Emprestimos() {
                 <DialogDescription>Insira a senha de 4 dígitos para confirmar a devolução.</DialogDescription>
                 <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-                <Input
-                  type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  maxLength={4}
-                  placeholder="Senha de 4 dígitos"
-                  className="dashboard-modal-input"
-                />
-                {erroSenha && <div className="dashboard-modal-error">Senha inválida.</div>}
-                {mensagemSucesso && <div className="dashboard-modal-success-message">{mensagemSucesso}</div>}
+                  <Input
+                    type="password"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    maxLength={4}
+                    placeholder="Senha de 4 dígitos"
+                    className="dashboard-modal-input"
+                    onKeyDown={async (e) => {
+                      if (e.key === 'Enter') {
+                        if (senha.length !== 4) {
+                          setErroSenha(true);
+                          return;
+                        }
 
-                <div className="dashboard-modal-actions">
-                  <Button variant="outline" onClick={() => setModalSenhaAberto(false)}>Cancelar</Button>
-                  <Button onClick={() => {
-                    if (senha.length === 4) {
-                      setMensagemSucesso('Devolução registrada com sucesso!');
-                      setErroSenha(false);
-                      setTimeout(() => {
-                        setModalSenhaAberto(false);
-                        setMensagemSucesso('');
-                        setSenha('');
-                      }, 2000);
-                    } else {
-                      setErroSenha(true);
-                    }
-                  }}>Confirmar</Button>
-                </div>
+                        try {
+                          const resposta = await validarSenhaAssinatura(emprestimoSelecionado.usuario.cpf, senha);
+                          if (resposta.status !== 200 && resposta.status !== 201) {
+                            setErroSenha(true);
+                            return;
+                          }
+
+                          await updateEmprestimo(emprestimoSelecionado.id, {
+                            horario_devolucao: new Date().toISOString(),
+                          });
+
+                          setMensagemSucesso('Devolução registrada com sucesso!');
+                          setErroSenha(false);
+                          setTimeout(() => {
+                            setModalSenhaAberto(false);
+                            setMensagemSucesso('');
+                            setSenha('');
+                          }, 2000);
+                        } catch (error) {
+                          console.error('Erro ao registrar devolução:', error);
+                          setErroSenha(true);
+                        }
+                      }
+                    }}
+                  />
               </DialogContent>
             </Dialog>
         )}  
-
+          <Dialog open={mensagemSucesso !== ''} onOpenChange={(open) => {
+              if (!open) setMensagemSucesso('');
+            }}>
+              <DialogOverlay className="dialog-overlay" />
+              <DialogContent className="dashboard-modal dashboard-no-close">
+                <DialogTitle>Devolução Confirmada</DialogTitle>
+                <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">
+                  <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+                  {mensagemSucesso}
+                </DialogDescription>
+              </DialogContent>
+          </Dialog>
     </div>
 
     
