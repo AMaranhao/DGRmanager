@@ -418,6 +418,41 @@ export const desativarUsuario = async (id, novoStatusAtivo) => {
   return res.json();
 };
 
+export const updateUsuarioSenha = async (id, novaSenha) => {
+  const res = await fetch(`${API_URL}/usuarios/${id}/senha`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senha: novaSenha }),
+  });
+
+  if (!res.ok) throw new Error('Erro ao atualizar senha do usuário');
+  return res.json();
+};
+
+export const updateUsuarioSenhaAssinatura = async (id, novaSenhaAssinatura) => {
+  const res = await fetch(`${API_URL}/usuarios/${id}/senha-assinatura`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senhaassassinatura: novaSenhaAssinatura }),
+  });
+
+  if (!res.ok) throw new Error('Erro ao atualizar senha de assinatura');
+  return res.json();
+};
+
+export const updateUsuarioAtivo = async (id, novoStatusAtivo) => {
+  const res = await fetch(`${API_URL}/usuarios/${id}/estaativo`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ esta_ativo: novoStatusAtivo }),
+  });
+  if (!res.ok) throw new Error('Erro ao alterar status do usuário');
+  return res.json();
+};
+
+
+
+
 // ------------------------
 // 👤 USUÁRIO LOGADO
 // ------------------------

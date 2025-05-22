@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog,DialogTrigger,DialogContent,DialogTitle,DialogDescription,DialogOverlay,} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { fetchUsuarios,criarUsuario,desativarUsuario, fetchCursos, fetchCargos} from "@/services/apiService";
+import {
+  fetchUsuarios,
+  criarUsuario,
+  fetchCursos,
+  fetchCargos,
+  updateUsuarioSenha,
+  updateUsuarioSenhaAssinatura,
+  updateUsuarioAtivo
+} from "@/services/apiService";
 import { Trash, X } from "lucide-react";
 
 import "@/styles/pages/usuarios.css";
@@ -13,14 +21,12 @@ import "@/styles/pages/modals.css";
 import "@/styles/pages/status.css";
 import '@/styles/mobile.css';
 
-
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [formUsuario, setFormUsuario] = useState({
     firstName: "",
     lastName: "",
-    username: "",
     email: "",
     cpf: "",
     matricula: "",
@@ -31,13 +37,16 @@ export default function Usuarios() {
     cargo: ""
   });
 
-  const [cursos, setCursos] = useState([]);
-  const [cargos, setCargos] = useState([]);
-  const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
-  const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+const [cursos, setCursos] = useState([]);
+const [cargos, setCargos] = useState([]);
+const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
+const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+const [erroFormulario, setErroFormulario] = useState("");
+const [filtroTexto, setFiltroTexto] = useState("");
+const [filtroStatus, setFiltroStatus] = useState("");
 
-  const [filtroTexto, setFiltroTexto] = useState("");
-  const [filtroStatus, setFiltroStatus] = useState("");
+
+
 
   useEffect(() => {
     carregarUsuarios();
@@ -56,7 +65,6 @@ export default function Usuarios() {
     const {
       firstName,
       lastName,
-      username,
       email,
       cpf,
       matricula,
@@ -70,35 +78,34 @@ export default function Usuarios() {
     if (
       !firstName.trim() ||
       !lastName.trim() ||
-      !username.includes('@') ||
       !email.includes('@') ||
       !cpf.trim() ||
       !matricula.trim()
     ) {
-      alert('Preencha todos os campos obrigatórios corretamente.');
+      setErroFormulario("Preencha todos os campos obrigatórios corretamente.");
       return;
     }
   
     const payload = {
       firstName,
       lastName,
-      username,
       email,
-      cpf: cpf.replace(/\D/g, ""), // Apenas números no CPF
+      cpf: cpf.replace(/\D/g, ""), 
       matricula,
       telefone,
       senha,
       senhaAssinatura,
-      curso: curso ? { id: Number(curso) } : null,
-      cargo: cargo ? { id: Number(cargo) } : null,
+      cursoId: typeof curso === 'object' ? curso?.id : curso || null,
+      cargoId: typeof cargo === 'object' ? cargo?.id : cargo || null,              
     };
   
     await criarUsuario(payload);
   
+    setErroFormulario("");
+
     setFormUsuario({
       firstName: "",
       lastName: "",
-      username: "",
       email: "",
       cpf: "",
       matricula: "",
@@ -121,12 +128,26 @@ export default function Usuarios() {
 
   const confirmarAtivarDesativar = async () => {
     if (usuarioSelecionado) {
-      await desativarUsuario(usuarioSelecionado.id, !usuarioSelecionado.ativo);
-      setConfirmarModalAberto(false);
-      setUsuarioSelecionado(null);
-      carregarUsuarios();
+      const novoStatus = !usuarioSelecionado.ativo;
+      console.log("Enviando para o endpoint:", {
+        id: usuarioSelecionado.id,
+        ativo: novoStatus
+      });
+  
+      try {
+        const resposta = await updateUsuarioAtivo(usuarioSelecionado.id, novoStatus);
+        console.log("Resposta da API:", resposta);
+        setConfirmarModalAberto(false);
+        setUsuarioSelecionado(null);
+        carregarUsuarios();
+      } catch (error) {
+        console.error("Erro ao atualizar status do usuário:", error);
+        alert("Erro ao atualizar status do usuário.");
+      }
     }
   };
+  
+  
 
   const usuariosFiltrados = usuarios.filter((usuario) => {
     const atendeTexto =
@@ -218,7 +239,7 @@ export default function Usuarios() {
             <div className="usuarios-input-wrapper">
               <Input
                 type="text"
-                placeholder="Sobrenome"
+                placeholder="Último Nome (Sobrenome)"
                 value={formUsuario.lastName}
                 onChange={(e) => setFormUsuario({ ...formUsuario, lastName: e.target.value })}
                 className="usuarios-modal-input"
@@ -230,22 +251,8 @@ export default function Usuarios() {
               )}
             </div>
 
-            {/* Username e email */}
-            <div className="usuarios-input-wrapper">
-              <Input
-                type="email"
-                placeholder="Usuário (Username)"
-                value={formUsuario.username}
-                onChange={(e) => setFormUsuario({ ...formUsuario, username: e.target.value })}
-                className="usuarios-modal-input"
-              />
-              {formUsuario.username && (
-                <button onClick={() => setFormUsuario({ ...formUsuario, username: "" })} className="dashboard-filtro-clear" title="Limpar">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
+            {/* email */}
+            
             <div className="usuarios-input-wrapper">
               <Input
                 type="email"
@@ -346,6 +353,12 @@ export default function Usuarios() {
             <div className="usuarios-modal-actions">
               <Button onClick={handleSalvarUsuario}>Salvar</Button>
             </div>
+
+            {erroFormulario && (
+              <div className="dashboard-modal-error">
+                {erroFormulario}
+              </div>
+            )}
           </DialogContent>
         </Dialog>
 
@@ -388,7 +401,7 @@ export default function Usuarios() {
 
         </table>
       </div>
-      {modalAberto && (
+      {confirmarModalAberto && (
       <Dialog open={confirmarModalAberto} onOpenChange={setConfirmarModalAberto}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className="dashboard-modal dashboard-no-close">
