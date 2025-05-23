@@ -308,11 +308,14 @@ export default function Emprestimos() {
 
                           setMensagemSucesso('Devolução registrada com sucesso!');
                           setErroSenha(false);
+                          setModalSenhaAberto(false); // Fecha o modal de senha imediatamente
+                          setSenha('');
+
                           setTimeout(() => {
-                            setModalSenhaAberto(false);
                             setMensagemSucesso('');
-                            setSenha('');
+                            carregarEmprestimos(); // opcional: recarrega lista após sucesso
                           }, 2000);
+
                         } catch (error) {
                           console.error('Erro ao registrar devolução:', error);
                           setErroSenha(true);

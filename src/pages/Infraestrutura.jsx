@@ -21,6 +21,9 @@ import '@/styles/mobile.css';
 export default function Infraestrutura() {
   const [tab, setTab] = useState('predios');
   const [modalAberto, setModalAberto] = useState(false);
+  const [modalAcaoConfirmadaAberto, setModalAcaoConfirmadaAberto] = useState(false);
+  const [tituloAcaoConfirmada, setTituloAcaoConfirmada] = useState('');
+
 
   // Estados para Prédios
   const [predios, setPredios] = useState([]);
@@ -56,6 +59,7 @@ export default function Infraestrutura() {
   const [buscaChaveSala, setBuscaChaveSala] = useState('');
   const [buscaKitsSala, setBuscaKitsSala] = useState('');
   const [confirmarExclusao, setConfirmarExclusao] = useState({ tipo: '', id: null });
+  
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
   
@@ -129,10 +133,15 @@ useEffect(() => {
     if (tipo === 'predio') {
       if (editandoPredio) await updatePredio(editandoPredio, formPredio);
       else await createPredio(formPredio);
+      
       setModalPredioAberto(false);
       setFormPredio({ nome: '', endereco: '', telefone: '' });
       setEditandoPredio(null);
       setPredios(await fetchPredios());
+      
+      setTituloAcaoConfirmada(editandoPredio ? 'Prédio Editado' : 'Prédio Cadastrado');
+      setModalAcaoConfirmadaAberto(true);
+
     } else if (tipo === 'sala') {
       const dados = {
         numero: formSala.numero,
@@ -153,6 +162,9 @@ useEffect(() => {
       setFormSala({ numero: '', tipo: '', lotacao: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });
       setEditandoSala(null);
       setSalas(await fetchSalas());
+
+      setTituloAcaoConfirmada(editandoSala ? 'Sala Editada' : 'Sala Cadastrada');
+      setModalAcaoConfirmadaAberto(true);  
     }
     
     else if (tipo === 'chave') {
@@ -172,6 +184,9 @@ useEffect(() => {
       setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null });
       setEditandoChave(null);
       setChaves(await fetchChaves());
+
+      setTituloAcaoConfirmada(editandoChave ? 'Chave Editada' : 'Chave Cadastrada');
+      setModalAcaoConfirmadaAberto(true);      
     }
     
     else if (tipo === 'kit') {
@@ -192,6 +207,9 @@ useEffect(() => {
     setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' });
     setEditandoKit(null);
     setKits(await fetchKits());
+
+    setTituloAcaoConfirmada(editandoKit ? 'Kit Editado' : 'Kit Cadastrado');
+    setModalAcaoConfirmadaAberto(true);    
   }
   
   };
@@ -226,14 +244,23 @@ const confirmarExclusaoItem = async () => {
       await deleteKit(confirmarExclusao.id);
       setKits(await fetchKits());
     }
-
-    setMensagemSucesso("Item excluído com sucesso!");
-
-    setTimeout(() => {
-      setModalConfirmarAberto(false);
-      setMensagemSucesso("");
+//alterando codigo aqui
+      setModalConfirmarAberto(false); // fecha imediatamente
       setConfirmarExclusao({ tipo: '', id: null });
-    }, 2000);
+
+      // Aguarda 100ms para evitar sobreposição
+      setTimeout(() => {
+        if (confirmarExclusao.tipo === 'predio') {
+          setTituloAcaoConfirmada('Prédio Excluído');
+        } else if (confirmarExclusao.tipo === 'sala') {
+          setTituloAcaoConfirmada('Sala Excluída');
+        } else if (confirmarExclusao.tipo === 'chave') {
+          setTituloAcaoConfirmada('Chave Excluída');
+        } else if (confirmarExclusao.tipo === 'kit') {
+          setTituloAcaoConfirmada('Kit Excluído');
+        }        setModalAcaoConfirmadaAberto(true);
+      }, 100);
+    
   } catch (error) {
     console.error("Erro ao excluir:", error);
   }
@@ -1024,6 +1051,16 @@ const handleEditarKit = async (kit) => {
         </TabsContent>
 
       </Tabs>
+      <Dialog open={modalAcaoConfirmadaAberto} onOpenChange={setModalAcaoConfirmadaAberto}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+          <DialogTitle>{tituloAcaoConfirmada}</DialogTitle>
+          <DialogDescription className="dashboard-modal-success-message">
+            Ação realizada com sucesso!
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

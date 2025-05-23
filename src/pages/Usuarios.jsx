@@ -44,6 +44,10 @@ const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
 const [erroFormulario, setErroFormulario] = useState("");
 const [filtroTexto, setFiltroTexto] = useState("");
 const [filtroStatus, setFiltroStatus] = useState("");
+const [mensagemSucesso, setMensagemSucesso] = useState('');
+const [tituloSucesso, setTituloSucesso] = useState('');
+
+
 
 
 
@@ -117,6 +121,12 @@ const [filtroStatus, setFiltroStatus] = useState("");
     });
   
     setModalAberto(false);
+    setTituloSucesso("Usuário Cadastrado");
+    setMensagemSucesso("Usuário criado com sucesso!");
+    setTimeout(() => {
+      setMensagemSucesso('');
+    }, 2000);
+
     carregarUsuarios();
   };
   
@@ -140,6 +150,11 @@ const [filtroStatus, setFiltroStatus] = useState("");
         setConfirmarModalAberto(false);
         setUsuarioSelecionado(null);
         carregarUsuarios();
+        setTituloSucesso(usuarioSelecionado.ativo ? "Usuário Desativado" : "Usuário Ativado");
+        setMensagemSucesso(`Usuário ${usuarioSelecionado.ativo ? 'desativado' : 'ativado'} com sucesso!`);
+        setTimeout(() => {
+          setMensagemSucesso('');
+        }, 2000);
       } catch (error) {
         console.error("Erro ao atualizar status do usuário:", error);
         alert("Erro ao atualizar status do usuário.");
@@ -427,6 +442,18 @@ const [filtroStatus, setFiltroStatus] = useState("");
         </DialogContent>
       </Dialog>
       )}
+      <Dialog open={mensagemSucesso !== ''} onOpenChange={(open) => {
+        if (!open) setMensagemSucesso('');
+        }}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <DialogTitle>{tituloSucesso || "Ação Confirmada"}</DialogTitle>
+          <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+            {mensagemSucesso}
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
