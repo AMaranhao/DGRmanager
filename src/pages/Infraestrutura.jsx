@@ -59,10 +59,30 @@ export default function Infraestrutura() {
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
   
-
+/*
   useEffect(() => {
     carregarTudo();
   }, []);
+*/
+
+useEffect(() => {
+  const carregarDadosDaAba = async () => {
+    if (tab === 'predios') {
+      setPredios(await fetchPredios());
+    } else if (tab === 'salas') {
+      setSalas(await fetchSalas());
+      setTiposSala(await fetchTiposSala());
+    } else if (tab === 'chaves') {
+      setChaves(await fetchChaves());
+    } else if (tab === 'kits') {
+      setKits(await fetchKits());
+    }
+  };
+
+  carregarDadosDaAba();
+}, [tab]);
+
+
 
   useEffect(() => {
     if (modalSalaAberto && formSala.predioId) {
@@ -114,27 +134,66 @@ export default function Infraestrutura() {
       setEditandoPredio(null);
       setPredios(await fetchPredios());
     } else if (tipo === 'sala') {
-      if (editandoSala) await updateSala(editandoSala, formSala);
-      else await createSala(formSala);
+      const dados = {
+        numero: formSala.numero,
+        tipoId: formSala.tipo?.id,
+        andarId: formSala.andar?.id,
+        ocupada: formSala.ocupada,
+        esta_ativa: formSala.esta_ativa,
+        lotacao: formSala.lotacao
+      };
+    
+      if (editandoSala) {
+        await updateSala(editandoSala, dados);
+      } else {
+        await createSala(dados);
+      }
+    
       setModalSalaAberto(false);
-      setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });
+      setFormSala({ numero: '', tipo: '', lotacao: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });
       setEditandoSala(null);
       setSalas(await fetchSalas());
-    } else if (tipo === 'chave') {
-      if (editandoChave) await updateChave(editandoChave, formChave);
-      else await createChave(formChave);
+    }
+    
+    else if (tipo === 'chave') {
+      const dados = {
+        numero: formChave.numero,
+        numeracaoArmario: formChave.numeracaoArmario,
+        salaId: formChave.sala?.id
+      };
+    
+      if (editandoChave) {
+        await updateChave(editandoChave, dados);
+      } else {
+        await createChave(dados);
+      }
+    
       setModalChaveAberto(false);
-      setFormChave({ numero: '', numeracaoArmario: '', salaId: '' });
+      setFormChave({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null });
       setEditandoChave(null);
       setChaves(await fetchChaves());
-    } else if (tipo === 'kit') {
-      if (editandoKit) await updateKit(editandoKit, formKit);
-      else await createKit(formKit);
-      setModalKitAberto(false);
-      setFormKit({ numero: '', numeracaoArmario: '', salaId: '' });
-      setEditandoKit(null);
-      setKits(await fetchKits());
     }
+    
+    else if (tipo === 'kit') {
+    const dados = {
+      numero: formKit.numero,
+      numeracaoArmario: formKit.numeracaoArmario,
+      tipo: formKit.tipo,
+      salaId: formKit.sala?.id
+    };
+  
+    if (editandoKit) {
+      await updateKit(editandoKit, dados);
+    } else {
+      await createKit(dados);
+    }
+  
+    setModalKitAberto(false);
+    setFormKit({ numero: '', numeracaoArmario: '', predioId: '', andarId: '', sala: null, tipo: '' });
+    setEditandoKit(null);
+    setKits(await fetchKits());
+  }
+  
   };
   
   const handleEditarPredio = (predio) => {
@@ -181,43 +240,87 @@ const confirmarExclusaoItem = async () => {
 };
 
 
-  const handleEditarSala = (sala) => {
-    setEditandoSala(sala.id);
-    setFormSala({
-      numero: sala.numero || '',
-      tipo: sala.tipo || null,
-      ocupada: sala.ocupada || false,
-      esta_ativa: sala.esta_ativa ?? true,
-      predioId: sala.predioId || '',
-      andar: sala.andar || null
-    });
-    setModalSalaAberto(true);
-  };
+const handleEditarSala = (sala) => {
+  setEditandoSala(sala.id);
 
-  const handleEditarChave = (chave) => {
-    setEditandoChave(chave.id);
-    setFormChave({
-      numero: chave.numero || '',
-      numeracaoArmario: chave.numeracaoArmario || '',
-      predioId: chave.predioId || '',
-      andarId: chave.andarId || '',
-      sala: chave.sala?.id ? chave.sala : null,
-    });
-    setModalChaveAberto(true);
-  };
+  setFormSala({
+    numero: sala.numero || '',
+    tipo: sala.tipo || null,
+    lotacao: sala.lotacao || '',
+    ocupada: sala.ocupada ?? false,
+    esta_ativa: sala.esta_ativa ?? true,
+    predioId: sala.andar?.predio?.id?.toString() || '',
+    andar: sala.andar || null
+  });
 
-  const handleEditarKit = (kit) => {
-    setEditandoKit(kit.id);
-    setFormKit({
-      numero: kit.sala?.numero || '',
-      numeracaoArmario: kit.numeracaoArmario || '',
-      predioId: kit.predioId || '',
-      andarId: kit.andarId || '',
-      sala: kit.sala || null,
-      tipo: kit.tipo || ''
-    });
-    setModalKitAberto(true);
-  };
+  if (sala.andar?.predio?.id) {
+    carregarAndaresPorPredio(sala.andar.predio.id);
+  }
+
+  setModalSalaAberto(true);
+};
+
+
+const handleEditarChave = async (chave) => {
+  const andarId = chave.sala?.andar?.id || '';
+  const predioId = chave.sala?.andar?.predio?.id || '';
+
+  // Carrega todas as salas e aguarda
+  const todasAsSalas = await fetchSalas();
+  setSalas(todasAsSalas);
+
+  // Carrega andares
+  await carregarAndaresPorPredio(predioId);
+
+  // Só depois filtra as salas corretas
+  const filtradas = todasAsSalas.filter(s => s.andar?.id === Number(andarId));
+  setSalasFiltradas(filtradas);
+
+  // Preenche o formulário
+  setEditandoChave(chave.id);
+  setFormChave({
+    numero: chave.numero || '',
+    numeracaoArmario: chave.numeracao_armario || '',
+    predioId,
+    andarId,
+    sala: chave.sala || null,
+  });
+
+  setModalChaveAberto(true);
+};
+
+
+
+
+
+
+const handleEditarKit = async (kit) => {
+  const andarId = kit.sala?.andar?.id || '';
+  const predioId = kit.sala?.andar?.predio?.id || '';
+
+  // Garante que todas as salas estejam carregadas
+  const todasAsSalas = await fetchSalas();
+  setSalas(todasAsSalas);
+
+  // Preenche os campos
+  setEditandoKit(kit.id);
+  setFormKit({
+    numero: kit.numero || '',
+    numeracaoArmario: kit.numeracao_armario || '',
+    predioId,
+    andarId,
+    sala: kit.sala || null,
+    tipo: kit.tipo || ''
+  });
+
+  // Carrega os andares e salas relacionadas
+  await carregarAndaresPorPredio(predioId);
+  carregarSalasPorAndar(andarId);
+
+  setModalKitAberto(true);
+};
+
+
 
   return (
     <div className="dashboard-wrapper">
@@ -411,7 +514,7 @@ const confirmarExclusaoItem = async () => {
                   className="usuarios-btn-material"
                   onClick={() => {
                     setEditandoSala(null);
-                    setFormSala({ numero: '', tipo: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });}}>
+                    setFormSala({ numero: '', tipo: '', lotacao: '', ocupada: false, esta_ativa: true, predioId: '', andarId: '' });}}>
                   Cadastrar Sala
                 </Button>
               </DialogTrigger>
@@ -715,7 +818,7 @@ const confirmarExclusaoItem = async () => {
                   .map((chave) => (
                     <tr key={chave.id}>
                       <td>{chave.numero}</td>
-                      <td>{chave.numeracaoArmario}</td>
+                      <td>{chave.numeracao_armario}</td>
                       <td>{chave.sala?.numero || ''}</td>
                       <td className="tabela-col-acoes">
                         <Button variant="outline" onClick={() => handleEditarChave(chave)}>Editar</Button>
@@ -906,7 +1009,7 @@ const confirmarExclusaoItem = async () => {
                   .map((kit) => (
                     <tr key={kit.id}>
                       <td>{kit.sala?.numero}</td>
-                      <td>{kit.numeracaoArmario}</td>
+                      <td>{kit.numeracao_armario}</td>
                       <td>{kit.sala?.numero || ''}</td>
                       <td>{kit.tipo}</td>
                       <td className="tabela-col-acoes">
