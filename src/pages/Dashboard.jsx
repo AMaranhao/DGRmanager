@@ -52,7 +52,11 @@ export default function Dashboard() {
   const [salasFiltradas, setSalasFiltradas] = useState([]);
   const [kitsFiltrados, setKitsFiltrados] = useState([]);
   const [formAvulso, setFormAvulso] = useState({ predioId: '', andarId: '', sala: null });
-
+  const [modalSelecionarKitAberto, setModalSelecionarKitAberto] = useState(false);
+  const [usarKitAgendamento, setUsarKitAgendamento] = useState(false);
+  const [kitSelecionadoAgendamento, setKitSelecionadoAgendamento] = useState('');
+  const [kitsFiltradosAgendamento, setKitsFiltradosAgendamento] = useState([]);
+  
 
 /*
 //ESSE CODIGO VAI SAIR
@@ -80,6 +84,17 @@ useEffect(() => {
 */
 
 //MODIFICANDO O CODIGO A PARTIR DE AGORA
+
+
+
+
+useEffect(() => {
+  if (modalSelecionarKitAberto) {
+    setUsarKitAgendamento(false);
+    setKitSelecionadoAgendamento('');
+    setKitsFiltradosAgendamento([]);
+  }
+}, [modalSelecionarKitAberto]);
 
 useEffect(() => {
   if (modalConfirmacaoAberto) {
@@ -220,8 +235,7 @@ const validarSenhaERegistrarEmprestimo = async () => {
 
   try {
     // Detecta se é um agendamento real (com `usuario`) ou um avulso
-    const cpf =
-      agendamentoParaEmprestimo?.usuario?.cpf || agendamentoParaEmprestimo?.cpf;
+    const cpf = agendamentoParaEmprestimo?.usuario?.cpf || agendamentoParaEmprestimo?.cpf;
 
     const resposta = await validarSenhaAssinatura(cpf, senhaDigitada);
 
@@ -233,12 +247,22 @@ const validarSenhaERegistrarEmprestimo = async () => {
     const isDevolucao = agendamentoParaEmprestimo?.retirado === true;
 
     if (isDevolucao) {
-      await updateEmprestimo(agendamentoParaEmprestimo.id, {
+      await updateEmprestimo(agendamentoParaEmprestimo.emprestimosId, {
         horario_devolucao: new Date().toISOString(),
       });
-    } else {
-      await createEmprestimo(agendamentoParaEmprestimo);
-    }
+    }    
+      else {
+        const payload = {
+          usuarioCPF: agendamentoParaEmprestimo.usuario?.cpf,
+          salaId: agendamentoParaEmprestimo.sala?.id,
+          agendamentoId: agendamentoParaEmprestimo.agendamentosId,
+          horario_recepcao: new Date().toISOString(),
+          horario_esperado_devolucao: agendamentoParaEmprestimo.horario_fim,
+          kitId: usarKitAgendamento ? kitSelecionadoAgendamento : null,
+        };
+        
+        await createEmprestimo(payload);
+      }
 
     setModalSenhaEmprestimoAberto(false);
     setModalConfirmacaoAberto(true);
@@ -415,8 +439,7 @@ const validarSenhaERegistrarEmprestimo = async () => {
     if (senha.length === 4) {
       try {
         await updateEmprestimo(agendamentoSelecionado.id, {
-          retirado: true,
-          horario_devolucao: new Date().toISOString()
+          retirado: true, horario_devolucao: new Date().toISOString()
         });
   
         setMensagemSucesso(`Devolução registrada para a sala ${agendamentoSelecionado.sala.numero}`);
@@ -614,18 +637,37 @@ const validarSenhaERegistrarEmprestimo = async () => {
                   <div
                     key={sala.id}
                     onClick={() => {
+
+//alterando codigo aqui                      
                       if (agHoraAtual.length > 0) {
                         const agendamento = agHoraAtual[0];
                         const retirado = agendamento.retirado === true || agendamento.retirado === 'true';
-                      
+
                         const payload = {
                           ...agendamento,
-                          retirado: retirado, // usado para decidir se é PUT ou POST
+                          retirado: retirado,
                         };
-                      
+
                         setAgendamentoParaEmprestimo(payload);
-                        setModalSenhaEmprestimoAberto(true);
+
+                        if (!retirado) {
+                          // Status verde — EMPRESTAR
+                          setUsarKitAgendamento(false); 
+                          setKitSelecionadoAgendamento('');
+
+                          fetchKits().then((todosKits) => {
+                            const kitsDaSala = todosKits.filter(k => k.sala?.id === (payload.sala?.id || payload.salaId));
+                            setKitsFiltradosAgendamento(kitsDaSala);
+                          });
+
+                          setModalSelecionarKitAberto(true);
+                        } else {
+                          // Status vermelho — RECEBER
+                          setModalSenhaEmprestimoAberto(true);
+                        }
                       }
+
+
                       else {
                         abrirModalNovoEmprestimo(sala, agProximaHora.length > 0 ? 'futuro' : 'livre');
                       }
@@ -777,22 +819,23 @@ const validarSenhaERegistrarEmprestimo = async () => {
               </label>
             </div>
 
-              {usarKit && (
-                <div className="usuarios-input-wrapper mt-2">
-                  <select
-                    value={kitSelecionado}
-                    onChange={(e) => setKitSelecionado(e.target.value)}
-                    className="usuarios-modal-select"
-                  >
-                    <option value="">Selecione o Kit</option>
-                    {kitsFiltrados.map((kit) => (
-                      <option key={kit.id} value={kit.id}>
-                        {kit.numero}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              <div className="usuarios-input-wrapper mt-2">
+                <select
+                  value={kitSelecionado}
+                  onChange={(e) => setKitSelecionado(e.target.value)}
+                  className="usuarios-modal-select"
+                  disabled={!usarKit}
+                  style={{ opacity: usarKit ? 1 : 0.5, cursor: usarKit ? 'pointer' : 'not-allowed' }}
+                >
+                  <option value="">Selecione o Kit</option>
+                  {kitsFiltrados.map((kit) => (
+                    <option key={kit.id} value={kit.id}>
+                      {kit.numero}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
 
               {mensagemErroEmprestimo && (
                 <p className="erro-modal">{mensagemErroEmprestimo}</p>
@@ -864,8 +907,57 @@ const validarSenhaERegistrarEmprestimo = async () => {
                 </DialogDescription>
             </DialogContent>
           </Dialog>
+          <Dialog open={modalSelecionarKitAberto} onOpenChange={setModalSelecionarKitAberto}>
+            <DialogOverlay className="dialog-overlay" />
+            <DialogContent className="dashboard-modal dashboard-no-close">
+              <DialogTitle>Deseja utilizar um Kit?</DialogTitle>
+              <DialogDescription className="usuarios-modal-descricao" />
+              <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+              <div className="usuarios-input-wrapper mt-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={usarKitAgendamento}
+                    onChange={(e) => setUsarKitAgendamento(e.target.checked)}
+                  />
+                  Incluir Kit no empréstimo?
+                </label>
+              </div>
 
-      
+              <div className="usuarios-input-wrapper mt-2">
+                <select
+                  value={kitSelecionadoAgendamento}
+                  onChange={(e) => setKitSelecionadoAgendamento(e.target.value)}
+                  className="usuarios-modal-select"
+                  disabled={!usarKitAgendamento}
+                  style={{ opacity: usarKitAgendamento ? 1 : 0.5, cursor: usarKitAgendamento ? 'pointer' : 'not-allowed' }}
+                >
+                  <option value="">Selecione o Kit</option>
+                  {kitsFiltradosAgendamento.map((kit) => (
+                    <option key={kit.id} value={kit.id}>{kit.numero}</option>
+                  ))}
+                </select>
+              </div>
+
+
+              <div className="usuarios-modal-actions mt-4">
+                <Button variant="outline" onClick={() => setModalSelecionarKitAberto(false)}>Cancelar</Button>
+                <Button
+                  onClick={() => {
+                    const payloadAtualizado = {
+                      ...agendamentoParaEmprestimo,
+                      kitId: usarKitAgendamento ? kitSelecionadoAgendamento : null,
+                    };
+                    setAgendamentoParaEmprestimo(payloadAtualizado);
+                    setModalSelecionarKitAberto(false);
+                    setModalSenhaEmprestimoAberto(true);
+                  }}
+                >
+                  Confirmar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>      
     </div>
   );
 }
