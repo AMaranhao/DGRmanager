@@ -676,6 +676,7 @@ const handleEditarKit = async (kit) => {
                       <th>Número</th>
                       <th>Tipo</th>
                       <th>Andar</th>
+                      <th>Lotação</th> 
                       <th>Ativa</th>
                       <th className="tabela-col-acoes">Ações</th>
                     </tr>
@@ -690,6 +691,7 @@ const handleEditarKit = async (kit) => {
                           <td>{sala.numero}</td>
                           <td>{sala.tipo?.tipo_sala}</td>
                           <td>{sala.andar?.nome}</td>
+                          <td>{sala.lotacao}</td>
                           <td>{sala.esta_ativa ? 'Sim' : 'Não'}</td>
                           <td className="tabela-col-acoes">
                             <Button variant="outline" onClick={() => handleEditarSala(sala)}>Editar</Button>
