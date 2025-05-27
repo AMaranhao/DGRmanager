@@ -34,10 +34,12 @@ export default function Header() {
       <div className="header-spacer" />
 
       <div className="header-center">
-        <h1 className="header-title">
-          <span className="block">Hospital das Clínicas</span>
+        <h1 className="header-title-with-logo">
+          <img src="/logo2.png" alt="Logo HC" className="header-logo" />
+          <span>Hospital das Clínicas</span>
         </h1>
       </div>
+
 
       <div className="header-actions noprint">
         {/* Dropdown Configurações */}

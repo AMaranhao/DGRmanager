@@ -17,8 +17,6 @@ import '@/styles/mobile.css';
 export default function Emprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
   const [statusFiltro, setStatusFiltro] = useState("");
-  const [dataInicial, setDataInicial] = useState("");
-  const [dataFinal, setDataFinal] = useState("");
   const [textoPesquisa, setTextoPesquisa] = useState("");
   const [modalConfirmacao, setModalConfirmacao] = useState(false);
   const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
@@ -26,6 +24,14 @@ export default function Emprestimos() {
   const [senha, setSenha] = useState('');
   const [erroSenha, setErroSenha] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState('');
+
+  const hoje = new Date();
+  const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+  const [dataInicial, setDataInicial] = useState(primeiroDia.toISOString().slice(0, 10));
+  const [dataFinal, setDataFinal] = useState(ultimoDia.toISOString().slice(0, 10));
+
 
 
   const carregarEmprestimos = async () => {
