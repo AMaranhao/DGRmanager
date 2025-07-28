@@ -1,43 +1,68 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; 
+import { isTokenExpired } from '../utils/authUtils';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  // Verifica o token ao iniciar o app
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (token && storedUser) {
+      try {
+        const decoded = jwtDecode(token);
+        const isExpired = decoded.exp * 1000 < Date.now();
+
+        if (isExpired) {
+          logout();
+        } else {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Token inválido:', error);
+        logout();
+      }
+    } else {
+      logout();
+    }
+  }, []);
 
   const login = async (login, senha) => {
-    const res = await fetch('http://localhost:3001/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login, senha }),
-    });
+    try {
+      const res = await fetch('http://localhost:3001/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login, senha }),
+      });
 
-    if (!res.ok) throw new Error('Falha na autenticação');
+      if (!res.ok) throw new Error('Falha na autenticação');
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data?.token) {
-      // Armazena token separadamente
-      localStorage.setItem('token', data.token);
+      if (data?.token && data?.refreshToken) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('refreshToken', data.refreshToken);
 
-      // Armazena dados do usuário
-      const userData = {
-        nome: data.nome,
-        cargo: data.cargo,
-        permissoes: data.permissoes || [],
-      };
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+        const userData = {
+          nome: data.nome,
+          cargo: data.cargo,
+          permissoes: data.permissoes || [],
+        };
 
-      navigate('/agenda');
-    } else {
-      throw new Error('Usuário ou senha inválidos');
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/agenda');
+      } else {
+        throw new Error('Usuário ou senha inválidos');
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -45,16 +70,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     navigate('/login');
   };
-
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (!stored && user) {
-      setUser(null);
-      navigate('/login');
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

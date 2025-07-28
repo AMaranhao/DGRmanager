@@ -4,8 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
-import '@/styles/pages/login.css';
-import '@/styles/mobile.css';
+import '@/styles/unified_pages_styles.css';
 
 export default function LoginPage() {
   const [login, setLogin] = useState('');

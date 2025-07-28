@@ -1,15 +1,18 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-// Para proteger rotas privadas (usuário precisa estar logado)
-const PrivateRoute = ({ children }) => {
+const RoleRoute = ({ allowedRoles = [], children }) => {
   const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  if (!allowedRoles.includes(user.cargo)) {
+    return <Navigate to="/agenda" replace />;
+  }
+
   return children;
 };
 
-export default PrivateRoute;
+export default RoleRoute;

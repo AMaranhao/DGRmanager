@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
+import RoleRoute from './RoleRoute';
 
 import Login from '../pages/Login';
 import Agenda from '../pages/Agenda';
@@ -27,7 +28,8 @@ export default function AppRoutes() {
           </PublicRoute>
         }
       />
-      {/* Rotas protegidas */}
+
+      {/* Rotas protegidas (acesso geral autenticado) */}
       <Route
         path="/agenda"
         element={
@@ -69,14 +71,6 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute>
-            <Layout><Dashboard /></Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
         path="/controlehonorarios"
         element={
           <PrivateRoute>
@@ -106,6 +100,16 @@ export default function AppRoutes() {
           <PrivateRoute>
             <Layout><Relatorios /></Layout>
           </PrivateRoute>
+        }
+      />
+
+      {/* Rota protegida por cargo */}
+      <Route
+        path="/dashboard"
+        element={
+          <RoleRoute allowedRoles={['gestor']}>
+            <Layout><Dashboard /></Layout>
+          </RoleRoute>
         }
       />
 
