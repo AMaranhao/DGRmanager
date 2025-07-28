@@ -9,7 +9,7 @@ import ParteAdversa from '../pages/ParteAdversa';
 import Processos from '../pages/Processos';
 import Acordos from '../pages/Acordos';
 import ColaboradoresDGR from '../pages/ColaboradoresDGR';
-import Dashboard from '../pages/Dashboard';
+import Dashboard from '../pages/DashboardGestao';
 import ControleHonorarios from '../pages/ControleHonorarios';
 import GerarDocumentos from '../pages/GerarDocumentos';
 import Publicacoes from '../pages/Publicacoes';
