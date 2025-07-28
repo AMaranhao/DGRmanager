@@ -1,33 +1,73 @@
-// src/routes/AppRoutes.jsx
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import Dashboard from '../pages/Dashboard';
-import Emprestimos from '../pages/Emprestimos';
-import Relatorios from '../pages/relatorios/GuiasRelatorios';
-import Infraestrutura from '../pages/Infraestrutura';
+import PrivateRoute from './PrivateRoute';
+import PublicRoute from './PublicRoute';
+
 import Login from '../pages/Login';
-import Usuarios from '../pages/Usuarios';
-import PerfilUsuario from '../pages/PerfilUsuario';
-import PrivateRoute from '../routes/PrivateRoute';
-import Agendamentos from "@/pages/Agendamentos"; // ajuste o caminho conforme a estrutura do seu projeto
-
-
-
+import Agenda from '../pages/Agenda';
+import ParteAdversa from '../pages/ParteAdversa';
+import Processos from '../pages/Processos';
+import Acordos from '../pages/Acordos';
+import ColaboradoresDGR from '../pages/ColaboradoresDGR';
+import Dashboard from '../pages/Dashboard';
+import ControleHonorarios from '../pages/ControleHonorarios';
+import GerarDocumentos from '../pages/GerarDocumentos';
+import Publicacoes from '../pages/Publicacoes';
+import Relatorios from '../pages/Relatorios';
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      
-      <Route 
-        path="/agendamentos" 
+      {/* Rota pública */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      {/* Rotas protegidas */}
+      <Route
+        path="/agenda"
         element={
           <PrivateRoute>
-            <Layout><Agendamentos /></Layout>
+            <Layout><Agenda /></Layout>
           </PrivateRoute>
-        } 
+        }
       />
-
+      <Route
+        path="/parteadversa"
+        element={
+          <PrivateRoute>
+            <Layout><ParteAdversa /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/processos"
+        element={
+          <PrivateRoute>
+            <Layout><Processos /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/acordos"
+        element={
+          <PrivateRoute>
+            <Layout><Acordos /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/colaboradoresdgr"
+        element={
+          <PrivateRoute>
+            <Layout><ColaboradoresDGR /></Layout>
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={
@@ -37,10 +77,26 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/emprestimos"
+        path="/controlehonorarios"
         element={
           <PrivateRoute>
-            <Layout><Emprestimos /></Layout>
+            <Layout><ControleHonorarios /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/gerardocumentos"
+        element={
+          <PrivateRoute>
+            <Layout><GerarDocumentos /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/publicacoes"
+        element={
+          <PrivateRoute>
+            <Layout><Publicacoes /></Layout>
           </PrivateRoute>
         }
       />
@@ -52,33 +108,16 @@ export default function AppRoutes() {
           </PrivateRoute>
         }
       />
-      <Route
-        path="/usuarios"
-        element={
-          <PrivateRoute>
-            <Layout><Usuarios /></Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/infraestrutura"
-        element={
-          <PrivateRoute>
-            <Layout><Infraestrutura /></Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/perfil"
-        element={
-          <PrivateRoute>
-            <Layout><PerfilUsuario /></Layout>
-          </PrivateRoute>
-        }
-      />
 
-      {/* fallback: redireciona qualquer rota inválida para login */}
-      <Route path="*" element={<Login />} />
+      {/* Fallback inteligente */}
+      <Route
+        path="*"
+        element={
+          localStorage.getItem('token')
+            ? <Navigate to="/agenda" />
+            : <Navigate to="/login" />
+        }
+      />
     </Routes>
   );
 }

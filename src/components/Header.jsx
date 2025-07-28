@@ -9,10 +9,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import '@/styles/darkmode-styles.css';
-import '@/styles/components.css';
-import '@/styles/mobile.css';
-import '@/styles/pages/buttons.css';
+import '@/styles/unified_styles.css';
+
 
 export default function Header() {
   const { logout } = useAuth();
@@ -35,8 +33,8 @@ export default function Header() {
 
       <div className="header-center">
         <h1 className="header-title-with-logo">
-          <img src="/logo2.png" alt="Logo HC" className="header-logo" />
-          <span>Hospital das Clínicas</span>
+          <img src="/logo_dgr2.png" alt="Logo HC" className="header-logo" />
+          <span>Sistema Jurídico Administrativo DGR</span>
         </h1>
       </div>
 

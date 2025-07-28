@@ -5,12 +5,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
   });
 
-  // login simulado via Mockoon (será adaptado para DRF no futuro)
   const login = async (login, senha) => {
     const res = await fetch('http://localhost:3001/login', {
       method: 'POST',
@@ -22,15 +22,20 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
 
-    const usuarioValido =
-      (data?.email === login || data?.cpf === login) &&
-      data?.senha === senha &&
-      data?.nome;
+    if (data?.token) {
+      // Armazena token separadamente
+      localStorage.setItem('token', data.token);
 
-    if (usuarioValido) {
-      setUser(data);
-      localStorage.setItem('user', JSON.stringify(data)); // persistência
-      navigate('/dashboard');
+      // Armazena dados do usuário
+      const userData = {
+        nome: data.nome,
+        cargo: data.cargo,
+        permissoes: data.permissoes || [],
+      };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      navigate('/agenda');
     } else {
       throw new Error('Usuário ou senha inválidos');
     }
@@ -39,10 +44,10 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
-  // segurança adicional: limpa o estado se não houver localStorage (caso removido manualmente)
   useEffect(() => {
     const stored = localStorage.getItem('user');
     if (!stored && user) {
