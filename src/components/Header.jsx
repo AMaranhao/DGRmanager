@@ -33,8 +33,12 @@ export default function Header() {
 
       <div className="header-center">
         <h1 className="header-title-with-logo">
-          <img src="/logo_dgr2.png" alt="Logo HC" className="header-logo" />
-          <span>Sistema Jurídico Administrativo DGR</span>
+          <span>DGR Manager - </span>
+          <img
+            src={isDark ? "/logo_finsol_dark.png" : "/logo_finsol.png"}
+            alt="Logo HC"
+            className="header-logo"
+          />
         </h1>
       </div>
 

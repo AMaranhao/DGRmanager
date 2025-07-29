@@ -71,8 +71,8 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-box">
       <div className="login-header">
-        <img src="/logo_dgr.png" alt="Logo principal" className="login-logo grande" />
-        <img src="/logo_dgr2.png" alt="Logo HC-UFPE" className="login-logo grande" />
+        <img src="/logo_dgr.png" alt="Logo principal" className="login-logo-dgr grande" />
+        <img src="/logo_finsol.png" alt="Logo Finsol" className="login-logo-cliente grande" />
       </div>
 
 

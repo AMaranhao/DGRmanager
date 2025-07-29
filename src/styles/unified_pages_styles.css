@@ -339,7 +339,12 @@
   object-fit: contain;
 }
 
-.login-logo.grande {
+.login-logo-cliente.grande {
+  /* maior */
+  height: 4rem;
+}
+
+.login-logo-dgr.grande {
   /* maior */
   height: 10rem;
 }

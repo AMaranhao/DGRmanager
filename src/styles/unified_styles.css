@@ -285,15 +285,20 @@ to {
 
 */
 .header-title-with-logo {
-  /* espaço entre o texto e o logo */
-    font-size: 1.75rem;
+  font-size: 1.75rem;
   align-items: center;
-  color: var(--header-title-color, #1f2937);
   display: flex;
   font-weight: 800;
   gap: 0.75rem;
   margin-top: -0.5rem;
+  color: #1f2937; /* cor padrão */
+
+  /* Modo escuro */
+  .dark & {
+    color: white;
+  }
 }
+
 
 .header-logo {
   /* ajuste conforme necessário */
