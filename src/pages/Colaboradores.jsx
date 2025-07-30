@@ -1,7 +1,7 @@
 // Novo módulo adaptado de `Usuarios`, focado em funcionários do sistema jurídico
 // Baseado na estrutura da tabela `colaboradores`
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,11 +12,12 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { X, Trash } from "lucide-react";
+import { X, Trash, Pencil, Eye } from "lucide-react";
 import {
   fetchColaboradores,
   createColaborador,
   updateStatusColaborador,
+  updateColaborador,
 } from "@/services/ENDPOINTS_ServiceColaboradores";
 import {
   fetchCargos,
@@ -28,6 +29,8 @@ import "@/styles/unified_styles.css";
 export default function Colaboradores() {
   const [colaboradores, setColaboradores] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
+  const [modoVisualizacao, setModoVisualizacao] = useState(false);
+  const [editando, setEditando] = useState(false);
   const [formColaborador, setFormColaborador] = useState({
     nome: "",
     cpf: "",
@@ -39,15 +42,23 @@ export default function Colaboradores() {
     data_admissao: "",
   });
 
+  const nomeInputRef = useRef(null);
   const [cargos, setCargos] = useState([]);
   const [equipes, setEquipes] = useState([]);
   const [filtroTexto, setFiltroTexto] = useState("");
-  const [filtroStatus, setFiltroStatus] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("ativo");
   const [mensagemSucesso, setMensagemSucesso] = useState("");
   const [tituloSucesso, setTituloSucesso] = useState("");
   const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
   const [colaboradorSelecionado, setColaboradorSelecionado] = useState(null);
   const [erroFormulario, setErroFormulario] = useState("");
+
+
+  useEffect(() => {
+    if (modalAberto && !editando && !modoVisualizacao) {
+      nomeInputRef.current?.blur(); 
+    }
+  }, [modalAberto, editando, modoVisualizacao]);
 
   useEffect(() => {
     carregarColaboradores();
@@ -60,14 +71,29 @@ export default function Colaboradores() {
     setColaboradores(dados);
   };
 
+  const limparFormulario = () => {
+    setFormColaborador({
+      nome: "",
+      cpf: "",
+      email: "",
+      cargoId: "",
+      equipeId: "",
+      oab: "",
+      telefone: "",
+      data_admissao: "",
+    });
+    setErroFormulario("");
+    setColaboradorSelecionado(null);
+    setEditando(false);
+    setModoVisualizacao(false);
+  };
+
   const handleSalvarColaborador = async () => {
     const { nome, cpf, email, cargoId, equipeId, oab, telefone, data_admissao } = formColaborador;
-
     if (!nome.trim() || !email.includes("@") || !cpf.trim()) {
       setErroFormulario("Preencha os campos obrigatórios corretamente.");
       return;
     }
-
     const payload = {
       nome,
       cpf: cpf.replace(/\D/g, ""),
@@ -79,12 +105,18 @@ export default function Colaboradores() {
       data_admissao,
     };
 
-    await createColaborador(payload);
+    if (editando && colaboradorSelecionado) {
+      await updateColaborador(colaboradorSelecionado.id, payload);
+      setTituloSucesso("Funcionário Atualizado");
+      setMensagemSucesso("Funcionário atualizado com sucesso!");
+    } else {
+      await createColaborador(payload);
+      setTituloSucesso("Funcionário Cadastrado");
+      setMensagemSucesso("Funcionário criado com sucesso!");
+    }
+
     setModalAberto(false);
-    setFormColaborador({ nome: "", cpf: "", email: "", cargoId: "", equipeId: "", oab: "", telefone: "", data_admissao: "" });
-    setErroFormulario("");
-    setTituloSucesso("Funcionário Cadastrado");
-    setMensagemSucesso("Funcionário criado com sucesso!");
+    limparFormulario();
     setTimeout(() => setMensagemSucesso(""), 2000);
     carregarColaboradores();
   };
@@ -107,6 +139,28 @@ export default function Colaboradores() {
     }
   };
 
+  const abrirModalEditar = (colaborador) => {
+    setFormColaborador({
+      nome: colaborador.nome,
+      cpf: colaborador.cpf,
+      email: colaborador.email,
+      cargoId: colaborador.cargo?.id || "",
+      equipeId: colaborador.equipe?.id || "",
+      oab: colaborador.oab,
+      telefone: colaborador.telefone,
+      data_admissao: colaborador.data_admissao,
+    });
+    setColaboradorSelecionado(colaborador);
+    setEditando(true);
+    setModoVisualizacao(false);
+    setModalAberto(true);
+  };
+
+  const abrirModalDetalhar = (colaborador) => {
+    abrirModalEditar(colaborador);
+    setModoVisualizacao(true);
+  };
+
   const colaboradoresFiltrados = colaboradores.filter((f) => {
     const texto = `${f.nome} ${f.email} ${f.cargo?.nome || ''} ${f.equipe?.nome || ''}`.toLowerCase();
     const atendeTexto = texto.includes(filtroTexto.toLowerCase());
@@ -126,9 +180,9 @@ export default function Colaboradores() {
               onChange={(e) => setFiltroStatus(e.target.value)}
               className="dashboard-select"
             >
-              <option value="">Todos os Status</option>
               <option value="ativo">Ativo</option>
               <option value="inativo">Inativo</option>
+              <option value="">Todos os Status</option>
             </select>
             {filtroStatus && (
               <button onClick={() => setFiltroStatus("")} className="dashboard-filtro-clear"><X size={14} /></button>
@@ -149,16 +203,32 @@ export default function Colaboradores() {
           </div>
         </div>
 
-        <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <Dialog open={modalAberto} onOpenChange={(v) => {
+          setModalAberto(v);
+          if (!v) limparFormulario();
+        }}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
             <Button className="usuarios-btn-material">Novo Colaborador</Button>
           </DialogTrigger>
           <DialogContent className="dashboard-modal dashboard-no-close">
-            <DialogTitle>Novo Colaborador</DialogTitle>
-            <DialogDescription className="usuarios-modal-descricao">Preencha as informações do colaborador.</DialogDescription>
+            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+            <DialogTitle>{modoVisualizacao ? "Detalhes do Colaborador" : editando ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
+            <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados" : "Preencha as informações do funcionário."}</DialogDescription>
 
-            {["nome", "cpf", "email", "oab", "telefone", "data_admissao"].map((campo) => (
+            <div className="usuarios-input-wrapper">
+              <Input
+                ref={nomeInputRef}
+                type="text"
+                placeholder="NOME"
+                value={formColaborador.nome}
+                onChange={(e) => setFormColaborador({ ...formColaborador, nome: e.target.value })}
+                className="usuarios-modal-input"
+                readOnly={modoVisualizacao}
+              />
+            </div>
+
+            {["cpf", "email", "oab", "telefone", "data_admissao"].map((campo) => (
               <div key={campo} className="usuarios-input-wrapper">
                 <Input
                   type={campo === "data_admissao" ? "date" : "text"}
@@ -166,24 +236,26 @@ export default function Colaboradores() {
                   value={formColaborador[campo]}
                   onChange={(e) => setFormColaborador({ ...formColaborador, [campo]: e.target.value })}
                   className="usuarios-modal-input"
+                  readOnly={modoVisualizacao}
                 />
               </div>
             ))}
-
-            <select value={formColaborador.cargoId} onChange={(e) => setFormColaborador({ ...formColaborador, cargoId: e.target.value })} className="usuarios-modal-select">
+            
+            <select disabled={modoVisualizacao} value={formColaborador.cargoId} onChange={(e) => setFormColaborador({ ...formColaborador, cargoId: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione o Cargo</option>
               {cargos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
 
-            <select value={formColaborador.equipeId} onChange={(e) => setFormColaborador({ ...formColaborador, equipeId: e.target.value })} className="usuarios-modal-select">
+            <select disabled={modoVisualizacao} value={formColaborador.equipeId} onChange={(e) => setFormColaborador({ ...formColaborador, equipeId: e.target.value })} className="usuarios-modal-select">
               <option value="">Selecione a Equipe</option>
               {equipes.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
             </select>
 
-            <div className="usuarios-modal-actions">
-              <Button onClick={handleSalvarColaborador}>Salvar</Button>
-            </div>
-
+            {!modoVisualizacao && (
+              <div className="usuarios-modal-actions">
+                <Button onClick={handleSalvarColaborador}>Salvar</Button>
+              </div>
+            )}
             {erroFormulario && <div className="dashboard-modal-error">{erroFormulario}</div>}
           </DialogContent>
         </Dialog>
@@ -213,6 +285,12 @@ export default function Colaboradores() {
                   <Button variant={f.ativo ? "destructive" : "default"} onClick={() => handleAtivarDesativar(f)} className="ativar-desativar-btn">
                     <Trash size={18} className="mr-2" />{f.ativo ? "Desativar" : "Ativar"}
                   </Button>
+                  <Button variant="secondary" onClick={() => abrirModalEditar(f)} className="ml-2">
+                    <Pencil size={16} className="mr-1" />Editar
+                  </Button>
+                  <Button variant="outline" onClick={() => abrirModalDetalhar(f)} className="ml-2">
+                    <Eye size={16} className="mr-1" />Detalhar
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -223,13 +301,13 @@ export default function Colaboradores() {
       <Dialog open={confirmarModalAberto} onOpenChange={setConfirmarModalAberto}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className="dashboard-modal dashboard-no-close">
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
           <DialogTitle>Confirmação</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao">
-           {colaboradorSelecionado?.ativo ? `Deseja desativar ${colaboradorSelecionado?.nome}?` : `Deseja ativar ${colaboradorSelecionado?.nome}?`}
+            {colaboradorSelecionado?.ativo ? `Deseja desativar ${colaboradorSelecionado?.nome}?` : `Deseja ativar ${colaboradorSelecionado?.nome}?`}
           </DialogDescription>
           <div className="usuarios-modal-actions">
-            <Button variant="outline" onClick={() => setConfirmarModalAberto(false)}>Cancelar</Button>
-            <Button variant={colaboradorSelecionado?.ativo ? "destructive" : "default"} onClick={confirmarAtivarDesativar}>Confirmar</Button>
+            <Button variant={colaboradorSelecionado?.ativo ? "destructive" : "default"} onClick={confirmarAtivarDesativar}>Desativar</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -237,6 +315,7 @@ export default function Colaboradores() {
       <Dialog open={!!mensagemSucesso} onOpenChange={(open) => !open && setMensagemSucesso("")}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className="dashboard-modal dashboard-no-close">
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
           <DialogTitle>{tituloSucesso || "Ação Confirmada"}</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">{mensagemSucesso}</DialogDescription>
         </DialogContent>
