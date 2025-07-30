@@ -1,4 +1,7 @@
+// src/services/authService.js
+
 import api from './api';
+
 
 // Serviço de login (caso queira reaproveitar)
 export async function loginRequest(login, senha) {

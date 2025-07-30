@@ -1,24 +1,26 @@
-// src/services/documentosService.js
+// src/services/ENDPOINTS_ServiceDocumentos.js
+
 import { get, post, put, del } from './apiService';
+
 
 const BASE_URL = '/documentos';
 
-export async function listarDocumentos() {
+export async function fetchDocumentos() {
   return await get(BASE_URL);
 }
 
-export async function obterDocumentoPorId(id) {
+export async function fetchDocumentoById(id) {
   return await get(`${BASE_URL}/${id}`);
 }
 
-export async function criarDocumento(dados) {
+export async function createDocumento(dados) {
   return await post(BASE_URL, dados);
 }
 
-export async function atualizarDocumento(id, dados) {
+export async function updateDocumento(id, dados) {
   return await put(`${BASE_URL}/${id}`, dados);
 }
 
-export async function excluirDocumento(id) {
+export async function deleteDocumento(id) {
   return await del(`${BASE_URL}/${id}`);
 }

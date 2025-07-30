@@ -1,24 +1,26 @@
-// src/services/controleHonorariosService.js
+// src/services/ENDPOINTS_ServiceControleHonorarios.js
+
 import { get, post, put, del } from './apiService';
+
 
 const BASE_URL = '/controle-honorarios';
 
-export async function listarHonorarios(params = {}) {
+export async function fetchHonorarios(params = {}) {
   return await get(BASE_URL, { params });
 }
 
-export async function obterHonorarioPorId(id) {
+export async function fetchHonorarioById(id) {
   return await get(`${BASE_URL}/${id}`);
 }
 
-export async function criarHonorario(dados) {
+export async function createHonorario(dados) {
   return await post(BASE_URL, dados);
 }
 
-export async function atualizarHonorario(id, dados) {
+export async function updateHonorario(id, dados) {
   return await put(`${BASE_URL}/${id}`, dados);
 }
 
-export async function excluirHonorario(id) {
+export async function deleteHonorario(id) {
   return await del(`${BASE_URL}/${id}`);
 }

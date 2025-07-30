@@ -1,0 +1,246 @@
+// Novo módulo adaptado de `Usuarios`, focado em funcionários do sistema jurídico
+// Baseado na estrutura da tabela `colaboradores`
+
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogOverlay,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { X, Trash } from "lucide-react";
+import {
+  fetchColaboradores,
+  createColaborador,
+  updateStatusColaborador,
+} from "@/services/ENDPOINTS_ServiceColaboradores";
+import {
+  fetchCargos,
+  fetchEquipes,
+} from "@/services/ENDPOINTS_ServiceReferenciais";
+
+import "@/styles/unified_styles.css";
+
+export default function Colaboradores() {
+  const [colaboradores, setColaboradores] = useState([]);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [formColaborador, setFormColaborador] = useState({
+    nome: "",
+    cpf: "",
+    email: "",
+    cargoId: "",
+    equipeId: "",
+    oab: "",
+    telefone: "",
+    data_admissao: "",
+  });
+
+  const [cargos, setCargos] = useState([]);
+  const [equipes, setEquipes] = useState([]);
+  const [filtroTexto, setFiltroTexto] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [tituloSucesso, setTituloSucesso] = useState("");
+  const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
+  const [colaboradorSelecionado, setColaboradorSelecionado] = useState(null);
+  const [erroFormulario, setErroFormulario] = useState("");
+
+  useEffect(() => {
+    carregarColaboradores();
+    fetchCargos().then(data => setCargos(data || []));
+    fetchEquipes().then(data => setEquipes(data || []));
+  }, []);
+
+  const carregarColaboradores = async () => {
+    const dados = await fetchColaboradores();
+    setColaboradores(dados);
+  };
+
+  const handleSalvarColaborador = async () => {
+    const { nome, cpf, email, cargoId, equipeId, oab, telefone, data_admissao } = formColaborador;
+
+    if (!nome.trim() || !email.includes("@") || !cpf.trim()) {
+      setErroFormulario("Preencha os campos obrigatórios corretamente.");
+      return;
+    }
+
+    const payload = {
+      nome,
+      cpf: cpf.replace(/\D/g, ""),
+      email,
+      cargo_id: cargoId,
+      equipe_id: equipeId,
+      oab,
+      telefone,
+      data_admissao,
+    };
+
+    await createColaborador(payload);
+    setModalAberto(false);
+    setFormColaborador({ nome: "", cpf: "", email: "", cargoId: "", equipeId: "", oab: "", telefone: "", data_admissao: "" });
+    setErroFormulario("");
+    setTituloSucesso("Funcionário Cadastrado");
+    setMensagemSucesso("Funcionário criado com sucesso!");
+    setTimeout(() => setMensagemSucesso(""), 2000);
+    carregarColaboradores();
+  };
+
+  const handleAtivarDesativar = (colaborador) => {
+    setColaboradorSelecionado(colaborador);
+    setConfirmarModalAberto(true);
+  };
+
+  const confirmarAtivarDesativar = async () => {
+    if (colaboradorSelecionado) {
+      const newStatus = !colaboradorSelecionado.ativo;
+      await updateStatusColaborador(colaboradorSelecionado.id, newStatus);
+      setConfirmarModalAberto(false);
+      setColaboradorSelecionado(null);
+      setTituloSucesso(newStatus ? "Funcionário Ativado" : "Funcionário Desativado");
+      setMensagemSucesso(`Funcionário ${newStatus ? "ativado" : "desativado"} com sucesso!`);
+      setTimeout(() => setMensagemSucesso(""), 2000);
+      carregarColaboradores();
+    }
+  };
+
+  const colaboradoresFiltrados = colaboradores.filter((f) => {
+    const texto = `${f.nome} ${f.email} ${f.cargo?.nome || ''} ${f.equipe?.nome || ''}`.toLowerCase();
+    const atendeTexto = texto.includes(filtroTexto.toLowerCase());
+    const atendeStatus = filtroStatus ? (filtroStatus === "ativo" ? f.ativo : !f.ativo) : true;
+    return atendeTexto && atendeStatus;
+  });
+
+  return (
+    <div className="dashboard-wrapper">
+      <h3 className="dashboard-heading">Colaboradores do Escritório</h3>
+
+      <div className="usuarios-header">
+        <div className="usuarios-filtros">
+          <div className="dashboard-filtro-group">
+            <select
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+              className="dashboard-select"
+            >
+              <option value="">Todos os Status</option>
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+            </select>
+            {filtroStatus && (
+              <button onClick={() => setFiltroStatus("")} className="dashboard-filtro-clear"><X size={14} /></button>
+            )}
+          </div>
+
+          <div className="dashboard-filtro-group">
+            <input
+              type="text"
+              placeholder="Nome, Email, Cargo ou Equipe"
+              value={filtroTexto}
+              onChange={(e) => setFiltroTexto(e.target.value)}
+              className="dashboard-select dashboard-filtro-usuario-input"
+            />
+            {filtroTexto && (
+              <button onClick={() => setFiltroTexto("")} className="dashboard-filtro-clear"><X size={14} /></button>
+            )}
+          </div>
+        </div>
+
+        <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+          <DialogOverlay className="dialog-overlay" />
+          <DialogTrigger asChild>
+            <Button className="usuarios-btn-material">Novo Colaborador</Button>
+          </DialogTrigger>
+          <DialogContent className="dashboard-modal dashboard-no-close">
+            <DialogTitle>Novo Colaborador</DialogTitle>
+            <DialogDescription className="usuarios-modal-descricao">Preencha as informações do colaborador.</DialogDescription>
+
+            {["nome", "cpf", "email", "oab", "telefone", "data_admissao"].map((campo) => (
+              <div key={campo} className="usuarios-input-wrapper">
+                <Input
+                  type={campo === "data_admissao" ? "date" : "text"}
+                  placeholder={campo.replace("_", " ").toUpperCase()}
+                  value={formColaborador[campo]}
+                  onChange={(e) => setFormColaborador({ ...formColaborador, [campo]: e.target.value })}
+                  className="usuarios-modal-input"
+                />
+              </div>
+            ))}
+
+            <select value={formColaborador.cargoId} onChange={(e) => setFormColaborador({ ...formColaborador, cargoId: e.target.value })} className="usuarios-modal-select">
+              <option value="">Selecione o Cargo</option>
+              {cargos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+            </select>
+
+            <select value={formColaborador.equipeId} onChange={(e) => setFormColaborador({ ...formColaborador, equipeId: e.target.value })} className="usuarios-modal-select">
+              <option value="">Selecione a Equipe</option>
+              {equipes.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
+            </select>
+
+            <div className="usuarios-modal-actions">
+              <Button onClick={handleSalvarColaborador}>Salvar</Button>
+            </div>
+
+            {erroFormulario && <div className="dashboard-modal-error">{erroFormulario}</div>}
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="usuarios-tabela-wrapper">
+        <table className="usuarios-tabela">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Cargo</th>
+              <th>Equipe</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {colaboradoresFiltrados.map((f) => (
+              <tr key={f.id}>
+                <td>{f.nome}</td>
+                <td>{f.email}</td>
+                <td>{f.cargo?.nome || "-"}</td>
+                <td>{f.equipe?.nome || "-"}</td>
+                <td><span className={f.ativo ? "" : "usuarios-status-inativo"}>{f.ativo ? "Ativo" : "Inativo"}</span></td>
+                <td className="usuarios-acoes">
+                  <Button variant={f.ativo ? "destructive" : "default"} onClick={() => handleAtivarDesativar(f)} className="ativar-desativar-btn">
+                    <Trash size={18} className="mr-2" />{f.ativo ? "Desativar" : "Ativar"}
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Dialog open={confirmarModalAberto} onOpenChange={setConfirmarModalAberto}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <DialogTitle>Confirmação</DialogTitle>
+          <DialogDescription className="usuarios-modal-descricao">
+           {colaboradorSelecionado?.ativo ? `Deseja desativar ${colaboradorSelecionado?.nome}?` : `Deseja ativar ${colaboradorSelecionado?.nome}?`}
+          </DialogDescription>
+          <div className="usuarios-modal-actions">
+            <Button variant="outline" onClick={() => setConfirmarModalAberto(false)}>Cancelar</Button>
+            <Button variant={colaboradorSelecionado?.ativo ? "destructive" : "default"} onClick={confirmarAtivarDesativar}>Confirmar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!mensagemSucesso} onOpenChange={(open) => !open && setMensagemSucesso("")}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <DialogTitle>{tituloSucesso || "Ação Confirmada"}</DialogTitle>
+          <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">{mensagemSucesso}</DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

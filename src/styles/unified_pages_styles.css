@@ -428,6 +428,12 @@
 /* ======================== */
 /*     Dashboard Page       */
 /* ======================== */
+
+.dashboard-wrapper {
+  padding-left: 3.5rem; 
+  padding-right: 1rem;
+}
+
 .dashboard-container {
   padding: 2rem;
 }

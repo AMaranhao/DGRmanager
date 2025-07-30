@@ -1,25 +1,27 @@
-// src/services/agendaService.js
+// src/services/ENDPOINTS_ServiceAgenda.js
+
 import { get, post, put, del } from './apiService';
+
 
 const BASE_URL = '/agenda';
 
-export async function listarCompromissos(params = {}) {
+export async function fetchCompromissos(params = {}) {
   return await get(BASE_URL, { params });
 }
 
-export async function obterCompromissoPorId(id) {
+export async function fetchCompromissoById(id) {
     return await get(`${BASE_URL}/${id}`);
 }
 
-export async function criarCompromisso(dados) {
+export async function createCompromisso(dados) {
   return await post(BASE_URL, dados);
 }
 
-export async function atualizarCompromisso(id, dados) {
+export async function updateCompromisso(id, dados) {
   return await put(`${BASE_URL}/${id}`, dados);
 }
 
-export async function excluirCompromisso(id) {
+export async function deleteCompromisso(id) {
   return await del(`${BASE_URL}/${id}`);
 }
 

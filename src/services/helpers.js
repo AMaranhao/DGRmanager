@@ -5,10 +5,9 @@ export const formatarData = (dataISO) => {
     return data.toLocaleDateString('pt-BR');
   };
   
-  export const formatarValor = (valor) => {
-    return Number(valor).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    });
-  };
-  
+export const formatarValor = (valor) => {
+  return Number(valor).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+};

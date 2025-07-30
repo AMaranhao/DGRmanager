@@ -9,7 +9,7 @@ import Agenda from '../pages/Agenda';
 import ParteAdversa from '../pages/ParteAdversa';
 import Processos from '../pages/Processos';
 import Acordos from '../pages/Acordos';
-import ColaboradoresDGR from '../pages/ColaboradoresDGR';
+import Colaboradores from '../pages/Colaboradores';
 import Dashboard from '../pages/DashboardGestao';
 import ControleHonorarios from '../pages/ControleHonorarios';
 import GerarDocumentos from '../pages/GerarDocumentos';
@@ -63,10 +63,10 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/colaboradoresdgr"
+        path="/colaboradores"
         element={
           <PrivateRoute>
-            <Layout><ColaboradoresDGR /></Layout>
+            <Layout><Colaboradores /></Layout>
           </PrivateRoute>
         }
       />

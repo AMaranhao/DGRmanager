@@ -43,7 +43,7 @@ export default function Sidebar() {
     },
     {
       label: "Colaboradores do Escritório",
-      path: "/colaboradoresdgr",
+      path: "/colaboradores",
       icon: <Landmark size={28} className="sidebar-icon" />,
       allowed: ["gestor"],
     },
