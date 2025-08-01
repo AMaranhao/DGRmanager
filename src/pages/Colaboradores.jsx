@@ -56,9 +56,12 @@ export default function Colaboradores() {
 
   useEffect(() => {
     if (modalAberto && !editando && !modoVisualizacao) {
-      nomeInputRef.current?.blur(); 
+      requestAnimationFrame(() => {
+        nomeInputRef.current?.blur();
+      });
     }
   }, [modalAberto, editando, modoVisualizacao]);
+  
 
   useEffect(() => {
     carregarColaboradores();
@@ -211,16 +214,17 @@ export default function Colaboradores() {
           <DialogTrigger asChild>
             <Button className="usuarios-btn-material">Novo Colaborador</Button>
           </DialogTrigger>
-          <DialogContent className="dashboard-modal dashboard-no-close">
+          <DialogContent className="dashboard-modal dashboard-no-close" onOpenAutoFocus={(e) => e.preventDefault()}>
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
             <DialogTitle>{modoVisualizacao ? "Detalhes do Colaborador" : editando ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
             <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados" : "Preencha as informações do funcionário."}</DialogDescription>
 
             <div className="usuarios-input-wrapper">
+              <label htmlFor="input-nome" className="usuarios-label">Nome</label>
               <Input
-                ref={nomeInputRef}
+                id="input-nome"
+                ref={editando || modoVisualizacao ? null : nomeInputRef}
                 type="text"
-                placeholder="NOME"
                 value={formColaborador.nome}
                 onChange={(e) => setFormColaborador({ ...formColaborador, nome: e.target.value })}
                 className="usuarios-modal-input"
@@ -228,28 +232,92 @@ export default function Colaboradores() {
               />
             </div>
 
-            {["cpf", "email", "oab", "telefone", "data_admissao"].map((campo) => (
-              <div key={campo} className="usuarios-input-wrapper">
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="cpf" className="usuarios-label">CPF</label>
+              <Input
+                id="cpf"
+                type="text"
+                value={formColaborador.cpf}
+                onChange={(e) => setFormColaborador({ ...formColaborador, cpf: e.target.value })}
+                className="usuarios-modal-input"
+                readOnly={modoVisualizacao}
+              />
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="email" className="usuarios-label">Email</label>
+              <Input
+                id="email"
+                type="text"
+                value={formColaborador.email}
+                onChange={(e) => setFormColaborador({ ...formColaborador, email: e.target.value })}
+                className="usuarios-modal-input"
+                readOnly={modoVisualizacao}
+              />
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="oab" className="usuarios-label">OAB</label>
+              <Input
+                id="oab"
+                type="text"
+                value={formColaborador.oab}
+                onChange={(e) => setFormColaborador({ ...formColaborador, oab: e.target.value })}
+                className="usuarios-modal-input"
+                readOnly={modoVisualizacao}
+              />
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="telefone" className="usuarios-label">Telefone</label>
+              <Input
+                id="telefone"
+                type="text"
+                value={formColaborador.telefone}
+                onChange={(e) => setFormColaborador({ ...formColaborador, telefone: e.target.value })}
+                className="usuarios-modal-input"
+                readOnly={modoVisualizacao}
+              />
+            </div>
+
+            {modoVisualizacao && (
+              <div className="usuarios-input-wrapper">
+                <label htmlFor="data_admissao" className="usuarios-label">Data de Admissão</label>
                 <Input
-                  type={campo === "data_admissao" ? "date" : "text"}
-                  placeholder={campo.replace("_", " ").toUpperCase()}
-                  value={formColaborador[campo]}
-                  onChange={(e) => setFormColaborador({ ...formColaborador, [campo]: e.target.value })}
+                  id="data_admissao"
+                  type="date"
+                  value={formColaborador.data_admissao}
                   className="usuarios-modal-input"
-                  readOnly={modoVisualizacao}
+                  readOnly
                 />
               </div>
-            ))}
-            
-            <select disabled={modoVisualizacao} value={formColaborador.cargoId} onChange={(e) => setFormColaborador({ ...formColaborador, cargoId: e.target.value })} className="usuarios-modal-select">
-              <option value="">Selecione o Cargo</option>
-              {cargos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
-            </select>
+            )}
 
-            <select disabled={modoVisualizacao} value={formColaborador.equipeId} onChange={(e) => setFormColaborador({ ...formColaborador, equipeId: e.target.value })} className="usuarios-modal-select">
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="select-cargo" className="usuarios-label">Cargo</label>
+              <select 
+                id="select-cargo"
+                disabled={modoVisualizacao} 
+                value={formColaborador.cargoId} 
+                onChange={(e) => setFormColaborador({ ...formColaborador, cargoId: e.target.value })} 
+                className="usuarios-modal-select">
+                <option value="">Selecione o Cargo</option>
+                {cargos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              </select>
+            </div>
+
+            <div className="usuarios-input-wrapper">
+              <label htmlFor="select-equipe" className="usuarios-label">Equipe</label>
+              <select 
+              id="select-equipe"
+              disabled={modoVisualizacao} 
+              value={formColaborador.equipeId} 
+              onChange={(e) => setFormColaborador({ ...formColaborador, equipeId: e.target.value })} 
+              className="usuarios-modal-select">
               <option value="">Selecione a Equipe</option>
               {equipes.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
             </select>
+            </div>
 
             {!modoVisualizacao && (
               <div className="usuarios-modal-actions">
