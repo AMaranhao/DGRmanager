@@ -54,20 +54,32 @@ export default function Colaboradores() {
   const [erroFormulario, setErroFormulario] = useState("");
 
 
-  useEffect(() => {
-    if (modalAberto && !editando && !modoVisualizacao) {
-      requestAnimationFrame(() => {
-        nomeInputRef.current?.blur();
-      });
-    }
-  }, [modalAberto, editando, modoVisualizacao]);
-  
 
+  
   useEffect(() => {
     carregarColaboradores();
-    fetchCargos().then(data => setCargos(data || []));
-    fetchEquipes().then(data => setEquipes(data || []));
   }, []);
+  
+  useEffect(() => {
+    if (modalAberto) {
+      fetchCargos().then(data => {
+        setCargos(data || []);
+      });
+      fetchEquipes().then(data => {
+        setEquipes(data || []);
+      });
+    }
+  }, [modalAberto]);
+  
+  useEffect(() => {
+    if (modalAberto) {
+      requestAnimationFrame(() => {
+        nomeInputRef.current?.focus(); 
+      });
+    }
+  }, [modalAberto]);
+  
+  
 
   const carregarColaboradores = async () => {
     const dados = await fetchColaboradores();
@@ -212,7 +224,12 @@ export default function Colaboradores() {
         }}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
-            <Button className="usuarios-btn-material">Novo Colaborador</Button>
+            <Button 
+              className="usuarios-btn-material" 
+              onClick={(e) => e.currentTarget.blur()}
+            >
+              Novo Colaborador
+            </Button>
           </DialogTrigger>
           <DialogContent className="dashboard-modal dashboard-no-close" onOpenAutoFocus={(e) => e.preventDefault()}>
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
@@ -353,10 +370,24 @@ export default function Colaboradores() {
                   <Button variant={f.ativo ? "destructive" : "default"} onClick={() => handleAtivarDesativar(f)} className="ativar-desativar-btn">
                     <Trash size={18} className="mr-2" />{f.ativo ? "Desativar" : "Ativar"}
                   </Button>
-                  <Button variant="secondary" onClick={() => abrirModalEditar(f)} className="ml-2">
+                  <Button 
+                    variant="secondary" 
+                    onClick={(e) => { 
+                      e.currentTarget.blur(); 
+                      abrirModalEditar(f); 
+                    }} 
+                    className="ml-2"
+                  >
                     <Pencil size={16} className="mr-1" />Editar
                   </Button>
-                  <Button variant="outline" onClick={() => abrirModalDetalhar(f)} className="ml-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={(e) => { 
+                      e.currentTarget.blur(); 
+                      abrirModalDetalhar(f); 
+                    }} 
+                    className="ml-2"
+                  >
                     <Eye size={16} className="mr-1" />Detalhar
                   </Button>
                 </td>

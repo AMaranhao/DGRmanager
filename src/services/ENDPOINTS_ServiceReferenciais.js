@@ -4,11 +4,9 @@ import { get, post, put, del } from './apiService';
 
 
 export async function fetchCargos() {
-    const res = await get('/cargos');
-    return res.data;
+    return await get('/cargos'); 
 }
-  
+
 export async function fetchEquipes() {
-const res = await get('/equipes');
-return res.data;
+    return await get('/equipes');  
 }
