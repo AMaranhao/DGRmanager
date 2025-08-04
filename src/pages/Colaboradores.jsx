@@ -406,7 +406,9 @@ export default function Colaboradores() {
             {colaboradorSelecionado?.ativo ? `Deseja desativar ${colaboradorSelecionado?.nome}?` : `Deseja ativar ${colaboradorSelecionado?.nome}?`}
           </DialogDescription>
           <div className="usuarios-modal-actions">
-            <Button variant={colaboradorSelecionado?.ativo ? "destructive" : "default"} onClick={confirmarAtivarDesativar}>Desativar</Button>
+            <Button variant={colaboradorSelecionado?.ativo ? "destructive" : "default"} onClick={confirmarAtivarDesativar}>
+              {colaboradorSelecionado?.ativo ? "Desativar" : "Ativar"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
