@@ -363,34 +363,63 @@ const partesFiltradas = partes.filter((p) => {
               {adicionandoEndereco ? (
                 <>
                   <h5>Adicionar Endereço</h5>
-                  <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">CEP</label>
-                    <Input value={formEndereco.cep} onChange={(e) => setFormEndereco({ ...formEndereco, cep: e.target.value })} />
+                  <div className="linha-endereco">
+                    <div className="input-flex-1">
+                      <label className="usuarios-label">CEP</label>
+                      <Input 
+                        className="endereco-modal-input flex-item"
+                        value={formEndereco.cep} 
+                        onChange={(e) => setFormEndereco({ ...formEndereco, cep: e.target.value })} />
+                    </div>
+                    <div className="input-flex-2">
+                      <label className="usuarios-label">Cidade</label>
+                      <Input 
+                        className="endereco-modal-input flex-item"
+                        value={formEndereco.cidade} 
+                        onChange={(e) => setFormEndereco({ ...formEndereco, cidade: e.target.value })} />
+                    </div>
+                    <div className="input-uf">
+                      <label className="usuarios-label">UF</label>
+                      <Input 
+                        className="endereco-modal-input uf"
+                        value={formEndereco.uf} 
+                        onChange={(e) => setFormEndereco({ ...formEndereco, uf: e.target.value })} />
+                    </div>
                   </div>
+
                   <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">UF</label>
-                    <Input value={formEndereco.uf} onChange={(e) => setFormEndereco({ ...formEndereco, uf: e.target.value })} />
+                    <label className="usuarios-label">Bairro</label>
+                    <Input 
+                      className="endereco-modal-input"
+                      value={formEndereco.bairro} 
+                      onChange={(e) => setFormEndereco({ ...formEndereco, bairro: e.target.value })} />
                   </div>
+
+                  <div className="linha-endereco">
+                    <div className="input-flex-3">
+                      <label className="usuarios-label">Rua</label>
+                      <Input 
+                        className="endereco-modal-input"
+                        value={formEndereco.rua} 
+                        onChange={(e) => setFormEndereco({ ...formEndereco, rua: e.target.value })} />
+                    </div>
+                    <div className="input-flex-1">
+                      <label className="usuarios-label">Número</label>
+                      <Input 
+                        className="endereco-modal-input"
+                        value={formEndereco.numero} 
+                        onChange={(e) => setFormEndereco({ ...formEndereco, numero: e.target.value })} />
+                    </div>
+                  </div>
+
                   <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">Cidade</label>
-                    <Input value={formEndereco.cidade} onChange={(e) => setFormEndereco({ ...formEndereco, cidade: e.target.value })} />
+                    <label className="usuarios-label">Complemento</label>
+                    <Input 
+                      className="endereco-modal-input"
+                      value={formEndereco.complemento} 
+                      onChange={(e) => setFormEndereco({ ...formEndereco, complemento: e.target.value })} />
                   </div>
-                  <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">Bairro</label>
-                    <Input value={formEndereco.bairro} onChange={(e) => setFormEndereco({ ...formEndereco, bairro: e.target.value })} />
-                  </div>
-                  <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">Rua</label>
-                    <Input value={formEndereco.rua} onChange={(e) => setFormEndereco({ ...formEndereco, rua: e.target.value })} />
-                  </div>
-                  <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">Número</label>
-                    <Input value={formEndereco.numero} onChange={(e) => setFormEndereco({ ...formEndereco, numero: e.target.value })} />
-                  </div>
-                  <div className="endereco-input-wrapper">
-                  <label htmlFor="input-nome" className="usuarios-label">Complemento</label>
-                    <Input value={formEndereco.complemento} onChange={(e) => setFormEndereco({ ...formEndereco, complemento: e.target.value })} />
-                  </div>
+
                   <div className="endereco-input-wrapper">
                     <label htmlFor="principal-checkbox" className="usuarios-label">
                       <input
