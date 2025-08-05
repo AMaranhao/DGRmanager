@@ -79,6 +79,18 @@
   width: 100%;
 }
 
+.endereco-input-wrapper{
+  align-items: center;
+  display: flex;
+  margin-bottom: 0.5rem;
+  padding: 0rem;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  right: 0.75rem;
+}
+
 .usuarios-acoes {
   /* opcional para afastar um pouco da borda */
   align-items: center;
@@ -847,7 +859,6 @@ input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
   outline: none;
   padding: 0.75rem 1rem;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .filtro-salas-utilizadas {
@@ -954,6 +965,19 @@ input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
 
 .dashboard-modal-actions,
   .usuarios-modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end !important;
+  margin-right: 1rem;
+}
+
+.usuarios-modal-mais-endereco {
+  margin-bottom: 0.5rem;
+/*  justify-content: flex-start !important;*/
+}
+
+.endereco-modal-actions {
+  margin-top: 1rem;
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
@@ -1349,6 +1373,71 @@ margin-bottom: 0.25rem;
   color: lightgray;
 }
 
+.dashboard-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 400px;
+  max-width: 100%;
+  overflow-y: auto;
+  background: white;
+  z-index: 50;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+}
+
+.endereco-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px; /* ajuste a largura como preferir */
+  height: 100%;
+  background: white;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 50; /* acima do modal principal */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.endereco-drawer-content {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.split-modal {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 900px !important; 
+  max-width: 900px !important; 
+  min-width: 900px !important; 
+  height: 450px !important; 
+  max-height: 450px !important; 
+  min-height: 450px !important; 
+  gap: 24px;
+}
+
+.split-left {
+  flex: 1;
+  min-width: 300px;
+}
+
+.split-right {
+  flex: 1;
+  min-width: 300px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+
+.enderecos-lista li {
+  margin-bottom: 0.5rem;
+}
+
 body.dark {
   background-color: white !important;
   color: black !important;
@@ -1728,3 +1817,6 @@ body.dark {
 .dark .usuarios-tabela td {
   border-color: #4b5563 !important;
 }
+
+
+

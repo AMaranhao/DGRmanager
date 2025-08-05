@@ -24,9 +24,15 @@ export default function Sidebar() {
       allowed: ["todos"], // todos os cargos
     },
     {
-      label: "Parte Adversa e Contratos",
+      label: "Partes Adversas",
       path: "/parteadversa",
       icon: <Users size={28} className="sidebar-icon" />,
+      allowed: ["gestor", "advogado"],
+    },
+    {
+      label: "Contratos",
+      path: "/contratos",
+      icon: <Handshake size={28} className="sidebar-icon" />,
       allowed: ["gestor", "advogado"],
     },
     {

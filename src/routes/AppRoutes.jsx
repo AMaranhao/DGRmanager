@@ -15,6 +15,8 @@ import ControleHonorarios from '../pages/ControleHonorarios';
 import GerarDocumentos from '../pages/GerarDocumentos';
 import Publicacoes from '../pages/Publicacoes';
 import Relatorios from '../pages/Relatorios';
+import Contratos from '../pages/Contratos';
+
 
 export default function AppRoutes() {
   return (
@@ -43,6 +45,14 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <Layout><ParteAdversa /></Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/contratos"
+        element={
+          <PrivateRoute>
+            <Layout><Contratos /></Layout>
           </PrivateRoute>
         }
       />

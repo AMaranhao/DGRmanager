@@ -5,7 +5,7 @@ import { get, post, put, del } from './apiService';
 
 const BASE_URL = '/parte-adversa';
 
-export async function fetchPartesAdversas() {
+export async function fetchParteAdversa() {
   return await get(BASE_URL);
 }
 

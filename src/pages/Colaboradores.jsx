@@ -52,6 +52,7 @@ export default function Colaboradores() {
   const [confirmarModalAberto, setConfirmarModalAberto] = useState(false);
   const [colaboradorSelecionado, setColaboradorSelecionado] = useState(null);
   const [erroFormulario, setErroFormulario] = useState("");
+  const salvarButtonRef = useRef(null);
 
 
 
@@ -169,7 +170,12 @@ export default function Colaboradores() {
     setEditando(true);
     setModoVisualizacao(false);
     setModalAberto(true);
+  
+    setTimeout(() => {
+      salvarButtonRef.current?.focus();
+    }, 0);
   };
+  
 
   const abrirModalDetalhar = (colaborador) => {
     abrirModalEditar(colaborador);
@@ -199,8 +205,10 @@ export default function Colaboradores() {
               <option value="inativo">Inativo</option>
               <option value="">Todos os Status</option>
             </select>
-            {filtroStatus && (
-              <button onClick={() => setFiltroStatus("")} className="dashboard-filtro-clear"><X size={14} /></button>
+            {(filtroStatus === "inativo" || filtroStatus === "") && (
+              <button onClick={() => setFiltroStatus("ativo")} className="dashboard-filtro-clear">
+                <X size={14} />
+              </button>
             )}
           </div>
 
@@ -223,18 +231,37 @@ export default function Colaboradores() {
           if (!v) limparFormulario();
         }}>
           <DialogOverlay className="dialog-overlay" />
-          <DialogTrigger asChild>
-            <Button 
-              className="usuarios-btn-material" 
-              onClick={(e) => e.currentTarget.blur()}
+            <DialogTrigger asChild>
+              <Button
+                className="usuarios-btn-material"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  limparFormulario();
+                  setModalAberto(true);
+
+                  setTimeout(() => {
+                    salvarButtonRef.current?.focus();
+                  }, 0);
+                }}
+              >
+                Novo Colaborador
+              </Button>
+            </DialogTrigger>
+          <DialogContent
+            className="dashboard-modal dashboard-no-close"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!modoVisualizacao) {
+                  handleSalvarColaborador();
+                }
+              }}
             >
-              Novo Colaborador
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="dashboard-modal dashboard-no-close" onOpenAutoFocus={(e) => e.preventDefault()}>
-            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-            <DialogTitle>{modoVisualizacao ? "Detalhes do Colaborador" : editando ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
-            <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados" : "Preencha as informações do funcionário."}</DialogDescription>
+              <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+              <DialogTitle>{modoVisualizacao ? "Detalhes do Colaborador" : editando ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
+              <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados" : "Preencha as informações do funcionário."}</DialogDescription>
 
             <div className="usuarios-input-wrapper">
               <label htmlFor="input-nome" className="usuarios-label">Nome</label>
@@ -336,12 +363,19 @@ export default function Colaboradores() {
             </select>
             </div>
 
-            {!modoVisualizacao && (
-              <div className="usuarios-modal-actions">
-                <Button onClick={handleSalvarColaborador}>Salvar</Button>
-              </div>
-            )}
-            {erroFormulario && <div className="dashboard-modal-error">{erroFormulario}</div>}
+           
+              {!modoVisualizacao && (
+                <div className="usuarios-modal-actions">
+                  <Button
+                    type="submit"
+                    ref={salvarButtonRef}
+                  >
+                    Salvar
+                  </Button>
+                </div>
+              )}
+              {erroFormulario && <div className="dashboard-modal-error">{erroFormulario}</div>}
+            </form>
           </DialogContent>
         </Dialog>
       </div>

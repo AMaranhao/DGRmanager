@@ -20,3 +20,7 @@ export async function updateEnderecoParte(id, data) {
 export async function deleteEnderecoParte(id) {
   return await del(`${BASE_URL}/${id}`);
 }
+
+export async function fetchEnderecosParteByParteId(parteId) {
+  return await get(`/parte-adversa/${parteId}/enderecos`);
+}
