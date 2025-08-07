@@ -55,6 +55,7 @@ export default function ParteAdversa() {
     complemento: "",
     principal: true,
   });
+  const [indiceEditando, setIndiceEditando] = useState(null);
 
 
   useEffect(() => {
@@ -443,9 +444,25 @@ const partesFiltradas = partes.filter((p) => {
                       Cancelar
                     </Button>
                     <Button
-                      type="button" 
+                      type="button"
                       onClick={() => {
-                        setEnderecos([...enderecos, formEndereco]);
+                        let novosEnderecos = [...enderecos];
+
+                        // Se o novo endereço é principal, desmarca os outros
+                        if (formEndereco.principal) {
+                          novosEnderecos = novosEnderecos.map((endereco, i) => ({
+                            ...endereco,
+                            principal: false,
+                          }));
+                        }
+
+                        if (indiceEditando !== null) {
+                          novosEnderecos[indiceEditando] = formEndereco;
+                        } else {
+                          novosEnderecos.push(formEndereco);
+                        }
+
+                        setEnderecos(novosEnderecos);
                         setFormEndereco({
                           cep: "",
                           uf: "",
@@ -457,9 +474,10 @@ const partesFiltradas = partes.filter((p) => {
                           principal: true,
                         });
                         setAdicionandoEndereco(false);
+                        setIndiceEditando(null);
                       }}
                       >
-                      Adicionar
+                      {indiceEditando !== null ? "Atualizar" : "Adicionar"}
                     </Button>
                   </div>
                 </>
@@ -467,15 +485,33 @@ const partesFiltradas = partes.filter((p) => {
                 <>
                 <div className="enderecos-lista">
                   <h4>Endereços Adicionados:</h4>
-                  <ul>
-                    {enderecos.map((end, index) => (
-                      <li key={index}>
-                        <div>{end.rua} - {end.numero} - {end.complemento} </div>
-                        <div>{end.bairro} - {end.cidade} - {end.uf}</div>
-                        <div>CEP - {end.cep}</div>
+                  <ul className="enderecos-lista">
+                  {enderecos.map((end, index) => (
+                      <li
+                        key={index}
+                        className={`endereco-item ${end.principal ? "principal" : ""}`}
+                        onClick={() => {
+                          setFormEndereco(end);
+                          setIndiceEditando(index);
+                          setAdicionandoEndereco(true);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <div className="endereco-texto">
+                          <div>
+                            {end.rua} - {end.numero}
+                            {end.complemento ? ` - ${end.complemento}` : ""}
+                          </div>
+                          <div>
+                            {end.bairro} - {end.cidade} - {end.uf}
+                          </div>
+                          <div>CEP - {end.cep}</div>
+                        </div>
                       </li>
                     ))}
                   </ul>
+
+
                 </div>
                 </>
               )}

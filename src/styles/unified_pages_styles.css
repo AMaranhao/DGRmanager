@@ -120,7 +120,91 @@
   width: 80px !important;
 }
 
+.endereco-principal-tag {
+  color: #065f46; /* verde-700 */
+  font-weight: bold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
 
+.enderecos-lista {
+  padding-left: 1rem;
+  list-style: none;
+}
+
+.enderecos-lista li {
+  display: flex;
+  align-items: flex-start; /* ou center, dependendo do layout desejado */
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.endereco-normal-item::before {
+  content: "•";
+  color: #6b7280; /* cinza escuro */
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  display: inline-block;
+  width: 1rem;
+}
+
+.endereco-principal-item::before {
+  content: "⭐";
+  color: #fbbf24; /* amarelo-400 */
+  font-size: 1.1rem;
+  margin-right: 0.5rem;
+  display: inline-block;
+  width: 1rem;
+}
+
+.endereco-principal-tag {
+  color: #065f46;
+  font-weight: bold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.enderecos-lista {
+  padding-left: 1.5rem; /* espaço para o ícone */
+}
+
+.endereco-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+  position: relative;
+}
+
+.endereco-item::before {
+  content: "•";
+  color: #6b7280;
+  font-size: 1.2rem;
+  position: absolute;
+  left: -1rem;
+  top: 0.2rem;
+}
+
+.endereco-item.principal::before {
+  content: "📍"; /* ou "🏡", "📍", etc. */
+  color: #fbbf24;
+  font-size: 1.1rem;
+  position: absolute;
+  left: -1.2rem;
+  top: 0.1rem;
+}
+
+.endereco-item.principal .endereco-texto {
+  font-weight: bold;
+}
+
+
+/* Ajusta o conteúdo para alinhar com o ícone */
+.endereco-texto {
+  display: inline-block;
+  line-height: 1.4;
+}
 
 .usuarios-input-wrapper {
   align-items: center;
