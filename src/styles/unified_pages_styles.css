@@ -81,6 +81,31 @@
   height: auto;
 }
 
+.split-right-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 80vh;
+  min-width: 300px;
+}
+
+.split-right-conteudo {
+  flex: 1;
+  overflow-y: auto;
+}
+
+
+
+.split-right {
+  position: relative; /* Isso é necessário para o posicionamento absoluto funcionar corretamente */
+  padding-bottom: 70px; /* Garante espaço para o botão */
+}
+
 /* Tamanho padrão (vai herdar flex ou inline-block do container) */
 .endereco-modal-input {
   width: 100%;
@@ -1109,10 +1134,16 @@ input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
 /*  justify-content: flex-start !important;*/
 }
 
+
+
+.botao-endereco-bottom,
 .endereco-modal-actions {
-  margin-top: 1rem;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
@@ -1554,19 +1585,37 @@ margin-bottom: 0.25rem;
 .split-left {
   flex: 1;
   min-width: 300px;
+  position: relative;
 }
+
+.botao-salvar-bottom {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
 
 .split-right {
   flex: 1;
   min-width: 300px;
   background: #f9f9f9;
-
+  position: relative;
   padding: 20px;
+
   border-radius: 8px;
   overflow-y: auto;
   max-height: 80vh;
 }
 
+.enderecos-lista h4,
+.split-right h5  {
+  font-size: 1.5rem; /* mesmo tamanho de .dashboard-modal-title */
+  font-weight: 600;
+  margin-top: 0rem; /* eleva o título */
+  margin-bottom: 1rem;
+}
 
 .enderecos-lista li {
   margin-bottom: 0.5rem;

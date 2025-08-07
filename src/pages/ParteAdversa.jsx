@@ -11,7 +11,7 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { X, Trash, Pencil, Eye } from "lucide-react";
+import { X, Trash, Pencil, Eye, FileText } from "lucide-react";
 import {
   fetchParteAdversa,
   createParteAdversa,
@@ -56,6 +56,9 @@ export default function ParteAdversa() {
     principal: true,
   });
   const [indiceEditando, setIndiceEditando] = useState(null);
+  const [modalContratosAberto, setModalContratosAberto] = useState(false);
+  const [parteContratosSelecionada, setParteContratosSelecionada] = useState(null);
+
 
 
   useEffect(() => {
@@ -101,7 +104,10 @@ export default function ParteAdversa() {
     setModoVisualizacao(false);
   };
   
-
+  const abrirModalContratos = (parte) => {
+    setParteContratosSelecionada(parte);
+    setModalContratosAberto(true);
+  };
 
   const handleSalvarParte = async () => {
     const { nome, cpf, email, telefone } = formParte;
@@ -342,16 +348,10 @@ const partesFiltradas = partes.filter((p) => {
                 />
               </div>
 
-              {!modoVisualizacao && (
-                <div className="usuarios-modal-actions usuarios-modal-mais-endereco">
-                  <Button type="button" variant="secondary" onClick={() => setAdicionandoEndereco(true)}>
-                    + Endereço
-                  </Button>
-                </div>
-              )}
+              
 
               {!modoVisualizacao && (
-                <div className="usuarios-modal-actions">
+                <div className="botao-salvar-bottom">
                   <Button type="submit" ref={salvarButtonRef}>
                     Salvar
                   </Button>
@@ -363,7 +363,7 @@ const partesFiltradas = partes.filter((p) => {
             <div className="split-right">
               {adicionandoEndereco ? (
                 <>
-                  <h5>Adicionar Endereço</h5>
+                  <h5>{indiceEditando !== null ? "Editar Endereço" : "Adicionar Endereço"}</h5>
                   <div className="linha-endereco">
                     <div className="input-flex-1">
                       <label className="usuarios-label">CEP</label>
@@ -443,6 +443,23 @@ const partesFiltradas = partes.filter((p) => {
                     >
                       Cancelar
                     </Button>
+
+                    {indiceEditando !== null && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => {
+                          const novos = [...enderecos];
+                          novos.splice(indiceEditando, 1);
+                          setEnderecos(novos);
+                          setIndiceEditando(null);
+                          setAdicionandoEndereco(false);
+                        }}
+                      >
+                        Deletar
+                      </Button>
+                    )}
+
                     <Button
                       type="button"
                       onClick={() => {
@@ -485,37 +502,65 @@ const partesFiltradas = partes.filter((p) => {
                 <>
                 <div className="enderecos-lista">
                   <h4>Endereços Adicionados:</h4>
-                  <ul className="enderecos-lista">
-                  {enderecos.map((end, index) => (
-                      <li
-                        key={index}
-                        className={`endereco-item ${end.principal ? "principal" : ""}`}
-                        onClick={() => {
-                          setFormEndereco(end);
-                          setIndiceEditando(index);
-                          setAdicionandoEndereco(true);
-                        }}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <div className="endereco-texto">
-                          <div>
-                            {end.rua} - {end.numero}
-                            {end.complemento ? ` - ${end.complemento}` : ""}
+                  <div>
+                    <ul className="enderecos-lista">
+                    {enderecos.map((end, index) => (
+                        <li
+                          key={index}
+                          className={`endereco-item ${end.principal ? "principal" : ""}`}
+                          onClick={() => {
+                            setFormEndereco(end);
+                            setIndiceEditando(index);
+                            setAdicionandoEndereco(true);
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="endereco-texto">
+                            <div>
+                              {end.rua} - {end.numero}
+                              {end.complemento ? ` - ${end.complemento}` : ""}
+                            </div>
+                            <div>
+                              {end.bairro} - {end.cidade} - {end.uf}
+                            </div>
+                            <div>CEP - {end.cep}</div>
                           </div>
-                          <div>
-                            {end.bairro} - {end.cidade} - {end.uf}
-                          </div>
-                          <div>CEP - {end.cep}</div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-
-
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    {!modoVisualizacao && !adicionandoEndereco && (
+                      <div className="botao-endereco-bottom">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            setFormEndereco({
+                              cep: "",
+                              uf: "",
+                              cidade: "",
+                              bairro: "",
+                              rua: "",
+                              numero: "",
+                              complemento: "",
+                              principal: true,
+                            });
+                            setIndiceEditando(null); 
+                            setAdicionandoEndereco(true); 
+                          }}
+                          >
+                          + Endereço
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 </>
               )}
             </div>
+
+            
               </form>
           </DialogContent>
           
@@ -561,6 +606,13 @@ const partesFiltradas = partes.filter((p) => {
                   >
                     <Eye size={16} className="mr-1" />Detalhar
                   </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => abrirModalContratos(p)}
+                    className="ml-2"
+                    >
+                    <FileText size={16} className="mr-1" />Contratos                  
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -573,6 +625,29 @@ const partesFiltradas = partes.filter((p) => {
           <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
           <DialogTitle>{tituloSucesso || "Ação Confirmada"}</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">{mensagemSucesso}</DialogDescription>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={modalContratosAberto} onOpenChange={setModalContratosAberto}>
+        <DialogOverlay className="dialog-overlay" />
+        <DialogContent className="dashboard-modal dashboard-no-close">
+          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+          <DialogTitle>Contratos da Parte</DialogTitle>
+          <DialogDescription className="usuarios-modal-descricao">
+            {parteContratosSelecionada?.nome}
+          </DialogDescription>
+
+          {/* LISTAGEM DE CONTRATOS */}
+          {parteContratosSelecionada?.contratos?.length > 0 ? (
+            <ul>
+              {parteContratosSelecionada.contratos.map((contrato, idx) => (
+                <li key={idx}>
+                  {contrato.titulo || `Contrato #${idx + 1}`} - {contrato.status}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Nenhum contrato vinculado a esta parte.</p>
+          )}
         </DialogContent>
       </Dialog>
     </div>
