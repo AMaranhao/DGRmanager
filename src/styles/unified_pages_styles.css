@@ -2014,4 +2014,34 @@ body.dark {
 }
 
 
+/* ======================== */
+/*    Tabela Contratos      */
+/* ======================== */
+
+.col-numero {
+  width: 3rem !important; /* 120px */
+}
+
+.col-valor {
+  width: 5rem !important; /* 110px */
+}
+
+.col-status {
+  width: 8rem !important; /* 130px */
+}
+
+.col-responsavel {
+  min-width: 13.75rem !important; /* 220px */
+}
+
+.col-lote {
+  min-width: none !important;
+  width: 1rem !important; /* 80px */
+}
+
+.col-acoes {
+  width: 9.375rem !important; /* 150px */
+}
+
+
 

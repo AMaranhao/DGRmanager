@@ -4,7 +4,29 @@ import { get, post, put, del } from './apiService';
 
 
 const BASE_URL = '/atribuicoes';
+const BASE_URL_ACORDO   = '/atribuicoes-acordo';
+const BASE_URL_PROCESSO = '/atribuicoes-processo';
+const BASE_URL_AGENDA   = '/atribuicoes-agenda';
 
+//---------------------------------------//
+// Endpoints para get especificos        //
+//---------------------------------------//
+
+export async function fetchAtribuicoesAcordo() {
+  return await get(BASE_URL_ACORDO);
+}
+
+export async function fetchAtribuicoesProcesso() {
+  return await get(BASE_URL_PROCESSO);
+}
+
+export async function fetchAtribuicoesAgenda() {
+  return await get(BASE_URL_AGENDA);
+}
+
+//---------------------------------------//
+// Endpoints para CRUD de atribuicoes    //
+//---------------------------------------//
 export async function fetchAtribuicoes() {
   return await get(BASE_URL);
 }

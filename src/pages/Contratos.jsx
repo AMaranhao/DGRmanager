@@ -1,41 +1,30 @@
 // src/pages/Contratos.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, Pencil, Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogOverlay,
 } from "@/components/ui/dialog";
-import { Eye, Pencil, Plus } from "lucide-react";
-import {
-  fetchContratos, createContrato, updateContrato, deleteContrato,
-} from "@/services/ENDPOINTS_ServiceContratos";
+
+import { fetchContratos, createContrato, updateContrato } from "@/services/ENDPOINTS_ServiceContratos";
+
+import { fetchAtribuicoesAcordo } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+
 import "@/styles/unified_styles.css";
 
-const STATUS_ORDER = [
-  "Criação",
-  "Partes",
-  "Aguard. Processo",
-  "Acordo Realizado",
-  "Sem Acordo",
-  "Finalizado",
-];
-
-// se vier “texto longo”, mapeia pra curto (você já definiu curtos, mas deixo aqui pra blindar)
-const toShortStatus = (s) => {
-  const map = {
-    "Criação": "Criação",
-    "Partes": "Partes",
-    "Aguard. Processo": "Aguard. Proc.",
-    "Acordo Realizado": "Acordo OK",
-    "Sem Acordo": "Sem Acordo",
-    "Finalizado": "Finalizado",
-  };
-  return map[s] || s;
-};
-
 const getCurrentEvento = (c) => c?.atribuicoes_evento?.[0] || null;
-const getStatus = (c) => toShortStatus(getCurrentEvento(c)?.atribuicao_descricao || "");
-const getResponsavel = (c) => getCurrentEvento(c)?.responsavel?.nome || "-";
+
+// normaliza texto: remove acentos e deixa minúsculo
+const norm = (s) =>
+  (s ?? "")
+    .toString()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+
+
 
 export default function Contratos() {
   const [lista, setLista] = useState([]);
@@ -61,31 +50,81 @@ export default function Contratos() {
   // lado direito do modal (partes vinculadas) – placeholder
   const [partesVinculadas, setPartesVinculadas] = useState([]); // [{id, nome}]
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await fetchContratos();
-        // garante ordem por status conforme STATUS_ORDER, se quiser
-        const sorted = [...data].sort((a, b) => {
-          const ia = STATUS_ORDER.indexOf(getStatus(a)) ?? 99;
-          const ib = STATUS_ORDER.indexOf(getStatus(b)) ?? 99;
-          return ia - ib;
-        });
-        setLista(sorted);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // ✅ Atribuições / status vindos da API
+const [atribs, setAtribs] = useState([]);
 
-  const filtrados = useMemo(() => {
-    return lista.filter((c) => {
-      const okStatus = fStatus ? getStatus(c) === fStatus : true;
-      const okLote = fLote ? String(c.lote || "").includes(String(fLote)) : true;
-      return okStatus && okLote;
-    });
-  }, [lista, fStatus, fLote]);
+// Mapa dinâmico: descrição longa -> rótulo curto
+const statusOrder = useMemo(() => {
+  return (atribs || []).map(a => a.descricao);
+}, [atribs]);
+
+// Helpers que dependem do status curto
+const getStatus = (c) =>
+  getCurrentEvento(c)?.atribuicao_descricao || "";
+
+const getResponsavel = (c) =>
+  getCurrentEvento(c)?.responsavel?.nome || "-";
+
+
+  // 1) Carrega as atribuições (status) uma única vez
+useEffect(() => {
+  (async () => {
+    setLoading(true);
+    try {
+      const s = await fetchAtribuicoesAcordo();
+      setAtribs(Array.isArray(s) ? s : []);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
+// 2) Depois que as atribuições estiverem carregadas, carrega contratos e ordena
+useEffect(() => {
+  if (!atribs?.length) return;
+
+  (async () => {
+    setLoading(true);
+    try {
+      const data = await fetchContratos();
+
+      const sorted = [...data].sort((a, b) => {
+        const sa = getStatus(a);
+        const sb = getStatus(b);
+        const ia = statusOrder.indexOf(sa);
+        const ib = statusOrder.indexOf(sb);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      });
+
+      setLista(sorted);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [atribs]);
+
+  
+
+const filtrados = useMemo(() => {
+  const termo = norm(fLote);
+
+  return lista.filter((c) => {
+    // status exato (como já era)
+    const okStatus = fStatus ? getStatus(c) === fStatus : true;
+
+    // busca livre por lote, nº do contrato ou responsável (parcial, case/acentos-insensitive)
+    const alvoLote = norm(String(c.lote ?? ""));
+    const alvoNumero = norm(String(c.numero ?? ""));
+    const alvoResp = norm(getResponsavel(c));
+
+    const okTexto = termo
+      ? (alvoLote.includes(termo) || alvoNumero.includes(termo) || alvoResp.includes(termo))
+      : true;
+
+    return okStatus && okTexto;
+  });
+}, [lista, fStatus, fLote]);
+
 
   const abrirNovo = () => {
     setEditando(false);
@@ -141,16 +180,19 @@ export default function Contratos() {
               title="Filtrar por status"
             >
               <option value="">Todos os Status</option>
-              {STATUS_ORDER.map((s) => (
-                <option key={s} value={toShortStatus(s)}>{toShortStatus(s)}</option>
+              {(atribs || []).map((a) => (
+                <option key={a.id} value={a.descricao}>
+                  {a.descricao}
+                </option>
               ))}
+
             </select>
           </div>
 
           <div className="dashboard-filtro-group">
             <Input
               className="dashboard-select dashboard-filtro-usuario-input"
-              placeholder="Filtrar por Lote"
+              placeholder="Lote, Contrato ou Resp"
               value={fLote}
               onChange={(e) => setFLote(e.target.value)}
             />
@@ -248,12 +290,12 @@ export default function Contratos() {
         <table className="usuarios-tabela">
           <thead>
             <tr>
-              <th>Número</th>
-              <th>Valor</th>
-              <th>Status</th>
-              <th>Responsável</th>
-              <th>Lote</th>
-              <th>Ações</th>
+              <th className="col-numero">Número</th>
+              <th className="col-valor">Valor</th>
+              <th className="col-status">Status</th>
+              <th className="col-responsavel">Responsável</th>
+              <th className="col-lote">Lote</th>
+              <th className="col-acoes">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -262,12 +304,12 @@ export default function Contratos() {
             ) : filtrados.length ? (
               filtrados.map((c) => (
                 <tr key={c.id}>
-                  <td>{c.numero}</td>
-                  <td>{Number(c.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                  <td>{getStatus(c)}</td>
-                  <td>{getResponsavel(c)}</td>
-                  <td>{c.lote ?? "-"}</td>
-                  <td className="usuarios-acoes">
+                  <td className="col-numero">{c.numero}</td>
+                  <td className="col-valor">{Number(c.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                  <td className="col-status">{getStatus(c)}</td>
+                  <td className="col-responsavel">{getResponsavel(c)}</td>
+                  <td className="col-lote">{c.lote ?? "-"}</td>
+                  <td className="col-acoes">
                     <Button variant="secondary" className="ml-2" onClick={() => abrirEditar(c)}>
                       <Pencil size={16} className="mr-1" />Editar
                     </Button>
