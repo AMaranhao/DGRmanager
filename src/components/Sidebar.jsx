@@ -6,6 +6,7 @@ import {
   Landmark,
   FolderKanban,
   Handshake,
+  FileEdit,
 } from "lucide-react";
 
 import "@/styles/unified_styles.css";
@@ -32,7 +33,7 @@ export default function Sidebar() {
     {
       label: "Contratos",
       path: "/contratos",
-      icon: <Handshake size={28} className="sidebar-icon" />,
+      icon: <FileEdit size={28} className="sidebar-icon" />,
       allowed: ["gestor", "advogado"],
     },
     {

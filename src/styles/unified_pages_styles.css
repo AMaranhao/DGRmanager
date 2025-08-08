@@ -1134,6 +1134,9 @@ input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
 /*  justify-content: flex-start !important;*/
 }
 
+.parte-contrato-modal {
+  padding-bottom: 5rem;
+}
 
 
 .botao-endereco-bottom,
@@ -1620,6 +1623,15 @@ margin-bottom: 0.25rem;
 .enderecos-lista li {
   margin-bottom: 0.5rem;
 }
+
+.botao-adicionar-contrato {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  margin-top: 5rem;
+}
+
+
 
 body.dark {
   background-color: white !important;

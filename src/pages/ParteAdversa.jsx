@@ -1,7 +1,11 @@
 // Novo módulo ParteAdversa.jsx adaptado do Colaboradores.jsx
 
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { X, Trash, Pencil, Eye, FileEdit } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogTrigger,
@@ -10,17 +14,16 @@ import {
   DialogDescription,
   DialogOverlay,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { X, Trash, Pencil, Eye, FileText } from "lucide-react";
+
 import {
   fetchParteAdversa,
   createParteAdversa,
   updateParteAdversa,
 } from "@/services/ENDPOINTS_ServiceParteAdversa";
 
-
-
 import "@/styles/unified_styles.css";
+
+
 
 export default function ParteAdversa() {
   const [partes, setPartes] = useState([]);
@@ -611,7 +614,7 @@ const partesFiltradas = partes.filter((p) => {
                     onClick={() => abrirModalContratos(p)}
                     className="ml-2"
                     >
-                    <FileText size={16} className="mr-1" />Contratos                  
+                    <FileEdit size={16} className="mr-1" />Contratos                  
                   </Button>
                 </td>
               </tr>
@@ -627,10 +630,11 @@ const partesFiltradas = partes.filter((p) => {
           <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">{mensagemSucesso}</DialogDescription>
         </DialogContent>
       </Dialog>
+
       <Dialog open={modalContratosAberto} onOpenChange={setModalContratosAberto}>
         <DialogOverlay className="dialog-overlay" />
-        <DialogContent className="dashboard-modal dashboard-no-close">
-          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+        <DialogContent className="dashboard-modal dashboard-no-close parte-contrato-modal">
+        <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
           <DialogTitle>Contratos da Parte</DialogTitle>
           <DialogDescription className="usuarios-modal-descricao">
             {parteContratosSelecionada?.nome}
@@ -638,16 +642,30 @@ const partesFiltradas = partes.filter((p) => {
 
           {/* LISTAGEM DE CONTRATOS */}
           {parteContratosSelecionada?.contratos?.length > 0 ? (
-            <ul>
-              {parteContratosSelecionada.contratos.map((contrato, idx) => (
-                <li key={idx}>
-                  {contrato.titulo || `Contrato #${idx + 1}`} - {contrato.status}
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="lista-contratos">
+                {parteContratosSelecionada.contratos.map((contrato, idx) => (
+                  <li key={contrato.id}>
+                    <Link to={`/contratos/${contrato.id}`} className="contrato-link">
+                      {contrato.numero}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : (
             <p>Nenhum contrato vinculado a esta parte.</p>
           )}
+            <div className="botao-adicionar-contrato">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      console.log("Adicionar contrato clicado");
+                    }}
+                  >
+                    Adicionar
+                  </Button>
+            </div>
         </DialogContent>
       </Dialog>
     </div>
