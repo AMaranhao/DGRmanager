@@ -93,10 +93,12 @@ const norm = (s) =>
   // ✅ Atribuições / status vindos da API
 const [atribs, setAtribs] = useState([]);
 
+/*
 // Mapa dinâmico: descrição longa -> rótulo curto
 const statusOrder = useMemo(() => {
   return (atribs || []).map(a => a.descricao);
 }, [atribs]);
+*/
 
 // Helpers que dependem do status curto
 const getStatus = (c) =>
@@ -114,6 +116,56 @@ useEffect(() => {
 }, [modalAberto, visualizando]);
 
 
+
+useEffect(() => {
+  (async () => {
+    setLoading(true);
+    try {
+      // carrega atribuições + contratos em paralelo
+      const [atribsRes, contratosRes] = await Promise.all([
+        fetchAtribuicoesAcordo(),
+        fetchContratos(),
+      ]);
+
+      const atribsArr = Array.isArray(atribsRes) ? atribsRes : [];
+      setAtribs(atribsArr);
+
+      // mapa descrição -> ordem (para ordenar contratos por status)
+      const ordem = new Map(atribsArr.map((a, i) => [a.descricao, i]));
+
+      // "decora" contratos com campos derivados para evitar recomputar sempre
+      const decorados = (Array.isArray(contratosRes) ? contratosRes : []).map((c) => {
+        const evt = getCurrentEvento(c);
+        const status = evt?.atribuicao_descricao || "";
+        const resp = evt?.responsavel?.nome || "-";
+        const valorBRL =
+          typeof c.valor === "number"
+            ? c.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+            : "-";
+
+        return {
+          ...c,
+          _evt: evt,
+          _status: status,
+          _responsavel: resp,
+          _valorBRL: valorBRL,
+          _ordemStatus: ordem.has(status) ? ordem.get(status) : 99,
+        };
+      });
+
+      // ordena uma vez só
+      decorados.sort((a, b) => a._ordemStatus - b._ordemStatus);
+
+      setLista(decorados);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
+
+
+/*
   // 1) Carrega as atribuições (status) uma única vez
 useEffect(() => {
   (async () => {
@@ -173,6 +225,29 @@ const filtrados = useMemo(() => {
     return okStatus && okTexto;
   });
 }, [lista, fStatus, fLote]);
+*/
+
+const filtrados = useMemo(() => {
+  const termo = norm(fLote);
+
+  return lista.filter((c) => {
+    // status exato usando o campo decorado
+    const okStatus = fStatus ? c._status === fStatus : true;
+
+    // busca livre usando campos já normalizados
+    const alvoLote   = norm(String(c.lote ?? ""));
+    const alvoNumero = norm(String(c.numero ?? ""));
+    const alvoResp   = norm(c._responsavel);
+    const alvoStatus = norm(c._status);
+
+    const okTexto = termo
+      ? (alvoLote.includes(termo) || alvoNumero.includes(termo) || alvoResp.includes(termo) || alvoStatus.includes(termo))
+      : true;
+
+    return okStatus && okTexto;
+  });
+}, [lista, fStatus, fLote]);
+
 
 
   const abrirNovo = () => {
@@ -720,9 +795,17 @@ const filtrados = useMemo(() => {
               filtrados.map((c) => (
                 <tr key={c.id}>
                   <td className="col-numero">{c.numero}</td>
+
+
+                  <td className="col-valor">{c._valorBRL}</td>
+                  <td className="col-status">{c._status}</td>
+                  <td className="col-responsavel">{c._responsavel}</td>
+                  {/*
                   <td className="col-valor">{Number(c.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
                   <td className="col-status">{getStatus(c)}</td>
                   <td className="col-responsavel">{getResponsavel(c)}</td>
+                  */}
+
                   <td className="col-lote">{c.lote ?? "-"}</td>
                   <td className="col-acoes">
                     <Button
