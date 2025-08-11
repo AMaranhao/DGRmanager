@@ -9,12 +9,32 @@ import {
 } from "@/components/ui/dialog";
 
 import { fetchContratos, createContrato, updateContrato } from "@/services/ENDPOINTS_ServiceContratos";
+import { fetchParteAdversa } from "@/services/ENDPOINTS_ServiceParteAdversa"; // GET /parte-adversa?termo=...
+
 
 import { fetchAtribuicoesAcordo } from "@/services/ENDPOINTS_ServiceAtribuicoes";
 
 import "@/styles/unified_styles.css";
+import "@/styles/unified_refactored_styles.css";
 
-const getCurrentEvento = (c) => c?.atribuicoes_evento?.[0] || null;
+
+
+
+
+
+
+const getCurrentEvento = (c) => {
+  const evts = Array.isArray(c?.atribuicoes_evento) ? c.atribuicoes_evento : [];
+  if (!evts.length) return null;
+
+  // prioriza a data mais recente; se empatar, maior id
+  return [...evts].sort((a, b) => {
+    const da = a?.data_inicial ?? "";
+    const db = b?.data_inicial ?? "";
+    if (da && db && da !== db) return da > db ? 1 : -1;
+    return (a?.id ?? 0) - (b?.id ?? 0);
+  }).at(-1);
+};
 
 // normaliza texto: remove acentos e deixa minúsculo
 const norm = (s) =>
@@ -25,30 +45,50 @@ const norm = (s) =>
     .toLowerCase();
 
 
+    export default function Contratos() {
+      const [lista, setLista] = useState([]);
+      const [loading, setLoading] = useState(false);
+    
+      // filtros
+      const [fStatus, setFStatus] = useState("");
+      const [fLote, setFLote] = useState("");
+    
+      // modal
+      const [modalAberto, setModalAberto] = useState(false);
+      const [editando, setEditando] = useState(false);
+      const salvarRef = useRef(null);
+    
+      // form contrato (lado esquerdo do modal)
+      const [form, setForm] = useState({
+        numero: "",
+        valor: "",
+        lote: "",
+        observacao: "",
+        atribId: "",
+      });
+    
+      // lado direito do modal (partes vinculadas)
+      const [partesVinculadas, setPartesVinculadas] = useState([]);
+    
+      // >>> estados do + Parte (PRECISAM estar aqui dentro) <<<
+      const [showFormParte, setShowFormParte] = useState(false);
+      const [fetchParte, setSearchParte] = useState("");
+      const [foundParte, setFoundParte] = useState(null);
+      const [fetchingParte, setSearchingParte] = useState(false);
+      const [parteAviso, setParteAviso] = useState("");
+      const [parteParaRemover, setParteParaRemover] = useState(null);
+      const [visualizando, setVisualizando] = useState(false);
+      // identifica o contrato aberto no modal
+      const [contratoSelecionado, setContratoSelecionado] = useState(null);
 
-export default function Contratos() {
-  const [lista, setLista] = useState([]);
-  const [loading, setLoading] = useState(false);
+      // histórico de atribuições (modo Detalhar)
+      const [mostrarHistorico, setMostrarHistorico] = useState(false);
+      const [historicoAtribs, setHistoricoAtribs] = useState([]);
+      const [loadingHistorico, setLoadingHistorico] = useState(false);
+      const [rightMode, setRightMode] = useState("partes");
 
-  // filtros
-  const [fStatus, setFStatus] = useState("");
-  const [fLote, setFLote] = useState("");
 
-  // modal
-  const [modalAberto, setModalAberto] = useState(false);
-  const [editando, setEditando] = useState(false);
-  const salvarRef = useRef(null);
 
-  // form contrato (lado esquerdo do modal)
-  const [form, setForm] = useState({
-    numero: "",
-    valor: "",
-    lote: "",
-    observacao: "",
-  });
-
-  // lado direito do modal (partes vinculadas) – placeholder
-  const [partesVinculadas, setPartesVinculadas] = useState([]); // [{id, nome}]
 
   // ✅ Atribuições / status vindos da API
 const [atribs, setAtribs] = useState([]);
@@ -64,6 +104,14 @@ const getStatus = (c) =>
 
 const getResponsavel = (c) =>
   getCurrentEvento(c)?.responsavel?.nome || "-";
+
+useEffect(() => {
+  if (modalAberto && !visualizando) {
+    requestAnimationFrame(() => {
+      salvarRef.current?.focus();
+    });
+  }
+}, [modalAberto, visualizando]);
 
 
   // 1) Carrega as atribuições (status) uma única vez
@@ -101,7 +149,7 @@ useEffect(() => {
       setLoading(false);
     }
   })();
-}, [atribs]);
+}, [statusOrder]);
 
   
 
@@ -109,16 +157,17 @@ const filtrados = useMemo(() => {
   const termo = norm(fLote);
 
   return lista.filter((c) => {
-    // status exato (como já era)
+    // status exato
     const okStatus = fStatus ? getStatus(c) === fStatus : true;
 
-    // busca livre por lote, nº do contrato ou responsável (parcial, case/acentos-insensitive)
-    const alvoLote = norm(String(c.lote ?? ""));
-    const alvoNumero = norm(String(c.numero ?? ""));
-    const alvoResp = norm(getResponsavel(c));
+    // busca livre (lote, nº contrato, responsável, status)
+    const alvoLote    = norm(String(c.lote ?? ""));
+    const alvoNumero  = norm(String(c.numero ?? ""));
+    const alvoResp    = norm(getResponsavel(c));
+    const alvoStatus  = norm(getStatus(c));
 
     const okTexto = termo
-      ? (alvoLote.includes(termo) || alvoNumero.includes(termo) || alvoResp.includes(termo))
+      ? (alvoLote.includes(termo) || alvoNumero.includes(termo) || alvoResp.includes(termo) || alvoStatus.includes(termo))
       : true;
 
     return okStatus && okTexto;
@@ -127,25 +176,180 @@ const filtrados = useMemo(() => {
 
 
   const abrirNovo = () => {
+    setShowFormParte(false);
+    setSearchParte("");
+    setFoundParte(null);
+    setRightMode("partes");
+    setParteAviso("");
+
     setEditando(false);
-    setForm({ numero: "", valor: "", lote: "", observacao: "" });
+    setForm({ numero: "", valor: "", lote: "", observacao: "", atribId: "" });
     setPartesVinculadas([]);
     setModalAberto(true);
     setTimeout(() => salvarRef.current?.focus(), 0);
   };
 
+  const abrirDetalhar = (c) => {
+    setVisualizando(true);
+    setShowFormParte(false);
+    setSearchParte("");
+    setFoundParte(null);
+    setParteAviso("");
+    setRightMode("partes");      
+    setMostrarHistorico(false);
+    setHistoricoAtribs([]);
+    setEditando(false);
+    setForm({
+      numero: c.numero || "",
+      valor: c.valor ?? "",
+      lote: c.lote ?? "",
+      observacao: c.observacao ?? "",
+      atribId: getCurrentEvento(c)?.atribuicao_id ?? "",
+    });
+  
+    setPartesVinculadas(c.partes || []);
+    setContratoSelecionado(c);           // <<< guarda o contrato aberto
+    setMostrarHistorico(false);          // reseta a seção de histórico
+    setHistoricoAtribs([]);
+  
+    setModalAberto(true);
+    requestAnimationFrame(() => document.activeElement.blur());
+  };
+  
+  
+  
+
+  
   const abrirEditar = (c) => {
+    setShowFormParte(false);
+    setSearchParte("");
+    setFoundParte(null);
+    setParteParaRemover(null);
+    setRightMode("partes");
+    setParteAviso("");
+
     setEditando(true);
     setForm({
       numero: c.numero || "",
       valor: c.valor ?? "",
       lote: c.lote ?? "",
       observacao: c.observacao ?? "",
+      atribId: getCurrentEvento(c)?.atribuicao_id ?? "",
     });
     setPartesVinculadas(c.partes || []);
     setModalAberto(true);
     setTimeout(() => salvarRef.current?.focus(), 0);
   };
+
+
+  const carregarHistoricoAtribuicoes = async () => {
+    if (!contratoSelecionado) return;
+    setLoadingHistorico(true);
+    try {
+      // Usamos os eventos já presentes no contrato (atribuicoes_evento),
+      // que você já utiliza para calcular o status atual.
+      const eventos = Array.isArray(contratoSelecionado.atribuicoes_evento)
+        ? contratoSelecionado.atribuicoes_evento
+        : [];
+  
+      // ordena de forma crescente pela data e, em empate, pelo id
+      const ordenados = [...eventos].sort((a, b) => {
+        const da = a?.data_inicial ?? "";
+        const db = b?.data_inicial ?? "";
+        if (da && db && da !== db) return da < db ? -1 : 1; // crescente
+        return (a?.id ?? 0) - (b?.id ?? 0);
+      });
+  
+      setHistoricoAtribs(ordenados);
+      setMostrarHistorico(true);
+    } finally {
+      setLoadingHistorico(false);
+    }
+  };
+  
+
+
+  const handleBuscarParte = async () => {
+    const termo = fetchParte; // o que o usuário digitou (sem validação no front)
+    const cpfDigits = (termo || "").replace(/\D/g, ""); // normaliza só pra comparar
+  
+    setParteAviso("");      // opcional, limpa aviso anterior
+    setSearchingParte(true);
+    try {
+      const results = await fetchParteAdversa(termo); // backend decide como processar o termo
+  
+      // >>> MATCH SOMENTE POR CPF no JSON de resposta <<<
+      const match =
+        (results || []).find(
+          (p) => ((p?.cpf || "").replace(/\D/g, "") === cpfDigits)
+        ) || null;
+  
+      setFoundParte(match);
+  
+      if (!match) {
+        setParteAviso("CPF não encontrado.");
+      }
+    } finally {
+      setSearchingParte(false);
+    }
+  };
+  
+  const handleRemoverParte = (parte) => {
+    // remove por id ou, se não tiver id, por CPF normalizado
+    const onlyDigits = (s) => (s || "").replace(/\D/g, "");
+    setPartesVinculadas((prev) =>
+      prev.filter((p) => {
+        const sameId = p.id && parte.id && p.id === parte.id;
+        const sameCpf =
+          onlyDigits(p.cpf) &&
+          onlyDigits(parte.cpf) &&
+          onlyDigits(p.cpf) === onlyDigits(parte.cpf);
+        return !(sameId || sameCpf);
+      })
+    );
+    // opcional: mostrar um aviso no próprio modal
+    setParteAviso("Parte removida.");
+  };
+  
+  
+  const handleAdicionarParte = () => {
+    if (!foundParte) return;
+  
+    const onlyDigits = (s) => (s || "").replace(/\D/g, "");
+    const alvoCPF = onlyDigits(foundParte.cpf);
+  
+    const jaExiste = partesVinculadas.some((p) => {
+      const cpfExistente = onlyDigits(p.cpf);
+      if (alvoCPF && cpfExistente) return cpfExistente === alvoCPF;
+      if (!alvoCPF && !cpfExistente && p.id && foundParte.id) return p.id === foundParte.id;
+      return false;
+    });
+  
+    if (jaExiste) {
+      setParteAviso("Essa parte já está vinculada a este contrato.");
+      return;
+    }
+  
+    setPartesVinculadas((prev) => [
+      ...prev,
+      {
+        id: foundParte.id,
+        nome: foundParte.nome,
+        cpf: foundParte.cpf,
+        tipo_parte: foundParte.tipo_parte || "Réu",
+      },
+    ]);
+  
+    // reset e volta para lista
+    setShowFormParte(false);
+    setSearchParte("");
+    setFoundParte(null);
+    setParteParaRemover(null);
+    setParteAviso(""); // limpar aviso após sucesso
+  };
+  
+  
+
 
   const salvar = async () => {
     // TODO: montar payload final
@@ -154,6 +358,7 @@ const filtrados = useMemo(() => {
       valor: form.valor ? Number(form.valor) : null,
       lote: form.lote ? String(form.lote).trim() : null,
       observacao: form.observacao?.trim() || "",
+      atrib_id: form.atribId || null,
       // partes_contrato viriam aqui quando formarmos o payload final
     };
     if (editando) {
@@ -199,95 +404,305 @@ const filtrados = useMemo(() => {
           </div>
         </div>
 
-        <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <Dialog open={modalAberto} onOpenChange={(open) => {
+            setModalAberto(open);
+            if (!open) {
+              setVisualizando(false);
+              setRightMode("partes");
+            }
+          }}>
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
-            <Button className="usuarios-btn-material" onClick={abrirNovo}>
+            <Button
+              className="usuarios-btn-material"
+              onClick={(e) => {
+                e.currentTarget.blur();
+                abrirNovo();
+              }}
+            >
               <Plus size={16} /> Novo Contrato
             </Button>
           </DialogTrigger>
 
           <DialogContent
-            className="dashboard-modal dashboard-no-close split-modal"
-            onOpenAutoFocus={(e) => e.preventDefault()}
+              className="contratos-modal contratos-modal-no-close contratos-split-modal"
+              onOpenAutoFocus={(e) => {
+                if (visualizando) {
+                  e.preventDefault();               // impede o foco automático do Radix
+                  requestAnimationFrame(() => {
+                    document.activeElement?.blur(); // garante que nada fique focado
+                  });
+                }
+              }}
           >
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
-            <div className="split-left">
-              <DialogTitle>{editando ? "Editar Contrato" : "Novo Contrato"}</DialogTitle>
-              <DialogDescription className="usuarios-modal-descricao">
+            <div className="contratos-split-modal-left">
+              <DialogTitle>
+                {visualizando ? "Detalhar Contrato" : editando ? "Editar Contrato" : "Novo Contrato"}
+              </DialogTitle>
+              <DialogDescription className="contratos-modal-descricao">
                 Preencha os dados do contrato.
               </DialogDescription>
 
-              <div className="usuarios-input-wrapper">
-                <label className="usuarios-label">Número</label>
+              <div className="contratos-input-wrapper">
+                <label className="contratos-input-label">Número</label>
                 <Input
-                  className="usuarios-modal-input"
+                  className="contratos-modal-input"
                   value={form.numero}
                   onChange={(e) => setForm({ ...form, numero: e.target.value })}
+                  readOnly={visualizando}
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
-                <label className="usuarios-label">Valor</label>
+              <div className="contratos-input-wrapper">
+                <label className="contratos-input-label">Valor</label>
                 <Input
-                  className="usuarios-modal-input"
+                  className="contratos-modal-input"
                   type="number"
                   value={form.valor}
                   onChange={(e) => setForm({ ...form, valor: e.target.value })}
+                  readOnly={visualizando}
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
-                <label className="usuarios-label">Lote</label>
+              <div className="contratos-input-wrapper">
+                <label className="contratos-input-label">Lote</label>
                 <Input
-                  className="usuarios-modal-input"
+                  className="contratos-modal-input"
                   value={form.lote}
                   onChange={(e) => setForm({ ...form, lote: e.target.value })}
+                  readOnly={visualizando}
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
-                <label className="usuarios-label">Observação</label>
+              <div className="contratos-input-wrapper">
+                <label className="contratos-input-label">Observação</label>
                 <Input
-                  className="usuarios-modal-input"
+                  className="contratos-modal-input"
                   value={form.observacao}
                   onChange={(e) => setForm({ ...form, observacao: e.target.value })}
+                  readOnly={visualizando}
                 />
               </div>
 
+              <div className="contratos-input-wrapper">
+                <label className="contratos-input-label">Atribuição (status)</label>
+                <select
+                  className="usuarios-modal-select"
+                  value={form.atribId}
+                  onChange={(e) => setForm({ ...form, atribId: e.target.value ? Number(e.target.value) : "" })}
+                  disabled={visualizando}
+                >
+                  <option value="">Selecione…</option>
+                  {(atribs || []).map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.descricao}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {!visualizando && (
               <div className="botao-salvar-bottom">
                 <Button ref={salvarRef} onClick={salvar}>Salvar</Button>
               </div>
+              )}
             </div>
 
-            <div className="split-right">
-              <h5>Partes vinculadas</h5>
-              {partesVinculadas?.length ? (
-                <ul className="enderecos-lista">
-                  {partesVinculadas.map((p) => (
-                    <li key={p.id} className="endereco-item">
-                      <div className="endereco-texto">
-                        <div>{p.nome}</div>
-                        <div className="text-xs text-gray-500">{p.tipo_parte}</div>
-                      </div>
-                    </li>
-                  ))}
+            <div className="contratos-split-modal-right">
+              {/* Cabeçalho com título dinâmico + botão de alternância (somente no Detalhar) */}
+              <div className="flex items-center justify-between">
+                <h5>{rightMode === "historico" ? "Histórico de Atribuições" : "Partes vinculadas"}</h5>
+
+                {visualizando && (
+                  <Button
+                    variant="secondary"
+                    className="botao-adicionar-contrato"
+                    onClick={async () => {
+                      if (rightMode === "partes") {
+                        // entrando no histórico: carrega se ainda não carregou
+                        if (!mostrarHistorico) {
+                          await carregarHistoricoAtribuicoes();
+                        }
+                        setRightMode("historico");
+                      } else {
+                        // voltando para Partes
+                        setRightMode("partes");
+                      }
+                    }}
+                  >
+                    {rightMode === "partes" ? "Atribuições" : "Partes"}
+                  </Button>
+                )}
+              </div>
+
+              {/* Conteúdo do painel direito */}
+              {rightMode === "historico" ? (
+                // ======= MODO HISTÓRICO =======
+                <ul className="contratos-modal-right-lista" style={{ marginTop: "0.75rem" }}>
+                  {loadingHistorico && <li>Carregando histórico…</li>}
+                  {!loadingHistorico && historicoAtribs.length === 0 && (
+                    <li>Nenhuma atribuição encontrada.</li>
+                  )}
+                  {!loadingHistorico &&
+                    historicoAtribs.map((evt) => {
+                      const dt = evt?.data_inicial ? new Date(evt.data_inicial) : null;
+                      const dataStr = dt ? dt.toLocaleDateString("pt-BR") : "—";
+                      const desc = evt?.atribuicao_descricao || "—";
+                      const resp = evt?.responsavel?.nome || "—";
+                      return (
+                        <li key={evt.id ?? `${evt.data_inicial}-${desc}`}>
+                          {dataStr} — {desc} — Responsável: {resp}
+                        </li>
+                      );
+                    })}
                 </ul>
               ) : (
-                <p>Nenhuma parte vinculada ainda.</p>
-              )}
+                // ======= MODO PARTES =======
+                <>
+                  {showFormParte && !visualizando ? (
+                    // ===== Form de busca de Parte já existente =====
+                    <div className="parte-contrato-modal">
+                      <div className="editable-input-wrapper">
+                        <label className="usuarios-label">CPF</label>
+                        <Input
+                          className="usuarios-modal-input"
+                          value={fetchParte}
+                          onChange={(e) => setSearchParte(e.target.value)}
+                          placeholder="Digite o CPF"
+                        />
+                      </div>
 
-              {/* Aqui depois você coloca o botão flutuante para “+ Parte”,
-                  igual fizemos no outro modal */}
+                      <div className="non-editable-input-wrapper">
+                        <label className="usuarios-label">Nome</label>
+                        <Input
+                          className="usuarios-modal-input"
+                          value={foundParte?.nome || ""}
+                          readOnly
+                          placeholder="—"
+                        />
+                      </div>
+
+                      <div className="non-editable-input-wrapper">
+                        <label className="usuarios-label">CPF</label>
+                        <Input
+                          className="usuarios-modal-input"
+                          value={foundParte?.cpf || ""}
+                          readOnly
+                          placeholder="—"
+                        />
+                      </div>
+
+                      {parteAviso && (
+                        <div
+                          className="dashboard-modal-error"
+                          style={{ margin: "0.5rem 0 0.25rem 0" }}
+                        >
+                          {parteAviso}
+                        </div>
+                      )}
+
+                      {/* Ações do formulário de Parte */}
+                      <div className="botao-adicionar-contrato">
+                        {!parteParaRemover ? (
+                          <>
+                            <Button onClick={handleBuscarParte} disabled={fetchingParte}>
+                              {fetchingParte ? "Buscando..." : "Buscar"}
+                            </Button>
+                            {foundParte && (
+                              <Button className="ml-2" onClick={handleAdicionarParte}>
+                                Adicionar
+                              </Button>
+                            )}
+                          </>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              handleRemoverParte(parteParaRemover);
+                              setShowFormParte(false);
+                              setFoundParte(null);
+                              setParteParaRemover(null);
+                            }}
+                          >
+                            Remover
+                          </Button>
+                        )}
+
+                        <Button
+                          variant="outline"
+                          className="ml-2"
+                          onClick={() => {
+                            setShowFormParte(false);
+                            setSearchParte("");
+                            setFoundParte(null);
+                            setParteParaRemover(null);
+                            setParteAviso("");
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    // ===== Lista de Partes =====
+                    <>
+                      {partesVinculadas?.length ? (
+                        <ul className="contratos-modal-right-lista">
+                          {partesVinculadas.map((p) => (
+                            <li
+                              key={p.id ?? p.cpf}
+                              className="contratos-modal-right-item"
+                              onClick={
+                                visualizando
+                                  ? undefined
+                                  : () => {
+                                      setFoundParte(p);
+                                      setSearchParte("");
+                                      setParteParaRemover(p);
+                                      setShowFormParte(true);
+                                      setParteAviso("");
+                                    }
+                              }
+                              style={{ cursor: visualizando ? "default" : "pointer" }}
+                              title={visualizando ? undefined : "Clique para remover"}
+                            >
+                              <div className="contratos-modal-right-texto">
+                                <div>{p.nome}</div>
+                                <div className="text-xs text-gray-500">
+                                  {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
+                                </div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>Nenhuma parte vinculada ainda.</p>
+                      )}
+
+                      {/* + Parte só aparece em Novo/Editar */}
+                      {!visualizando && (
+                        <Button
+                          className="botao-adicionar-contrato"
+                          onClick={() => setShowFormParte(true)}
+                        >
+                          + Parte
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </DialogContent>
+
         </Dialog>
       </div>
 
       {/* Tabela */}
       <div className="usuarios-tabela-wrapper">
-        <table className="usuarios-tabela">
+        <table className="usuarios-tabela contratos-tabela">
           <thead>
             <tr>
               <th className="col-numero">Número</th>
@@ -310,10 +725,18 @@ const filtrados = useMemo(() => {
                   <td className="col-responsavel">{getResponsavel(c)}</td>
                   <td className="col-lote">{c.lote ?? "-"}</td>
                   <td className="col-acoes">
-                    <Button variant="secondary" className="ml-2" onClick={() => abrirEditar(c)}>
+                    <Button
+                      variant="secondary"
+                      className="ml-2"
+                      onClick={(e) => { e.currentTarget.blur(); abrirEditar(c); }}
+                    >
                       <Pencil size={16} className="mr-1" />Editar
                     </Button>
-                    <Button variant="outline" className="ml-2" onClick={() => {/* abrir modal detalhar */}}>
+                    <Button
+                      variant="outline"
+                      className="ml-2"
+                      onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(c); }}
+                      >
                       <Eye size={16} className="mr-1" />Detalhar
                     </Button>
                   </td>

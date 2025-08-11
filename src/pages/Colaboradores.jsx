@@ -26,6 +26,7 @@ import {
 
 import "@/styles/unified_styles.css";
 
+
 export default function Colaboradores() {
   const [colaboradores, setColaboradores] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);

@@ -22,6 +22,7 @@ import {
 } from "@/services/ENDPOINTS_ServiceParteAdversa";
 
 import "@/styles/unified_styles.css";
+import "@/styles/unified_refactored_styles.css";
 
 
 
@@ -78,7 +79,6 @@ export default function ParteAdversa() {
 
   const carregarPartesAdversas = async () => {
     const dados = await fetchParteAdversa();
-    console.log("Dados recebidos:", dados);
     setPartes(Array.isArray(dados) ? dados : []);
   };
   
@@ -138,7 +138,6 @@ export default function ParteAdversa() {
       })),
     };
   
-    console.log("Payload Parte Adversa:", payloadParte);
   
     if (editando && parteSelecionada) {
       await updateParteAdversa(parteSelecionada.id, payloadParte);
@@ -302,7 +301,7 @@ const partesFiltradas = partes.filter((p) => {
               <DialogTitle>{modoVisualizacao ? "Detalhes da Parte Adversa" : editando ? "Editar Parte Adversa" : "Nova Parte Adversa"}</DialogTitle>
               <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados." : "Preencha as informações da parte adversa."}</DialogDescription>
 
-              <div className="usuarios-input-wrapper">
+              <div className={modoVisualizacao ? "non-editable-input-wrapper" : "editable-input-wrapper"}>
                 <label htmlFor="input-nome" className="usuarios-label">Nome</label>
                 <Input
                   id="input-nome"
@@ -315,7 +314,7 @@ const partesFiltradas = partes.filter((p) => {
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
+              <div className={modoVisualizacao ? "non-editable-input-wrapper" : "editable-input-wrapper"}>
                 <label htmlFor="cpf" className="usuarios-label">CPF</label>
                 <Input
                   id="cpf"
@@ -327,7 +326,7 @@ const partesFiltradas = partes.filter((p) => {
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
+              <div className={modoVisualizacao ? "non-editable-input-wrapper" : "editable-input-wrapper"}>
                 <label htmlFor="email" className="usuarios-label">Email</label>
                 <Input
                   id="email"
@@ -339,7 +338,7 @@ const partesFiltradas = partes.filter((p) => {
                 />
               </div>
 
-              <div className="usuarios-input-wrapper">
+              <div className={modoVisualizacao ? "non-editable-input-wrapper" : "editable-input-wrapper"}>
                 <label htmlFor="telefone" className="usuarios-label">Telefone</label>
                 <Input
                   id="telefone"
@@ -660,7 +659,7 @@ const partesFiltradas = partes.filter((p) => {
                   <Button
                     type="button"
                     onClick={() => {
-                      console.log("Adicionar contrato clicado");
+                      console.log("Adicionar contrato clicado"); {/* ADICIONAR ACAO */}
                     }}
                   >
                     Adicionar

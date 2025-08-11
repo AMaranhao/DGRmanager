@@ -2018,6 +2018,40 @@ body.dark {
 /*    Tabela Contratos      */
 /* ======================== */
 
+/* Escopo só da tabela de Contratos */
+.contratos-tabela th,
+.contratos-tabela td {
+  text-align: left; /* padrão melhor pra texto */
+}
+
+/* Larguras em rem – só para Contratos */
+.contratos-tabela .col-numero {
+  width: 7.5rem !important;    /* 120px */
+}
+
+.contratos-tabela .col-valor {
+  width: 6.875rem !important;  /* 110px */
+}
+
+.contratos-tabela .col-status {
+  width: 8.125rem !important;  /* 130px */
+}
+
+.contratos-tabela .col-responsavel {
+  min-width: 13.75rem !important; /* 220px */
+  text-align: left !important;
+}
+
+.contratos-tabela .col-lote {
+  width: 5rem !important;      /* 80px */
+  min-width: 5rem !important;
+}
+
+.contratos-tabela .col-acoes {
+  width: 9.375rem !important;  /* 150px */
+}
+
+
 .col-numero {
   width: 3rem !important; /* 120px */
 }
@@ -2042,6 +2076,8 @@ body.dark {
 .col-acoes {
   width: 9.375rem !important; /* 150px */
 }
+
+
 
 
 
