@@ -785,7 +785,7 @@ const filtrados = useMemo(() => {
               <th className="col-status">Status</th>
               <th className="col-responsavel">Responsável</th>
               <th className="col-lote">Lote</th>
-              <th className="col-acoes">Ações</th>
+              <th className="col-acoes-two-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>

@@ -652,7 +652,7 @@ const salvar = async () => {
               <th>Comarca</th>
               <th>Prazo Interno</th>
               <th className="col-responsavel">Resp.</th>
-              <th className="col-acoes">Ações</th>
+              <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -669,7 +669,7 @@ const salvar = async () => {
                   <td className="col-responsavel">
                     {p.responsavel_atual?.nome ?? p.responsavel?.nome ?? "-"}
                   </td>
-                  <td className="col-acoes">
+                  <td className="col-acoes-three-buttons">
                     <Button
                       variant="secondary"
                       className="ml-2"

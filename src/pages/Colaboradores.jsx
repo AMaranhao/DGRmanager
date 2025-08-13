@@ -390,7 +390,7 @@ export default function Colaboradores() {
               <th>Cargo</th>
               <th>Equipe</th>
               <th>Status</th>
-              <th>Ações</th>
+              <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>

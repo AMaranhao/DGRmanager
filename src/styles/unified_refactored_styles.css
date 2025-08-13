@@ -500,3 +500,14 @@ cursor: pointer;
 .col-acoes button:last-child {
   margin-right: 0; /* remove margem do último */
 }
+
+
+.col-acoes-two-buttons {
+  max-width: 5rem !important;
+  width: 5rem !important; /* 150px */
+}
+
+.col-acoes-three-buttons {
+  max-width: 15rem !important;
+  width: 15rem !important; /* 150px */
+}

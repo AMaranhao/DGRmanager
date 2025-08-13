@@ -577,7 +577,7 @@ const partesFiltradas = partes.filter((p) => {
               <th>CPF</th>
               <th>Email</th>
               <th>Telefone</th>
-              <th>Ações</th>
+              <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>
