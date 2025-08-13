@@ -483,3 +483,20 @@ cursor: pointer;
   background-color: #e5e7eb !important;
   color: #111827 !important;
 }
+
+.processo-modal-split-right h5,
+  .processo-modal-split-right-lista h4 {
+    font-size: 1.5rem; /* mesmo tamanho de .dashboard-modal-title */
+    font-weight: 600;
+    margin-top: 0rem;
+    margin-bottom: 1rem;
+  }
+
+
+.col-acoes button {
+  margin-right: 0.5rem; /* espaço entre os botões */
+}
+
+.col-acoes button:last-child {
+  margin-right: 0; /* remove margem do último */
+}

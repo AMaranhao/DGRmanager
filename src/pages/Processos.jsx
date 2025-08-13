@@ -609,7 +609,7 @@ const salvar = async () => {
 
             {/* Lado direito */}
             <div className="processo-modal-split-right">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center processo-modal-title">
                 <h5>Atribuições do processo</h5>
               </div>
 
