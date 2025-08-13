@@ -73,7 +73,7 @@
     border: 1px solid #d1d5db;
     color: black;
     font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     max-width: 24rem !important;
     padding: 0.5rem;
   }
@@ -192,7 +192,7 @@ cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
   
   .editable-input-wrapper label {
@@ -238,3 +238,248 @@ cursor: pointer;
     font-size: 0.875rem;
     color: #6b7280;
   }
+
+
+
+
+
+/* =========================
+   Processo Modal — Clean CSS
+   ========================= */
+
+/* Layout (split) */
+.processo-split-modal {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 1100px !important;
+  max-width: 1100px !important;
+  min-width: 1100px !important;
+  height: 550px !important;
+  max-height: 550px !important;
+  min-height: 550px !important;
+  gap: 24px;
+}
+
+.processo-modal-split-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem; 
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+}
+
+.processo-modal-split-right {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 80vh;
+  padding-bottom: 70px; /* espaço para botões flutuantes */
+}
+
+.processo-botao-salvar-bottom {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Modal base */
+.processo-modal {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  height: auto;
+  margin: 0 auto;
+  max-width: 22rem !important;
+  padding: 1rem;
+  width: 100%;
+}
+
+/* Overlays */
+.processo-dialog-overlay {
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  position: fixed;
+  z-index: 50;
+}
+
+.processo-dialog-overlay-custom {
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Esconder botões de fechar */
+.processo-no-close button[aria-label="Close"] {
+  display: none !important;
+}
+
+.processo-dialog-content button[aria-label="Close"],
+.processo-dialog-content > button.absolute.top-4.right-4 {
+  display: none !important;
+}
+
+/* Título / Descrição / Erro */
+.processo-modal-title {
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  margin-left: 1rem;
+}
+
+.processo-modal-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+  margin-left: 1rem;
+}
+
+.processo-modal-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  margin-left: 0.75rem;
+}
+
+/* Inputs */
+.processo-modal-input {
+  border-radius: 9999px !important;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  max-width: 21rem !important;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  max-width: none;          
+  box-sizing: border-box;
+}
+
+.processo-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.processo-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4b5563;
+  text-align: left;
+  margin-bottom: 0.25rem;
+  align-self: flex-start;
+}
+
+/* Linha com 2-3 campos por linha (use nas linhas onde precisar) */
+.processo-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  flex-wrap: nowrap;         /* mantém lado a lado no desktop */
+}
+
+
+@media (min-width: 1100px) {
+  .processo-input-row.triple {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1200px) {
+  .processo-input-row,
+  .processo-input-row.triple {
+    flex-wrap: wrap; 
+  }
+}
+
+/* Painel direito (containers auxiliares) */
+.processo-split-right-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 80vh;
+  min-width: 300px;
+}
+
+.processo-split-right-conteudo {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Lista no painel direito */
+.processo-modal-right-lista {
+  list-style: none;
+  padding-left: 1.5rem;
+}
+
+.processo-modal-right-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+  position: relative;
+}
+
+.processo-modal-right-item::before {
+  content: "•";
+  color: #6b7280;
+  font-size: 1.2rem;
+  position: absolute;
+  left: -1rem;
+  top: 0.2rem;
+}
+
+.processo-modal-right-item.principal::before {
+  content: "📍";
+  color: #fbbf24;
+  font-size: 1.1rem;
+  position: absolute;
+  left: -1.2rem;
+  top: 0.1rem;
+}
+
+.processo-modal-right-texto {
+  display: inline-block;
+  line-height: 1.4;
+}
+
+/* Botão adicionar (painel direito) */
+.botao-adicionar-processo {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  margin-top: 5rem;
+}
+
+/* Dark mode */
+.dark .processo-modal {
+  background-color: #1f2937;
+  border: 1px solid #4b5563;
+  color: #d1d5db;
+}
+
+.dark .processo-modal-title,
+.dark .processo-modal-description {
+  color: #d1d5db;
+}
+
+.dark .processo-modal-input {
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
+}

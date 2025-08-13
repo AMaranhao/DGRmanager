@@ -1038,6 +1038,8 @@ input[type="date"].dashboard-select::-webkit-calendar-picker-indicator {
   color: lightgray !important;
 }
 
+
+
 .dark .usuarios-modal-select {
   background-color: lightgray !important;
   color: black !important;

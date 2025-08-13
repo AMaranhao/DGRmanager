@@ -5,7 +5,7 @@ import { get, post, put, del } from './apiService';
 
 const BASE_URL = '/atribuicoes';
 const BASE_URL_ACORDO   = '/atribuicoes-acordo';
-const BASE_URL_PROCESSO = '/atribuicoes-processo';
+const BASE_URL_PROCESSO = '/atribuicoes-processos';
 const BASE_URL_AGENDA   = '/atribuicoes-agenda';
 
 //---------------------------------------//

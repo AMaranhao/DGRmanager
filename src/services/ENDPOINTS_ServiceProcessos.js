@@ -5,6 +5,22 @@ import { get, post, put, del } from './apiService';
 
 const BASE_URL = '/processos';
 
+export async function createParteAoProcesso(id, parte) {
+  const response = await api.post(`${BASE}/${id}/partes`, parte);
+  return response.data;
+}
+
+export async function removeParteDoProcesso(id, parteId) {
+  const response = await api.delete(`${BASE}/${id}/partes/${parteId}`);
+  return response.data;
+}
+
+export async function fetchAndamentos(id) {
+  const response = await api.get(`${BASE}/${id}/andamentos`);
+  return response.data;
+}
+
+
 export async function fetchProcessos() {
   return await get(BASE_URL);
 }
