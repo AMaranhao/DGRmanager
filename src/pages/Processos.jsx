@@ -18,6 +18,12 @@ import {
   fetchAndamentos,
 } from "@/services/ENDPOINTS_ServiceProcessos";
 import { fetchAtribuicoesProcesso } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
+import {
+  fetchAtribuicoesEvento,
+  createAtribuicaoEvento,
+  updateAtribuicaoEvento,
+} from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
 
 import "@/styles/unified_styles.css";
 import "@/styles/unified_refactored_styles.css";
@@ -91,6 +97,31 @@ export default function Processos() {
   const [editando, setEditando] = useState(false);
   const salvarRef = useRef(null);
 
+  // painel direito: modo "lista" ou "form" de nova atribuição
+  const [rightPanelMode, setRightPanelMode] = useState("list");
+
+  // catálogos
+  const [colabs, setColabs] = useState([]); // GET /colaboradores
+
+  // form da nova atribuição
+  const [novaAtrib, setNovaAtrib] = useState({
+    executor_id: "",        // colaborador que executou (parte 1)
+    atribuicao_id: "",      // tipo de atribuição (parte 2)
+    colaborador_id: "",     // responsável (parte 2)
+  });
+
+  // right pane: modo e formulário de atribuição
+  const [atrSelecionada, setAtrSelecionada] = useState(null); // a que foi clicada
+  const [isUltima, setIsUltima] = useState(false);            // se é a última da lista
+  const [formAtrib, setFormAtrib] = useState({
+    executor_id: "",          // quem executou (fecha a atual)
+    proxima_atr_id: "",       // id do tipo da próxima atribuição
+    proximo_resp_id: "",      // colaborador responsável pela próxima
+    observacao: "",           // observação (para PUT atual e/ou POST próxima)
+    ultimaEtapa: false,       // se marcar → só PUT na atual
+  });
+
+
   // formulário do processo
   const [form, setForm] = useState({
     numero: "",
@@ -116,6 +147,16 @@ export default function Processos() {
   const [erroModal, setErroModal] = useState("");
 
   useEffect(() => {
+    if (!modalAberto) return;
+    (async () => {
+      try {
+        const c = await fetchColaboradores();
+        setColabs(Array.isArray(c) ? c : []);
+      } catch { setColabs([]); }
+    })();
+  }, [modalAberto]);
+
+  useEffect(() => {
     (async () => {
       setLoading(true);
       try {
@@ -136,8 +177,16 @@ export default function Processos() {
         console.error("Falha ao carregar atribuições:", e);
         setAtribs([]);
       }
+      try {
+        const users = await fetchColaboradores();
+        setColabs(Array.isArray(users) ? users : []);
+      } catch (e) {
+        console.error("Falha ao carregar colaboradores:", e);
+        setColabs([]);
+      }
     })();
   }, []);
+  
 
   const filtrados = useMemo(() => {
     const txt = norm(fTexto);
@@ -238,19 +287,33 @@ export default function Processos() {
       const data = await fetchProcessoById(id);
       setProcessoSel(data);
       popularFormDoBackend(data);
+  
       const movs = await fetchAndamentos(id).catch(() => []);
       setAndamentos(Array.isArray(movs) ? movs : []);
+  
       setVisualizando(false);
       setEditando(true);
       setRightMode("partes");
       setModalAberto(true);
       setTimeout(() => salvarRef.current?.focus(), 0);
+  
+      // defaults para a edição de atribuição:
+      const respDefaultId = data?.responsavel_atual?.id ?? data?.responsavel?.id ?? "";
+      setFormAtrib({
+        executor_id: respDefaultId,
+        proxima_atr_id: "",
+        proximo_resp_id: "",
+        observacao: "",
+        ultimaEtapa: false,
+      });
+  
     } catch (e) {
       console.error(e);
       setErroModal("Erro ao carregar o processo.");
       setModalAberto(true);
     }
   };
+  
 
   // ===== Persistência =====
   // ===== Persistência =====
@@ -592,13 +655,15 @@ const salvar = async () => {
 
               {/* Observação */}
               <LinhaInput label="Observação">
-                <Input
-                  className="processo-modal-input"
+                <textarea
+                  className="processo-textarea"
+                  rows={2}
                   value={form.observacao}
                   onChange={(e) => setForm({ ...form, observacao: e.target.value })}
                   readOnly={visualizando}
                 />
               </LinhaInput>
+
 
               {!visualizando && (
                 <div className="processo-botao-salvar-bottom">
@@ -613,26 +678,163 @@ const salvar = async () => {
                 <h5>Atribuições do processo</h5>
               </div>
 
-              <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
-                {(andamentos?.length
-                  ? andamentos
-                  : (processoSel?.atribuicoes_evento || [])
-                ).length ? (
-                  (andamentos?.length ? andamentos : processoSel.atribuicoes_evento).map((a) => (
-                    <li key={a.id} className="processo-modal-right-item">
-                      <div className="processo-modal-right-texto">
-                        <div>{a.atribuicao_descricao}</div>
-                        <div className="text-xs text-gray-500">
-                          {a.data_inicial ?? "-"} • {a.responsavel?.nome ?? "Sem responsável"}
+              {rightMode !== "editAtrib" ? (
+                <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
+                  {(andamentos?.length ? andamentos : processoSel?.atribuicoes_evento || []).map((a, idx, arr) => {
+                    const ultima = idx === arr.length - 1;
+                    return (
+                      <li
+                        key={a.id}
+                        className="processo-modal-right-item processo-atr-item"
+                        onClick={() => {
+                          setAtrSelecionada(a);
+                          setIsUltima(ultima);
+                        
+                          const execDefault = a?.responsavel?.id ?? "";
+                          const nextTypeId  = (atribs && atribs[0]?.id) || "";
+                          const nextRespId  = a?.responsavel?.id || (colabs[0]?.id || "");
+                        
+                          setFormAtrib({
+                            executor_id: execDefault,
+                            proxima_atr_id: nextTypeId,
+                            proximo_resp_id: nextRespId,
+                            observacao: "",
+                          });
+                        
+                          setRightMode("editAtrib");
+                        }}
+                        
+                      >
+                        <div className="processo-modal-right-texto">
+                          <div>{a.atribuicao_descricao}</div>
+                          <div className="text-xs text-gray-500">
+                            {a.data_inicial ?? "-"} • {a.responsavel?.nome ?? "Sem responsável"}
+                            {ultima ? " • (atual)" : ""}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <li>Sem atribuições.</li>
-                )}
-              </ul>
+                      </li>
+                    );
+                  })}
+
+                </ul>
+              ) : (
+                // ===== Formulário de Edição / Nova Atribuição =====
+            
+           
+                <>
+                  <div className="processo-right-content" style={{ marginTop: "0.75rem" }}>
+                    {/* Executor da atribuição atual */}
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Executor da atribuição atual</label>
+                      <select
+                        className="processo-modal-input"
+                        value={formAtrib.executor_id}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, executor_id: e.target.value })}
+                      >
+                        <option value="">Selecione…</option>
+                        {colabs.map(c => (
+                          <option key={c.id} value={c.id}>{c.nome}</option>
+                        ))}
+                      </select>
+                    </div>
+              
+                    {/* Observação (2 linhas) */}
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Observação</label>
+                      <textarea
+                        className="processo-textarea-right"
+                        rows={2}
+                        value={formAtrib.observacao}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
+                    
+                      />
+                    </div>
+              
+                    {/* Se for a última, mostrar “Nova atribuição” */}
+                    {isUltima && (
+                      <>
+                        <h6 style={{ marginBottom: 8, marginTop: 12 }}>Nova atribuição</h6>
+              
+                        <div className="processo-input-wrapper">
+                          <label className="processo-label">Tipo da próxima atribuição</label>
+                          <select
+                            className="processo-modal-input"
+                            value={formAtrib.proxima_atr_id}
+                            onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
+                          >
+                            <option value="">Selecione…</option>
+                            {(atribs || []).map(a => (
+                              <option key={a.id} value={a.id}>{a.descricao}</option>
+                            ))}
+                          </select>
+                        </div>
+              
+                        <div className="processo-input-wrapper">
+                          <label className="processo-label">Responsável da próxima etapa</label>
+                          <select
+                            className="processo-modal-input"
+                            value={formAtrib.proximo_resp_id}
+                            onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
+                          >
+                            <option value="">Selecione…</option>
+                            {colabs.map(c => (
+                              <option key={c.id} value={c.id}>{c.nome}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+              
+                  {/* Footer fixo no bottom-right */}
+                  <div className="processo-right-actions">
+                    <Button variant="secondary" onClick={() => setRightMode("partes")}>
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        try {
+                          if (!atrSelecionada?.id) return;
+              
+                          await updateAtribuicaoEvento(atrSelecionada.id, {
+                            executor_id: formAtrib.executor_id ? Number(formAtrib.executor_id) : null,
+                            observacao: formAtrib.observacao || null,
+                            data_final: new Date().toISOString(),
+                          });
+              
+                          if (isUltima) {
+                            if (!formAtrib.proxima_atr_id || !formAtrib.proximo_resp_id) {
+                              setErroModal("Selecione o tipo e o responsável da próxima etapa.");
+                              return;
+                            }
+                            await createAtribuicaoEvento({
+                              processo_id: Number(processoSel.id),
+                              atribuicao_id: Number(formAtrib.proxima_atr_id),
+                              responsavel_id: Number(formAtrib.proximo_resp_id),
+                              data_inicial: new Date().toISOString(),
+                              observacao: formAtrib.observacao || null,
+                            });
+                          }
+              
+                          const atualizados = await fetchAtribuicoesEvento({ processo_id: processoSel.id }).catch(() => []);
+                          setAndamentos(Array.isArray(atualizados) ? atualizados : []);
+                          setRightMode("partes");
+                          setErroModal("");
+                        } catch (e) {
+                          console.error(e);
+                          setErroModal(e?.message || "Falha ao salvar atribuição.");
+                        }
+                      }}
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                </>                   
+            )}
             </div>
+
+
+
 
                       
 

@@ -270,11 +270,12 @@ to {
   text-align: center;
 }
 
+/*
 .header-spacer {
-  /* vazio para manter o centro real */
+  vazio para manter o centro real
 }
 
-/*
+
     .header-title {
   color: #1f2937;
   font-size: 1.75rem;
