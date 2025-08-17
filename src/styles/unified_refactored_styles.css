@@ -254,9 +254,9 @@ cursor: pointer;
   width: 980px !important;
   max-width: 980px !important;
   min-width: 980px !important;
-  height: 550px !important;
-  max-height: 550px !important;
-  min-height: 550px !important;
+  height: 580px !important;
+  max-height: 580px !important;
+  min-height: 580px !important;
   gap: 24px;
 }
 
@@ -449,6 +449,19 @@ cursor: pointer;
   top: 0.2rem;
 }
 
+/* Quando for a última atribuição (status atual), troca o marcador */
+.processo-modal-right-item.atual::before {
+  content: "✔";
+  color: #2563eb;
+  font-size: 1rem;
+  position: absolute;
+  left: -1.1rem;
+  top: 50%;
+  transform: translateY(-50%); /* centraliza verticalmente */
+}
+
+
+
 .processo-modal-right-item.principal::before {
   content: "📍";
   color: #fbbf24;
@@ -592,3 +605,221 @@ button.absolute.top-4.right-4 {
    border-color:#93c5fd; 
   }
 
+/* ===== Processo – bloco "Atribuição atual" (painel direito) ===== */
+.processo-atr-section {
+  margin: 0.25rem 0 0.75rem;      /* aproxima do título e separa do select */
+}
+
+.processo-atr-section-title {
+  font-size: 0.8125rem;           /* ~13px, pequeno como no print */
+  font-weight: 600;
+  color: #111827;                 /* gray-900 */
+  margin-bottom: 0.25rem;
+}
+
+.processo-atr-atual {
+  font-size: 0.9375rem;           /* ~15px: linha "em_andamento" do print */
+  color: #111827;                 /* texto primário */
+  line-height: 1.35;
+  margin-top: 1rem;
+}
+
+.processo-atr-meta {
+  margin-top: 2px;
+  font-size: 0.75rem;             /* 12px */
+  color: #6b7280;                 /* gray-500 */
+}
+
+/* espaçamento mais justo antes do primeiro select após o bloco */
+.processo-atr-section + .processo-input-wrapper {
+  margin-top: 0.25rem;
+}
+
+/* Dark mode */
+.dark .processo-atr-section-title,
+.dark .processo-atr-atual {
+  color: #e5e7eb;                 /* gray-200 */
+}
+.dark .processo-atr-meta {
+  color: #9ca3af;                 /* gray-400 */
+}
+
+/* inputs do right panel um pouco mais compactos */
+.processo-modal-split-right .processo-input-wrapper {
+  margin-bottom: 0.5rem;          /* já está ~0.5rem no código; ajuste se quiser */
+}
+
+
+/* linhas alinhadas tipo tabela no bloco "Atribuição atual" */
+.atr-linha{
+  display:grid;
+  grid-template-columns: 130px 1fr; /* ajuste se quiser mais/menos largura do rótulo */
+  align-items:center;
+  gap:8px;
+  font-size:0.9375rem;
+  line-height:1.35;
+}
+.atr-label{
+  font-weight:600;
+  color:#374151;          /* gray-700 */
+}
+.atr-valor{
+  color:#111827;          /* gray-900 */
+  word-break:break-word;
+}
+
+/* dark mode */
+.dark .atr-label{ color:#e5e7eb; }
+.dark .atr-valor{ color:#f9fafb; }
+
+
+
+/* ==== Lista de endereços – marcador e layout ==== */
+
+.endereco-item {
+  position: relative;
+  padding-left: 1.25rem;      /* espaço para o marcador */
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: 48px;           /* dá “corpo” pro centrado vertical */
+}
+
+/* marcador padrão (ponto) CENTRALIZADO verticalmente */
+.endereco-item::before {
+  content: "•";
+  position: absolute;
+  left: -0.75rem;
+  top: 50%;
+  transform: translateY(-50%); /* centraliza na altura do <li> */
+  font-size: 1.2rem;
+  color: #6b7280; /* gray-500 */
+  line-height: 1;
+}
+
+/* marcador quando for endereço principal (pin) CENTRALIZADO */
+.endereco-item.principal::before {
+  content: "📍";
+  left: -0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+}
+
+/* bloco do texto do endereço em GRID (label/valor) */
+.endereco-texto {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr; /* coluna de label + coluna de valor */
+  column-gap: 0px;
+  row-gap: 4px;
+}
+
+/* cada linha do grid (apenas semântica) */
+.endereco-linha {
+  display: contents; /* permite que lbl/val ocupem as colunas do grid */
+}
+
+/* label (coluna esquerda) */
+.endereco-lbl {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;             /* gray-500 */
+}
+
+/* valor (coluna direita) */
+.endereco-val {
+  font-size: 0.95rem;
+  color: #111827;             /* gray-900 */
+  line-height: 1.35;
+}
+
+.endereco-item.principal .endereco-val { font-weight: 700; }
+
+
+/* opcional: hover suave no item clicável */
+.endereco-item:hover {
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+
+
+/* ===== Endereços – marcador centralizado ===== */
+.enderecos-lista .endereco-item {
+  position: relative;
+  padding-left: 1.25rem;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: 48px;
+}
+
+.enderecos-lista .endereco-item::before {
+  content: "•";
+  position: absolute;
+  left: -0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #6b7280;
+  line-height: 1;
+}
+
+.enderecos-lista .endereco-item.principal::before {
+  content: "📍";
+  left: -0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+}
+
+/* ===== Endereços – grid label/valor (força override) ===== */
+.enderecos-lista .endereco-texto{
+  display: grid !important;
+  grid-template-columns: max-content 1fr; /* 🔑 sem largura fixa */
+  column-gap: 6px;                        /* espaço mínimo entre label e valor */
+  row-gap: 4px;
+  align-items: start;
+}
+
+/* cada “linha” vira somente um agrupador; os filhos ocupam as colunas */
+.enderecos-lista .endereco-linha { display: contents; }
+
+/* label (coluna esquerda) */
+.enderecos-lista .endereco-lbl{
+  white-space: nowrap;     /* evita quebra do label */
+  text-align: left;       /* aproxima o ':' do valor */
+  padding-right: 0;        /* garante que não tenha “acolchoamento” extra */
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* adiciona “:” automaticamente nos labels */
+.enderecos-lista .endereco-lbl::after{
+  content: ":";
+  margin-left: 2px;
+}
+
+/* Valor */
+.enderecos-lista .endereco-val{
+  font-size: 0.95rem;
+  color: #111827;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* (Opcional) fallback se quiser limitar um mínimo p/ a coluna de label em telas largas */
+@media (min-width: 900px){
+  .enderecos-lista .endereco-texto{
+    grid-template-columns: minmax(5.5rem, max-content) 1fr;
+  }
+}
+
+/* destaque do endereço principal: só a 1ª linha em negrito */
+.enderecos-lista .endereco-item.principal .endereco-linha:first-child .endereco-val {
+  font-weight: 700;
+}
+
+/* hover suave no item */
+.enderecos-lista .endereco-item:hover {
+  background: #f5f5f5;
+  border-radius: 6px;
+}

@@ -145,6 +145,8 @@ export default function Processos() {
   const [partes, setPartes] = useState([]);
   const [andamentos, setAndamentos] = useState([]);
   const [erroModal, setErroModal] = useState("");
+  const [tick, setTick] = useState(0);
+
 
   useEffect(() => {
     if (!modalAberto) return;
@@ -187,6 +189,11 @@ export default function Processos() {
     })();
   }, []);
   
+  useEffect(() => {
+    if (!modalAberto || rightMode !== "editAtrib") return;
+    const id = setInterval(() => setTick((t) => t + 1), 60 * 1000); // a cada 1 min
+    return () => clearInterval(id);
+  }, [modalAberto, rightMode]);
 
   const filtrados = useMemo(() => {
     const txt = norm(fTexto);
@@ -372,6 +379,28 @@ const salvar = async () => {
       {children}
     </div>
   );
+
+  const fmtDataBR = (s) => {
+    if (!s) return "-";
+    const d = new Date(s);
+    return Number.isNaN(d.getTime()) ? "-" : d.toLocaleDateString("pt-BR");
+  };
+  
+  const tempoDecorrido = (s) => {
+    if (!s) return "-";
+    const ini = new Date(s);
+    if (Number.isNaN(ini.getTime())) return "-";
+    const now = new Date();
+    const diff = Math.max(0, now - ini);
+    const m = 60 * 1000, h = 60 * m, d = 24 * h;
+    const dias = Math.floor(diff / d);
+    const horas = Math.floor((diff - dias * d) / h);
+    const mins  = Math.floor((diff - dias * d - horas * h) / m);
+    if (dias >= 1) return `${dias} dia${dias > 1 ? "s" : ""}`;
+    if (horas >= 1) return `${horas}h ${mins}m`;
+    return `${mins}m`;
+  };
+  
 
   // buffer p/ adicionar parte no modo "novo"
   const [parteCPF, setParteCPF] = useState("");
@@ -675,17 +704,20 @@ const salvar = async () => {
             {/* Lado direito */}
             <div className="processo-modal-split-right">
               <div className="flex items-center processo-modal-title">
-                <h5>Atribuições do processo</h5>
+                <h5>Atribuições do Processo</h5>
               </div>
 
               {rightMode !== "editAtrib" ? (
+                
+                
                 <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
                   {(andamentos?.length ? andamentos : processoSel?.atribuicoes_evento || []).map((a, idx, arr) => {
                     const ultima = idx === arr.length - 1;
                     return (
+                      
                       <li
                         key={a.id}
-                        className="processo-modal-right-item processo-atr-item"
+                        className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
                         onClick={() => {
                           setAtrSelecionada(a);
                           setIsUltima(ultima);
@@ -693,6 +725,8 @@ const salvar = async () => {
                           const execDefault = a?.responsavel?.id ?? "";
                           const nextTypeId  = (atribs && atribs[0]?.id) || "";
                           const nextRespId  = a?.responsavel?.id || (colabs[0]?.id || "");
+                          const listaAtrs = andamentos?.length ? andamentos : (processoSel?.atribuicoes_evento || []);
+                          const atrAtual   = atrSelecionada || listaAtrs[listaAtrs.length - 1]; 
                         
                           setFormAtrib({
                             executor_id: execDefault,
@@ -706,10 +740,17 @@ const salvar = async () => {
                         
                       >
                         <div className="processo-modal-right-texto">
-                          <div>{a.atribuicao_descricao}</div>
-                          <div className="text-xs text-gray-500">
-                            {a.data_inicial ?? "-"} • {a.responsavel?.nome ?? "Sem responsável"}
-                            {ultima ? " • (atual)" : ""}
+                          <div className="atr-desc">{a.atribuicao_descricao}</div>
+
+                          <div className="atr-lista">
+                            <div className="atr-linha">
+                              <span className="atr-label">Definida em</span>
+                              <span className="atr-valor">{fmtDataBR(a.data_inicial) || "-"}</span>
+                            </div>
+                            <div className="atr-linha">
+                              <span className="atr-label">Responsável</span>
+                              <span className="atr-valor">{a.responsavel?.nome ?? "Sem responsável"}</span>
+                            </div>
                           </div>
                         </div>
                       </li>
@@ -723,9 +764,37 @@ const salvar = async () => {
            
                 <>
                   <div className="processo-right-content" style={{ marginTop: "0.75rem" }}>
+                    {/* Atribuição atual */}
+                    {(() => {
+                      const listaAtrs = andamentos?.length ? andamentos : (processoSel?.atribuicoes_evento || []);
+                      if (!listaAtrs.length && !atrSelecionada) return null;
+                      const atrAtual = atrSelecionada || listaAtrs[listaAtrs.length - 1];
+                      return (
+                        <div className="processo-atr-section">
+                          <div className="processo-atr-section-title">
+                            Atribuição atual
+                            </div>
+                            <div className="processo-atr-atual">
+                              <div className="atr-linha">
+                                <span className="atr-label">Status Atual</span>
+                                <span className="atr-valor">{atrAtual?.atribuicao_descricao || "-"}</span>
+                              </div>
+                              <div className="atr-linha">
+                                <span className="atr-label">Definida em</span>
+                                <span className="atr-valor">{fmtDataBR(atrAtual?.data_inicial)}</span>
+                              </div>
+                              <div className="atr-linha">
+                                <span className="atr-label">Tempo no Status</span>
+                                <span className="atr-valor">{tempoDecorrido(atrAtual?.data_inicial)}</span>
+                              </div>
+                            </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* Executor da atribuição atual */}
                     <div className="processo-input-wrapper">
-                      <label className="processo-label">Executor da atribuição atual</label>
+                      <label className="processo-label">Executor</label>
                       <select
                         className="processo-modal-input"
                         value={formAtrib.executor_id}

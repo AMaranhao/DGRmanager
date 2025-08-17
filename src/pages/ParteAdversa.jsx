@@ -518,15 +518,27 @@ const partesFiltradas = partes.filter((p) => {
                           style={{ cursor: "pointer" }}
                         >
                           <div className="endereco-texto">
-                            <div>
-                              {end.rua} - {end.numero}
-                              {end.complemento ? ` - ${end.complemento}` : ""}
+                            <div className="endereco-linha">
+                              <span className="endereco-lbl">Logradouro</span>
+                              <span className="endereco-val">
+                                {end.rua} - {end.numero}
+                                {end.complemento ? ` - ${end.complemento}` : ""}
+                              </span>
                             </div>
-                            <div>
-                              {end.bairro} - {end.cidade} - {end.uf}
+
+                            <div className="endereco-linha">
+                              <span className="endereco-lbl">Cidade</span>
+                              <span className="endereco-val">
+                                {end.bairro} - {end.cidade} - {end.uf}
+                              </span>
                             </div>
-                            <div>CEP - {end.cep}</div>
+
+                            <div className="endereco-linha">
+                              <span className="endereco-lbl">CEP</span>
+                              <span className="endereco-val">{end.cep}</span>
+                            </div>
                           </div>
+
                         </li>
                       ))}
                     </ul>
