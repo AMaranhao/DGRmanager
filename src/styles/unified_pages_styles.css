@@ -2080,6 +2080,19 @@ body.dark {
 }
 
 
+/* Força visual do nome da parte (ex: "Maria Oliveira") */
+.parte-contrato-modal [data-slot="dialog-description"] {
+  margin-top: 0px !important;
+  margin-bottom: 8px !important;
+  margin-left: 0px !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: #334155 !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
 
 
 

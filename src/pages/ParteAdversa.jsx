@@ -21,6 +21,13 @@ import {
   updateParteAdversa,
 } from "@/services/ENDPOINTS_ServiceParteAdversa";
 
+import {
+  findContratoByNumero,
+  createParteContrato,
+  createContratoComParte,
+} from "@/services/ENDPOINTS_ServiceContratos";
+
+
 import "@/styles/unified_styles.css";
 import "@/styles/unified_refactored_styles.css";
 
@@ -29,6 +36,7 @@ import "@/styles/unified_refactored_styles.css";
 export default function ParteAdversa() {
   const [partes, setPartes] = useState([]);
   const salvarButtonRef = useRef(null);
+  const botaoAdicionarContratoRef = useRef(null);
   const [modalAberto, setModalAberto] = useState(false);
   const [modoVisualizacao, setModoVisualizacao] = useState(false);
   const [editando, setEditando] = useState(false);
@@ -63,6 +71,20 @@ export default function ParteAdversa() {
   const [modalContratosAberto, setModalContratosAberto] = useState(false);
   const [parteContratosSelecionada, setParteContratosSelecionada] = useState(null);
 
+  // Modal Contratos – estado do formulário de criação/vínculo
+  const [showContratoForm, setShowContratoForm] = useState(false);
+  const [contratoForm, setContratoForm] = useState({
+    numero: "",
+    valor: "",
+    lote: "",
+    principal: true,   // checkbox
+  });
+  const [contratoErro, setContratoErro] = useState("");
+  const [salvandoContrato, setSalvandoContrato] = useState(false);
+
+  // Fluxo “contrato já existe?”
+  const [confirmAttach, setConfirmAttach] = useState(false);
+  const [existingContrato, setExistingContrato] = useState(null); // {id, numero, ...}
 
 
   useEffect(() => {
@@ -108,9 +130,16 @@ export default function ParteAdversa() {
   };
   
   const abrirModalContratos = (parte) => {
-    setParteContratosSelecionada(parte);
-    setModalContratosAberto(true);
-  };
+  setParteContratosSelecionada(parte);
+  setModalContratosAberto(true);
+  // reset controles do sub-modal
+  setShowContratoForm(false);
+  setContratoForm({ numero: "", valor: "", lote: "", principal: true });
+  setContratoErro("");
+  setConfirmAttach(false);
+  setExistingContrato(null);
+};
+
 
   const handleSalvarParte = async () => {
     const { nome, cpf, email, telefone } = formParte;
@@ -156,8 +185,20 @@ export default function ParteAdversa() {
   };
   
 
-  
+  useEffect(() => {
+    setConfirmAttach(false);
+    setExistingContrato(null);
+    setContratoErro("");
+  }, [contratoForm.numero]);
 
+  useEffect(() => {
+    if (modalContratosAberto && !showContratoForm) {
+      requestAnimationFrame(() => {
+        botaoAdicionarContratoRef.current?.focus();
+      });
+    }
+  }, [modalContratosAberto, showContratoForm]);
+  
 
 
 const abrirModalEditar = async (parte) => {
@@ -633,52 +674,204 @@ const partesFiltradas = partes.filter((p) => {
           </tbody>
         </table>
       </div>
-      <Dialog open={!!mensagemSucesso} onOpenChange={(open) => !open && setMensagemSucesso("")}>
-        <DialogOverlay className="dialog-overlay" />
-        <DialogContent className="dashboard-modal dashboard-no-close">
-          <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-          <DialogTitle>{tituloSucesso || "Ação Confirmada"}</DialogTitle>
-          <DialogDescription className="usuarios-modal-descricao dashboard-modal-success-message">{mensagemSucesso}</DialogDescription>
-        </DialogContent>
-      </Dialog>
+
 
       <Dialog open={modalContratosAberto} onOpenChange={setModalContratosAberto}>
         <DialogOverlay className="dialog-overlay" />
-        <DialogContent className="dashboard-modal dashboard-no-close parte-contrato-modal">
-        <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
-          <DialogTitle>Contratos da Parte</DialogTitle>
-          <DialogDescription className="usuarios-modal-descricao">
-            {parteContratosSelecionada?.nome}
-          </DialogDescription>
+        <DialogContent 
+          className="parte-adversa-contratos-modal dashboard-no-close"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+        <DialogTitle className="dialog-description-hidden" >
 
-          {/* LISTAGEM DE CONTRATOS */}
-          {parteContratosSelecionada?.contratos?.length > 0 ? (
-            <>
-              <ul className="lista-contratos">
-                {parteContratosSelecionada.contratos.map((contrato, idx) => (
-                  <li key={contrato.id}>
-                    <Link to={`/contratos/${contrato.id}`} className="contrato-link">
-                      {contrato.numero}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        </DialogTitle>
+          <DialogDescription className="dialog-description-hidden" />
+          <div className="parte-adversa-contratos-titulo">
+            <h2 className="modal-heading">Contratos da Parte</h2>
+            <h3 className="usuarios-modal-descricao">{parteContratosSelecionada?.nome}</h3>
+          </div>
+            {!showContratoForm && (
+                <>
+                  {parteContratosSelecionada?.contratos?.length > 0 ? (
+                    <ul>
+                      {parteContratosSelecionada.contratos.map((c) => (
+                        <li key={c.id}>
+                          <div><strong>{c.numero}</strong></div>
+                          <div>Lote: {c.lote ?? "-"}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{ marginTop: '0', marginBottom: '2rem', fontSize: '0.95rem' }}>
+                      Nenhum contrato vinculado a esta parte.
+                    </p>
+                  )}
+
+
+              <div className="parte-adversa-contratos-modal-actions">
+                <Button
+                  type="button"
+                  ref={botaoAdicionarContratoRef}
+                  onClick={() => {
+                    setShowContratoForm(true);
+                    setContratoErro("");
+                    setConfirmAttach(false);
+                    setExistingContrato(null);
+                  }}
+                >
+                  Adicionar
+                </Button>
+              </div>
             </>
-          ) : (
-            <p>Nenhum contrato vinculado a esta parte.</p>
           )}
-            <div className="botao-adicionar-contrato">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      console.log("Adicionar contrato clicado"); {/* ADICIONAR ACAO */}
-                    }}
-                  >
-                    Adicionar
-                  </Button>
-            </div>
+
+          {showContratoForm && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setContratoErro("");
+
+                if (!contratoForm.numero.trim()) {
+                  setContratoErro("Informe o número do contrato.");
+                  return;
+                }
+
+                try {
+                  setSalvandoContrato(true);
+
+                  let createdContrato = null;
+
+                  if (confirmAttach && existingContrato?.id) {
+                    await createParteContrato({
+                      contrato_id: existingContrato.id,
+                      parte_adversa_id: parteContratosSelecionada.id,
+                      principal: !!contratoForm.principal,
+                      lote: contratoForm.lote || null,
+                    });
+                  } else {
+                    const found = await findContratoByNumero(contratoForm.numero.trim());
+
+                    if (found && found.id) {
+                      setExistingContrato(found);
+                      setConfirmAttach(true);
+                      setContratoErro(
+                        "Este número de contrato já está cadastrado. Deseja vincular esta parte ao contrato existente?"
+                      );
+                      return;
+                    }
+
+                    const resp = await createContratoComParte({
+                      numero: contratoForm.numero.trim(),
+                      valor: contratoForm.valor ? Number(contratoForm.valor) : null,
+                      lote: contratoForm.lote || null,
+                      parte_adversa_id: parteContratosSelecionada.id,
+                      principal: !!contratoForm.principal,
+                    });
+
+                    createdContrato = resp?.contrato ?? null;
+                  }
+
+                  setShowContratoForm(false);
+                  setConfirmAttach(false);
+                  setExistingContrato(null);
+
+                  const novoContrato = existingContrato?.id
+                    ? existingContrato
+                    : (createdContrato ?? {
+                        id: crypto.randomUUID(),
+                        numero: contratoForm.numero.trim(),
+                        lote: contratoForm.lote || null,
+                      });
+
+                  setParteContratosSelecionada((prev) => ({
+                    ...prev,
+                    contratos: [...(prev?.contratos || []), novoContrato],
+                  }));
+
+                  setContratoForm({ numero: "", valor: "", lote: "", principal: true });
+                } catch (err) {
+                  setContratoErro(err?.message || "Falha ao salvar.");
+                } finally {
+                  setSalvandoContrato(false);
+                }
+              }}
+            >
+              <div className="editable-input-wrapper">
+                <label className="usuarios-label">Número</label>
+                <Input
+                  className="usuarios-modal-input"
+                  value={contratoForm.numero}
+                  onChange={(e) => setContratoForm({ ...contratoForm, numero: e.target.value })}
+                  readOnly={confirmAttach}
+                />
+              </div>
+
+
+              {!confirmAttach && (
+                <>
+                  <div className="editable-input-wrapper">
+                    <label className="usuarios-label">Valor</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      className="usuarios-modal-input"
+                      value={contratoForm.valor}
+                      onChange={(e) => setContratoForm({ ...contratoForm, valor: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="editable-input-wrapper">
+                    <label className="usuarios-label">Lote</label>
+                    <Input
+                      className="usuarios-modal-input"
+                      value={contratoForm.lote}
+                      onChange={(e) => setContratoForm({ ...contratoForm, lote: e.target.value })}
+                    />
+                  </div>
+
+                </>
+              )}
+
+              <div>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={contratoForm.principal}
+                    onChange={(e) => setContratoForm({ ...contratoForm, principal: e.target.checked })}
+                  />
+                  Parte principal
+                </label>
+              </div>
+
+              {contratoErro && (
+                <div className="dashboard-modal-error">{contratoErro}</div>
+              )}
+
+              <div className="parte-adversa-contratos-modal-actions">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowContratoForm(false);
+                    setConfirmAttach(false);
+                    setExistingContrato(null);
+                    setContratoErro("");
+                    setContratoForm({ numero: "", valor: "", lote: "", principal: true });
+                  }}
+                >
+                  Cancelar
+                </Button>
+
+                <Button type="submit" disabled={salvandoContrato}>
+                  {confirmAttach ? "Confirmar" : "Salvar"}
+                </Button>
+              </div>
+
+            </form>
+          )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
