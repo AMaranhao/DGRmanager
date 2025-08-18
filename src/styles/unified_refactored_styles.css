@@ -907,7 +907,7 @@ button.absolute.top-4.right-4 {
 
 
 .modal-heading {
-  font-size: 1.75rem !important;
+  font-size: 1.5rem !important;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
@@ -941,4 +941,46 @@ button.absolute.top-4.right-4 {
   font-weight: 400;
   margin: 0;
   color: #6b7280; /* text-gray-500 equivalente */
+}
+
+
+.parte-adversa-contratos-modal {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.parte-adversa-contratos-modal-inner {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.parte-adversa-contratos-modal-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+
+.parte-adversa-contratos-nome {
+  color: #4b5563;
+  font-size: 1.25rem !important;
+  margin-bottom: 2rem !important;
+  margin-top: 1rem !important;
+}
+
+.dark .parte-adversa-contratos-nome {
+  color: lightgray;
+}
+
+.parte-adversa-lista {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.dark .parte-adversa-lista {
+  color: lightgray;
 }

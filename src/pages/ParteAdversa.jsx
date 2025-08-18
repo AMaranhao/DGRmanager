@@ -27,6 +27,11 @@ import {
   createContratoComParte,
 } from "@/services/ENDPOINTS_ServiceContratos";
 
+import { 
+  deleteParteContrato 
+} from "@/services/ENDPOINTS_ServicePartesContrato"; // certifique-se de já importar
+
+
 
 import "@/styles/unified_styles.css";
 import "@/styles/unified_refactored_styles.css";
@@ -85,6 +90,7 @@ export default function ParteAdversa() {
   // Fluxo “contrato já existe?”
   const [confirmAttach, setConfirmAttach] = useState(false);
   const [existingContrato, setExistingContrato] = useState(null); // {id, numero, ...}
+  const [selectedContrato, setSelectedContrato] = useState(null);
 
 
   useEffect(() => {
@@ -140,6 +146,20 @@ export default function ParteAdversa() {
   setExistingContrato(null);
 };
 
+const handleDeleteContrato = async (contratoId) => {
+  try {
+    await deleteParteContrato(contratoId); // chamada real à API
+
+    setParteContratosSelecionada(prev => ({
+      ...prev,
+      contratos: prev.contratos.filter(c => c.id !== contratoId),
+    }));
+
+    setSelectedContrato(null); // fecha o modo detalhe
+  } catch (err) {
+    console.error("Erro ao deletar contrato:", err);
+  }
+};
 
   const handleSalvarParte = async () => {
     const { nome, cpf, email, telefone } = formParte;
@@ -340,7 +360,7 @@ const partesFiltradas = partes.filter((p) => {
               <div className="split-left">
               <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
               <DialogTitle>{modoVisualizacao ? "Detalhes da Parte Adversa" : editando ? "Editar Parte Adversa" : "Nova Parte Adversa"}</DialogTitle>
-              <DialogDescription className="usuarios-modal-descricao">{modoVisualizacao ? "Visualize os dados." : "Preencha as informações da parte adversa."}</DialogDescription>
+              <DialogDescription className="parte-adversa-lista">{modoVisualizacao ? "Visualize os dados." : "Preencha as informações da parte adversa."}</DialogDescription>
 
               <div className={modoVisualizacao ? "non-editable-input-wrapper" : "editable-input-wrapper"}>
                 <label htmlFor="input-nome" className="usuarios-label">Nome</label>
@@ -677,200 +697,227 @@ const partesFiltradas = partes.filter((p) => {
 
 
       <Dialog open={modalContratosAberto} onOpenChange={setModalContratosAberto}>
-        <DialogOverlay className="dialog-overlay" />
-        <DialogContent 
-          className="parte-adversa-contratos-modal dashboard-no-close"
-          onOpenAutoFocus={(e) => e.preventDefault()}
+  <DialogOverlay className="dialog-overlay" />
+  <DialogContent 
+    className="parte-adversa-contratos-modal dashboard-no-close"
+    onOpenAutoFocus={(e) => e.preventDefault()}
+  >
+    <DialogTitle className="dialog-description-hidden" />
+    <DialogDescription className="dialog-description-hidden" />
+
+    <div className="parte-adversa-contratos-modal-inner">
+      <div className="parte-adversa-contratos-titulo">
+        <h2 className="modal-heading">Contratos da Parte</h2>
+        <h3 className="parte-adversa-contratos-nome">{parteContratosSelecionada?.nome}</h3>
+      </div>
+
+      {showContratoForm ? (
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setContratoErro("");
+
+            if (!contratoForm.numero.trim()) {
+              setContratoErro("Informe o número do contrato.");
+              return;
+            }
+
+            try {
+              setSalvandoContrato(true);
+              let createdContrato = null;
+
+              if (confirmAttach && existingContrato?.id) {
+                await createParteContrato({
+                  contrato_id: existingContrato.id,
+                  parte_adversa_id: parteContratosSelecionada.id,
+                  principal: !!contratoForm.principal,
+                  lote: contratoForm.lote || null,
+                });
+              } else {
+                const found = await findContratoByNumero(contratoForm.numero.trim());
+
+                if (found && found.id) {
+                  setExistingContrato(found);
+                  setConfirmAttach(true);
+                  setContratoErro(
+                    "Este número de contrato já está cadastrado. Deseja vincular esta parte ao contrato existente?"
+                  );
+                  return;
+                }
+
+                const resp = await createContratoComParte({
+                  numero: contratoForm.numero.trim(),
+                  valor: contratoForm.valor ? Number(contratoForm.valor) : null,
+                  lote: contratoForm.lote || null,
+                  parte_adversa_id: parteContratosSelecionada.id,
+                  principal: !!contratoForm.principal,
+                });
+
+                createdContrato = resp?.contrato ?? null;
+              }
+
+              setShowContratoForm(false);
+              setConfirmAttach(false);
+              setExistingContrato(null);
+
+              const novoContrato = existingContrato?.id
+                ? existingContrato
+                : (createdContrato ?? {
+                    id: crypto.randomUUID(),
+                    numero: contratoForm.numero.trim(),
+                    lote: contratoForm.lote || null,
+                  });
+
+              setParteContratosSelecionada((prev) => ({
+                ...prev,
+                contratos: [...(prev?.contratos || []), novoContrato],
+              }));
+
+              setContratoForm({ numero: "", valor: "", lote: "", principal: true });
+            } catch (err) {
+              setContratoErro(err?.message || "Falha ao salvar.");
+            } finally {
+              setSalvandoContrato(false);
+            }
+          }}
         >
-        <DialogTitle className="dialog-description-hidden" >
-
-        </DialogTitle>
-          <DialogDescription className="dialog-description-hidden" />
-          <div className="parte-adversa-contratos-titulo">
-            <h2 className="modal-heading">Contratos da Parte</h2>
-            <h3 className="usuarios-modal-descricao">{parteContratosSelecionada?.nome}</h3>
+          <div className="editable-input-wrapper">
+            <label className="usuarios-label">Número</label>
+            <Input
+              className="usuarios-modal-input"
+              value={contratoForm.numero}
+              onChange={(e) => setContratoForm({ ...contratoForm, numero: e.target.value })}
+              readOnly={confirmAttach}
+            />
           </div>
-            {!showContratoForm && (
-                <>
-                  {parteContratosSelecionada?.contratos?.length > 0 ? (
-                    <ul>
-                      {parteContratosSelecionada.contratos.map((c) => (
-                        <li key={c.id}>
-                          <div><strong>{c.numero}</strong></div>
-                          <div>Lote: {c.lote ?? "-"}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={{ marginTop: '0', marginBottom: '2rem', fontSize: '0.95rem' }}>
-                      Nenhum contrato vinculado a esta parte.
-                    </p>
-                  )}
 
+          {!confirmAttach && (
+            <>
+              <div className="editable-input-wrapper">
+                <label className="usuarios-label">Valor</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  className="usuarios-modal-input"
+                  value={contratoForm.valor}
+                  onChange={(e) => setContratoForm({ ...contratoForm, valor: e.target.value })}
+                />
+              </div>
 
-              <div className="parte-adversa-contratos-modal-actions">
-                <Button
-                  type="button"
-                  ref={botaoAdicionarContratoRef}
-                  onClick={() => {
-                    setShowContratoForm(true);
-                    setContratoErro("");
-                    setConfirmAttach(false);
-                    setExistingContrato(null);
-                  }}
-                >
-                  Adicionar
-                </Button>
+              <div className="editable-input-wrapper">
+                <label className="usuarios-label">Lote</label>
+                <Input
+                  className="usuarios-modal-input"
+                  value={contratoForm.lote}
+                  onChange={(e) => setContratoForm({ ...contratoForm, lote: e.target.value })}
+                />
               </div>
             </>
           )}
 
-          {showContratoForm && (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={contratoForm.principal}
+                onChange={(e) => setContratoForm({ ...contratoForm, principal: e.target.checked })}
+              />
+              Parte principal
+            </label>
+          </div>
+
+          {contratoErro && (
+            <div className="dashboard-modal-error">{contratoErro}</div>
+          )}
+
+          <div className="parte-adversa-contratos-modal-actions">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowContratoForm(false);
+                setConfirmAttach(false);
+                setExistingContrato(null);
                 setContratoErro("");
-
-                if (!contratoForm.numero.trim()) {
-                  setContratoErro("Informe o número do contrato.");
-                  return;
-                }
-
-                try {
-                  setSalvandoContrato(true);
-
-                  let createdContrato = null;
-
-                  if (confirmAttach && existingContrato?.id) {
-                    await createParteContrato({
-                      contrato_id: existingContrato.id,
-                      parte_adversa_id: parteContratosSelecionada.id,
-                      principal: !!contratoForm.principal,
-                      lote: contratoForm.lote || null,
-                    });
-                  } else {
-                    const found = await findContratoByNumero(contratoForm.numero.trim());
-
-                    if (found && found.id) {
-                      setExistingContrato(found);
-                      setConfirmAttach(true);
-                      setContratoErro(
-                        "Este número de contrato já está cadastrado. Deseja vincular esta parte ao contrato existente?"
-                      );
-                      return;
-                    }
-
-                    const resp = await createContratoComParte({
-                      numero: contratoForm.numero.trim(),
-                      valor: contratoForm.valor ? Number(contratoForm.valor) : null,
-                      lote: contratoForm.lote || null,
-                      parte_adversa_id: parteContratosSelecionada.id,
-                      principal: !!contratoForm.principal,
-                    });
-
-                    createdContrato = resp?.contrato ?? null;
-                  }
-
-                  setShowContratoForm(false);
-                  setConfirmAttach(false);
-                  setExistingContrato(null);
-
-                  const novoContrato = existingContrato?.id
-                    ? existingContrato
-                    : (createdContrato ?? {
-                        id: crypto.randomUUID(),
-                        numero: contratoForm.numero.trim(),
-                        lote: contratoForm.lote || null,
-                      });
-
-                  setParteContratosSelecionada((prev) => ({
-                    ...prev,
-                    contratos: [...(prev?.contratos || []), novoContrato],
-                  }));
-
-                  setContratoForm({ numero: "", valor: "", lote: "", principal: true });
-                } catch (err) {
-                  setContratoErro(err?.message || "Falha ao salvar.");
-                } finally {
-                  setSalvandoContrato(false);
-                }
+                setContratoForm({ numero: "", valor: "", lote: "", principal: true });
               }}
             >
-              <div className="editable-input-wrapper">
-                <label className="usuarios-label">Número</label>
-                <Input
-                  className="usuarios-modal-input"
-                  value={contratoForm.numero}
-                  onChange={(e) => setContratoForm({ ...contratoForm, numero: e.target.value })}
-                  readOnly={confirmAttach}
-                />
-              </div>
+              Cancelar
+            </Button>
 
+            <Button type="submit" disabled={salvandoContrato}>
+              {confirmAttach ? "Confirmar" : "Salvar"}
+            </Button>
+          </div>
+        </form>
+      ) : selectedContrato ? (
+        <>
+          <div className="parte-adversa-contratos-lista" style={{ marginBottom: "1.5rem" }}>
+            <div><strong>Número:</strong> {selectedContrato.numero}</div>
+            <div><strong>Valor:</strong> {selectedContrato.valor ? `R$ ${selectedContrato.valor}` : "-"}</div>
+            <div><strong>Lote:</strong> {selectedContrato.lote ?? "-"}</div>
+            <div><strong>Parte principal:</strong> {selectedContrato.principal ? "Sim" : "Não"}</div>
+          </div>
 
-              {!confirmAttach && (
-                <>
-                  <div className="editable-input-wrapper">
-                    <label className="usuarios-label">Valor</label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      className="usuarios-modal-input"
-                      value={contratoForm.valor}
-                      onChange={(e) => setContratoForm({ ...contratoForm, valor: e.target.value })}
-                    />
-                  </div>
+          <div className="parte-adversa-contratos-modal-actions">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSelectedContrato(null)}
+            >
+              Cancelar
+            </Button>
 
-                  <div className="editable-input-wrapper">
-                    <label className="usuarios-label">Lote</label>
-                    <Input
-                      className="usuarios-modal-input"
-                      value={contratoForm.lote}
-                      onChange={(e) => setContratoForm({ ...contratoForm, lote: e.target.value })}
-                    />
-                  </div>
-
-                </>
-              )}
-
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={contratoForm.principal}
-                    onChange={(e) => setContratoForm({ ...contratoForm, principal: e.target.checked })}
-                  />
-                  Parte principal
-                </label>
-              </div>
-
-              {contratoErro && (
-                <div className="dashboard-modal-error">{contratoErro}</div>
-              )}
-
-              <div className="parte-adversa-contratos-modal-actions">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowContratoForm(false);
-                    setConfirmAttach(false);
-                    setExistingContrato(null);
-                    setContratoErro("");
-                    setContratoForm({ numero: "", valor: "", lote: "", principal: true });
-                  }}
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => handleDeleteContrato(selectedContrato.id)}
+            >
+              Deletar
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          {parteContratosSelecionada?.contratos?.length > 0 ? (
+            <ul className="parte-adversa-contratos-lista">
+              {parteContratosSelecionada.contratos.map((c) => (
+                <li
+                  key={c.id}
+                  style={{ cursor: 'pointer', padding: '0.5rem 0' }}
+                  onClick={() => setSelectedContrato(c)}
                 >
-                  Cancelar
-                </Button>
-
-                <Button type="submit" disabled={salvandoContrato}>
-                  {confirmAttach ? "Confirmar" : "Salvar"}
-                </Button>
-              </div>
-
-            </form>
+                  <div><strong>{c.numero}</strong></div>
+                  <div>Lote: {c.lote ?? "-"}</div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={{ marginTop: '0', marginBottom: '2rem', fontSize: '0.95rem' }}>
+              Nenhum contrato vinculado a esta parte.
+            </p>
           )}
-        </DialogContent>
-      </Dialog>
+
+          <div className="parte-adversa-contratos-modal-actions">
+            <Button
+              type="button"
+              ref={botaoAdicionarContratoRef}
+              onClick={() => {
+                setShowContratoForm(true);
+                setContratoErro("");
+                setConfirmAttach(false);
+                setExistingContrato(null);
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
+
 
     </div>
   );
