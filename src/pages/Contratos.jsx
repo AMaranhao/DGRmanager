@@ -757,14 +757,26 @@ const filtrados = useMemo(() => {
                       )}
 
                       {/* + Parte só aparece em Novo/Editar */}
-                      {!visualizando && (
-                        <Button
-                          className="botao-adicionar-contrato"
-                          onClick={() => setShowFormParte(true)}
-                        >
-                          + Parte
-                        </Button>
+                      {!visualizando && editando && (
+                        <div className="botao-contrato-painel-adicionar-parte">
+                          <Button
+                            variant="secondary"
+                            onClick={() => {/* ação futura */}}
+                          >
+                            Atribuição
+                          </Button>
+
+                          <Button
+                            className="ml-2"
+                            onClick={() => setShowFormParte(true)}
+                          >
+                            + Parte
+                          </Button>
+                        </div>
                       )}
+
+
+
                     </>
                   )}
                 </>

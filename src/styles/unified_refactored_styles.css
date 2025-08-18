@@ -984,3 +984,19 @@ button.absolute.top-4.right-4 {
 .dark .parte-adversa-lista {
   color: lightgray;
 }
+
+
+.botao-contrato-painel-adicionar-parte {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.botao-adicionar-contrato {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  margin-top: 5rem;
+}
