@@ -1000,3 +1000,53 @@ button.absolute.top-4.right-4 {
   right: 1.5rem;
   margin-top: 5rem;
 }
+
+
+.contrato-modal-split-right-atribuicao {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border-left: 1px solid #e5e7eb;
+  background-color: #f9f9f9;
+}
+
+.contrato-textarea{
+  width:100%;
+  min-height:3.5rem;      /* ~2 linhas */
+  resize:vertical;
+  border-radius:0.5rem;
+  border:1px solid #e5e7eb;
+  padding:0.625rem 0.75rem;
+  font-size:0.95rem;
+  line-height:1.25rem;
+}
+.contrato-textarea:focus{
+  outline:none;
+  box-shadow:0 0 0 2px rgba(59,130,246,.3);
+  border-color:#93c5fd;
+}
+
+.contratos-modal-right-item {
+  list-style-type: none;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.contratos-modal-right-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
+}
+
+.emoji-indicador::before {
+  content: "✔️";
+  margin-right: 0.5rem;
+  display: inline-block;
+}
+
+.contratos-modal-right-texto {
+  margin-left: 1rem;
+}
+

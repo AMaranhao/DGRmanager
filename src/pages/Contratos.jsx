@@ -1,6 +1,6 @@
 // src/pages/Contratos.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Pencil, Plus } from "lucide-react";
+import { Eye, Pencil, Plus, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +85,7 @@ const norm = (s) =>
       const [mostrarHistorico, setMostrarHistorico] = useState(false);
       const [historicoAtribs, setHistoricoAtribs] = useState([]);
       const [loadingHistorico, setLoadingHistorico] = useState(false);
-      const [rightMode, setRightMode] = useState("partes");
+      const [rightMode, setRightMode] = useState("atribuicoes");
 
 
 
@@ -254,7 +254,7 @@ const filtrados = useMemo(() => {
     setShowFormParte(false);
     setSearchParte("");
     setFoundParte(null);
-    setRightMode("partes");
+    setRightMode("atribuicoes");
     setParteAviso("");
 
     setEditando(false);
@@ -270,7 +270,7 @@ const filtrados = useMemo(() => {
     setSearchParte("");
     setFoundParte(null);
     setParteAviso("");
-    setRightMode("partes");      
+    setRightMode("atribuicoes");    
     setMostrarHistorico(false);
     setHistoricoAtribs([]);
     setEditando(false);
@@ -282,10 +282,20 @@ const filtrados = useMemo(() => {
       atribId: getCurrentEvento(c)?.atribuicao_id ?? "",
     });
   
-    setPartesVinculadas(c.partes || []);
+    setPartesVinculadas(c.partes_adversas || []);
     setContratoSelecionado(c);           // <<< guarda o contrato aberto
-    setMostrarHistorico(false);          // reseta a seção de histórico
-    setHistoricoAtribs([]);
+
+    // carrega o histórico imediatamente (já que vamos abrir em "historico")
+    const eventos = Array.isArray(c.atribuicoes_evento) ? c.atribuicoes_evento : [];
+    const ordenados = [...eventos].sort((a, b) => {
+    const da = a?.data_inicial ?? "";
+    const db = b?.data_inicial ?? "";
+    if (da && db && da !== db) return da < db ? -1 : 1; // crescente
+    return (a?.id ?? 0) - (b?.id ?? 0);
+    });
+    setHistoricoAtribs(ordenados);
+    setMostrarHistorico(true);
+    
   
     setModalAberto(true);
     requestAnimationFrame(() => document.activeElement.blur());
@@ -300,7 +310,7 @@ const filtrados = useMemo(() => {
     setSearchParte("");
     setFoundParte(null);
     setParteParaRemover(null);
-    setRightMode("partes");
+    setRightMode("atribuicoes");
     setParteAviso("");
 
     setEditando(true);
@@ -311,7 +321,8 @@ const filtrados = useMemo(() => {
       observacao: c.observacao ?? "",
       atribId: getCurrentEvento(c)?.atribuicao_id ?? "",
     });
-    setPartesVinculadas(c.partes || []);
+    setPartesVinculadas(c.partes_adversas || []);
+    setContratoSelecionado(c);
     setModalAberto(true);
     setTimeout(() => salvarRef.current?.focus(), 0);
   };
@@ -390,7 +401,7 @@ const filtrados = useMemo(() => {
   const handleAdicionarParte = () => {
     if (!foundParte) return;
   
-    const onlyDigits = (s) => (s || "").replace(/\D/g, "");
+    const onlyDigits = (s) => String(s ?? "").replace(/\D/g, "");
     const alvoCPF = onlyDigits(foundParte.cpf);
   
     const jaExiste = partesVinculadas.some((p) => {
@@ -405,15 +416,27 @@ const filtrados = useMemo(() => {
       return;
     }
   
-    setPartesVinculadas((prev) => [
-      ...prev,
-      {
-        id: foundParte.id,
-        nome: foundParte.nome,
-        cpf: foundParte.cpf,
-        tipo_parte: foundParte.tipo_parte || "Réu",
-      },
-    ]);
+    setPartesVinculadas((prev) => {
+      // Se a nova parte for marcada como principal, remove esse status de todas as outras
+      const novaPartePrincipal = foundParte?.principal;
+    
+      const atualizadas = prev.map((parte) => ({
+        ...parte,
+        principal: novaPartePrincipal ? false : parte.principal,
+      }));
+    
+      return [
+        ...atualizadas,
+        {
+          id: foundParte.id,
+          nome: foundParte.nome,
+          cpf: foundParte.cpf,
+          principal: novaPartePrincipal || false,
+        },
+      ];
+    });
+    
+    
   
     // reset e volta para lista
     setShowFormParte(false);
@@ -483,7 +506,7 @@ const filtrados = useMemo(() => {
             setModalAberto(open);
             if (!open) {
               setVisualizando(false);
-              setRightMode("partes");
+              setRightMode("atribuicoes");
             }
           }}>
           <DialogOverlay className="dialog-overlay" />
@@ -561,22 +584,7 @@ const filtrados = useMemo(() => {
                 />
               </div>
 
-              <div className="contratos-input-wrapper">
-                <label className="contratos-input-label">Atribuição (status)</label>
-                <select
-                  className="usuarios-modal-select"
-                  value={form.atribId}
-                  onChange={(e) => setForm({ ...form, atribId: e.target.value ? Number(e.target.value) : "" })}
-                  disabled={visualizando}
-                >
-                  <option value="">Selecione…</option>
-                  {(atribs || []).map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.descricao}
-                    </option>
-                  ))}
-                </select>
-              </div>
+             
 
               {!visualizando && (
               <div className="botao-salvar-bottom">
@@ -588,7 +596,14 @@ const filtrados = useMemo(() => {
             <div className="contratos-split-modal-right">
               {/* Cabeçalho com título dinâmico + botão de alternância (somente no Detalhar) */}
               <div className="flex items-center justify-between">
-                <h5>{rightMode === "historico" ? "Histórico de Atribuições" : "Partes vinculadas"}</h5>
+              <h5>
+                {rightMode === "historico"
+                  ? "Atribuições do Contrato"
+                  : rightMode === "atribuicoes"
+                  ? "Atribuições do Contrato"
+                  : "Partes Vinculadas"}
+              </h5>
+
 
                 {visualizando && (
                   <Button
@@ -615,26 +630,90 @@ const filtrados = useMemo(() => {
               {/* Conteúdo do painel direito */}
               {rightMode === "historico" ? (
                 // ======= MODO HISTÓRICO =======
-                <ul className="contratos-modal-right-lista" style={{ marginTop: "0.75rem" }}>
+                <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
                   {loadingHistorico && <li>Carregando histórico…</li>}
                   {!loadingHistorico && historicoAtribs.length === 0 && (
                     <li>Nenhuma atribuição encontrada.</li>
                   )}
                   {!loadingHistorico &&
-                    historicoAtribs.map((evt) => {
+                    historicoAtribs.map((evt, idx, arr) => {
+                      const ultima = idx === arr.length - 1;
                       const dt = evt?.data_inicial ? new Date(evt.data_inicial) : null;
                       const dataStr = dt ? dt.toLocaleDateString("pt-BR") : "—";
                       const desc = evt?.atribuicao_descricao || "—";
                       const resp = evt?.responsavel?.nome || "—";
                       return (
-                        <li key={evt.id ?? `${evt.data_inicial}-${desc}`}>
-                          {dataStr} — {desc} — Responsável: {resp}
+                        <li
+                          key={evt.id ?? `${evt.data_inicial}-${desc}`}
+                          className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
+                        >
+                          <div className="processo-modal-right-texto">
+                            <div className="atr-desc">{desc}</div>
+                            <div className="atr-lista">
+                              <div className="atr-linha">
+                                <span className="atr-label">Definida em</span>
+                                <span className="atr-valor">{dataStr}</span>
+                              </div>
+                              <div className="atr-linha">
+                                <span className="atr-label">Responsável</span>
+                                <span className="atr-valor">{resp}</span>
+                              </div>
+                            </div>
+                          </div>
                         </li>
                       );
                     })}
                 </ul>
+
+              ) : rightMode === "atribuicoes" ? (
+                // Painel de Atribuições do Contrato
+              
+                <>
+                  <div className="botao-contrato-painel-adicionar-parte">
+                    <Button
+                      variant="secondary"
+                      onClick={() => setRightMode("partes")}
+                    >
+                      Partes
+                    </Button>
+                  </div>
+              
+                  <ul className="processo-modal-right-lista">
+                    {(contratoSelecionado?.atribuicoes_evento || []).map((a, idx, arr) => {
+                      const ultima = idx === arr.length - 1;
+                      const dataStr = a.data_inicial
+                        ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
+                        : "—";
+              
+                      return (
+                        <li
+                          key={a.id}
+                          className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
+                        >
+                          <div className="processo-modal-right-texto">
+                            <div className="atr-desc">{a.atribuicao_descricao}</div>
+              
+                            <div className="atr-lista">
+                              <div className="atr-linha">
+                                <span className="atr-label">Definida em</span>
+                                <span className="atr-valor">{dataStr}</span>
+                              </div>
+                              <div className="atr-linha">
+                                <span className="atr-label">Responsável</span>
+                                <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              
+               
               ) : (
                 // ======= MODO PARTES =======
+
                 <>
                   {showFormParte && !visualizando ? (
                     // ===== Form de busca de Parte já existente =====
@@ -668,6 +747,34 @@ const filtrados = useMemo(() => {
                           placeholder="—"
                         />
                       </div>
+
+                      <div className="checkbox-wrapper">
+                        <label className="usuarios-label flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={foundParte?.principal || false}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                            
+                              // Garante que só possa haver um principal marcado
+                              if (checked) {
+                                setPartesVinculadas((prev) =>
+                                  prev.map((p) => ({ ...p, principal: false }))
+                                );
+                              }
+                            
+                              setFoundParte((prev) => ({
+                                ...prev,
+                                principal: checked,
+                              }));
+                            }}
+                            
+                            disabled={visualizando}
+                          />
+                          Parte Principal
+                        </label>
+                      </div>
+
 
                       {parteAviso && (
                         <div
@@ -728,7 +835,7 @@ const filtrados = useMemo(() => {
                           {partesVinculadas.map((p) => (
                             <li
                               key={p.id ?? p.cpf}
-                              className="contratos-modal-right-item"
+                              className={`contratos-modal-right-item ${p.principal ? "emoji-indicador" : ""}`}
                               onClick={
                                 visualizando
                                   ? undefined
@@ -742,9 +849,11 @@ const filtrados = useMemo(() => {
                               }
                               style={{ cursor: visualizando ? "default" : "pointer" }}
                               title={visualizando ? undefined : "Clique para remover"}
-                            >
+                              >
                               <div className="contratos-modal-right-texto">
-                                <div>{p.nome}</div>
+                                <div className={p.principal ? "font-bold" : ""}>
+                                  {p.nome}
+                                </div>
                                 <div className="text-xs text-gray-500">
                                   {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
                                 </div>
@@ -760,18 +869,19 @@ const filtrados = useMemo(() => {
                       {!visualizando && editando && (
                         <div className="botao-contrato-painel-adicionar-parte">
                           <Button
-                            variant="secondary"
-                            onClick={() => {/* ação futura */}}
+                              className="ml-2"
+                              onClick={() => setShowFormParte(true)}
                           >
-                            Atribuição
+                              + Parte
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setRightMode("atribuicoes")}
+                          >
+                            Atribuições
                           </Button>
 
-                          <Button
-                            className="ml-2"
-                            onClick={() => setShowFormParte(true)}
-                          >
-                            + Parte
-                          </Button>
+
                         </div>
                       )}
 
