@@ -94,6 +94,7 @@ const norm = (s) =>
         proxima_atr_id: "",
         proximo_resp_id: "",
         observacao: "",
+        proximo_prazo: "",
       });
       const [colabs, setColabs] = useState([]);
 
@@ -707,12 +708,29 @@ const filtrados = useMemo(() => {
                 <>
                   <div className="botao-contrato-painel-adicionar-parte">
                     <Button
+                      onClick={() => {
+                        setAtrSelecionada(null);
+                        setFormAtrib({
+                          executor_id: "",
+                          proxima_atr_id: "",
+                          proximo_resp_id: "",
+                          observacao: "",
+                          proximo_prazo: "",
+                        });
+                        setRightMode("editAtrib");
+                      }}
+                    >
+                      Nova Atribuição
+                    </Button>
+
+                    <Button
                       variant="secondary"
                       onClick={() => setRightMode("partes")}
                     >
                       Partes
                     </Button>
                   </div>
+
               
                   <ul className="processo-modal-right-lista">
                     {(contratoSelecionado?.atribuicoes_evento || []).map((a, idx, arr) => {
@@ -771,8 +789,29 @@ const filtrados = useMemo(() => {
                         <span className="atr-label">Definida em</span>
                         <span className="atr-valor">{atrSelecionada?.data_inicial ? new Date(atrSelecionada.data_inicial).toLocaleDateString("pt-BR") : "-"}</span>
                       </div>
+                      {atrSelecionada?.prazo && (
+                        <div className="atr-linha">
+                          <span className="atr-label">Prazo</span>
+                          <span className="atr-valor">
+                            {new Date(atrSelecionada.prazo).toLocaleDateString("pt-BR")}
+                          </span>
+                        </div>
+                      )}
+                      {atrSelecionada?.data_inicial && (
+                        <div className="atr-linha">
+                          <span className="atr-label">Tempo no Status</span>
+                          <span className="atr-valor">
+                            {Math.floor(
+                              (new Date().getTime() - new Date(atrSelecionada.data_inicial).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                            dias
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
+
               
                   <div className="processo-input-wrapper">
                     <label className="processo-label">Executor</label>
@@ -825,6 +864,19 @@ const filtrados = useMemo(() => {
                       ))}
                     </select>
                   </div>
+
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Prazo da próxima atribuição</label>
+                    <input
+                      type="date"
+                      className="processo-modal-input"
+                      value={formAtrib.proximo_prazo || ""}
+                      onChange={(e) =>
+                        setFormAtrib({ ...formAtrib, proximo_prazo: e.target.value })
+                      }
+                    />
+                  </div>
+
               
                   <div className="processo-right-actions">
                     <Button variant="secondary" onClick={() => setRightMode("atribuicoes")}>
