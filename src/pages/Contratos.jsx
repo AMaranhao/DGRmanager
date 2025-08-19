@@ -11,6 +11,7 @@ import {
 import { fetchContratos, createContrato, updateContrato } from "@/services/ENDPOINTS_ServiceContratos";
 import { fetchParteAdversa } from "@/services/ENDPOINTS_ServiceParteAdversa"; // GET /parte-adversa?termo=...
 
+import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
 import { fetchAtribuicoesAcordo } from "@/services/ENDPOINTS_ServiceAtribuicoes";
 
@@ -69,6 +70,7 @@ const norm = (s) =>
     
       // lado direito do modal (partes vinculadas)
       const [partesVinculadas, setPartesVinculadas] = useState([]);
+
     
       // >>> estados do + Parte (PRECISAM estar aqui dentro) <<<
       const [showFormParte, setShowFormParte] = useState(false);
@@ -86,8 +88,14 @@ const norm = (s) =>
       const [historicoAtribs, setHistoricoAtribs] = useState([]);
       const [loadingHistorico, setLoadingHistorico] = useState(false);
       const [rightMode, setRightMode] = useState("atribuicoes");
-
-
+      const [atrSelecionada, setAtrSelecionada] = useState(null);
+      const [formAtrib, setFormAtrib] = useState({
+        executor_id: "",
+        proxima_atr_id: "",
+        proximo_resp_id: "",
+        observacao: "",
+      });
+      const [colabs, setColabs] = useState([]);
 
 
   // ✅ Atribuições / status vindos da API
@@ -122,10 +130,13 @@ useEffect(() => {
     setLoading(true);
     try {
       // carrega atribuições + contratos em paralelo
-      const [atribsRes, contratosRes] = await Promise.all([
+      const [atribsRes, contratosRes, colabsRes] = await Promise.all([
         fetchAtribuicoesAcordo(),
         fetchContratos(),
+        fetchColaboradores(), // carrega os colaboradores
       ]);
+      
+      setColabs(Array.isArray(colabsRes) ? colabsRes : []);
 
       const atribsArr = Array.isArray(atribsRes) ? atribsRes : [];
       setAtribs(atribsArr);
@@ -256,12 +267,37 @@ const filtrados = useMemo(() => {
     setFoundParte(null);
     setRightMode("atribuicoes");
     setParteAviso("");
-
+    setVisualizando(false);
     setEditando(false);
     setForm({ numero: "", valor: "", lote: "", observacao: "", atribId: "" });
     setPartesVinculadas([]);
     setModalAberto(true);
     setTimeout(() => salvarRef.current?.focus(), 0);
+
+    setForm({
+      numero: "",
+      valor: "",
+      lote: "",
+      observacao: "",
+      atribId: "",
+    });
+    setPartesVinculadas([]);
+
+    // limpa o painel direito
+  setContratoSelecionado(null);
+  setAtrSelecionada(null);
+  setFormAtrib({
+    executor_id: "",
+    proxima_atr_id: "",
+    proximo_resp_id: "",
+    observacao: "",
+  });
+  setHistoricoAtribs([]);
+  setMostrarHistorico(false);
+
+  setModalAberto(true);
+  setTimeout(() => salvarRef.current?.focus(), 0);
+
   };
 
   const abrirDetalhar = (c) => {
@@ -689,6 +725,16 @@ const filtrados = useMemo(() => {
                         <li
                           key={a.id}
                           className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
+                          onClick={() => {
+                            setAtrSelecionada(a);
+                            setFormAtrib({
+                              executor_id: a?.responsavel?.id || "",
+                              proxima_atr_id: "", // ← defina default se quiser
+                              proximo_resp_id: a?.responsavel?.id || "",
+                              observacao: "",
+                            });
+                            setRightMode("editAtrib");
+                          }}
                         >
                           <div className="processo-modal-right-texto">
                             <div className="atr-desc">{a.atribuicao_descricao}</div>
@@ -711,6 +757,90 @@ const filtrados = useMemo(() => {
                 </>
               
                
+              ) : rightMode === "editAtrib" ? (
+                // ======= MODO EDIÇÃO DE ATRIBUIÇÃO =======
+                <div className="processo-right-content">
+                  <div className="processo-atr-section">
+                    <div className="processo-atr-section-title">Atribuição atual</div>
+                    <div className="processo-atr-atual">
+                      <div className="atr-linha">
+                        <span className="atr-label">Status Atual</span>
+                        <span className="atr-valor">{atrSelecionada?.atribuicao_descricao || "-"}</span>
+                      </div>
+                      <div className="atr-linha">
+                        <span className="atr-label">Definida em</span>
+                        <span className="atr-valor">{atrSelecionada?.data_inicial ? new Date(atrSelecionada.data_inicial).toLocaleDateString("pt-BR") : "-"}</span>
+                      </div>
+                    </div>
+                  </div>
+              
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Executor</label>
+                    <select
+                      className="processo-modal-input"
+                      value={formAtrib.executor_id}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, executor_id: e.target.value })}
+                    >
+                      <option value="">Selecione…</option>
+                      {colabs.map(c => (
+                        <option key={c.id} value={c.id}>{c.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+              
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Observação</label>
+                    <textarea
+                      className="processo-textarea-right"
+                      rows={2}
+                      value={formAtrib.observacao}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
+                    />
+                  </div>
+              
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Tipo da próxima atribuição</label>
+                    <select
+                      className="processo-modal-input"
+                      value={formAtrib.proxima_atr_id}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
+                    >
+                      <option value="">Selecione…</option>
+                      {(atribs || []).map(a => (
+                        <option key={a.id} value={a.id}>{a.descricao}</option>
+                      ))}
+                    </select>
+                  </div>
+              
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Responsável da próxima etapa</label>
+                    <select
+                      className="processo-modal-input"
+                      value={formAtrib.proximo_resp_id}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
+                    >
+                      <option value="">Selecione…</option>
+                      {colabs.map(c => (
+                        <option key={c.id} value={c.id}>{c.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+              
+                  <div className="processo-right-actions">
+                    <Button variant="secondary" onClick={() => setRightMode("atribuicoes")}>
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        // await updateAtribuicaoContrato(...) ou equivalente
+                        // await createAtribuicaoContrato(...) para a próxima
+                        setRightMode("atribuicoes");
+                      }}
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 // ======= MODO PARTES =======
 
@@ -866,13 +996,10 @@ const filtrados = useMemo(() => {
                       )}
 
                       {/* + Parte só aparece em Novo/Editar */}
-                      {!visualizando && editando && (
+                      {!visualizando && (
                         <div className="botao-contrato-painel-adicionar-parte">
-                          <Button
-                              className="ml-2"
-                              onClick={() => setShowFormParte(true)}
-                          >
-                              + Parte
+                          <Button className="ml-2" onClick={() => setShowFormParte(true)}>
+                            + Parte
                           </Button>
                           <Button
                             variant="secondary"
@@ -880,10 +1007,9 @@ const filtrados = useMemo(() => {
                           >
                             Atribuições
                           </Button>
-
-
                         </div>
                       )}
+
 
 
 
