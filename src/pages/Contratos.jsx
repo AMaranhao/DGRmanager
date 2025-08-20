@@ -14,7 +14,7 @@ import { fetchParteAdversaByCPF } from "@/services/ENDPOINTS_ServiceParteAdversa
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
 import { fetchAtribuicoesContratos } from "@/services/ENDPOINTS_ServiceAtribuicoes";
-import { createAtribuicaoEvento } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+import { createAtribuicaoEvento, updateAtribuicaoEvento } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
 
 
 import { createParteContrato } from "@/services/ENDPOINTS_ServicePartesContrato";
@@ -100,17 +100,18 @@ const norm = (s) =>
       const [rightMode, setRightMode] = useState("atribuicoes");
       const [atrSelecionada, setAtrSelecionada] = useState(null);
       const [formAtrib, setFormAtrib] = useState({
-        executor_id: "",
+        solucionador_id: "",
         proxima_atr_id: "",
         proximo_resp_id: "",
         observacao: "",
         proximo_prazo: "",
+        prazo: ""
       });
       
       useEffect(() => {
         if (rightMode === "visualizarAtrib" && atrSelecionada) {
           setFormAtrib({
-            executor_id: atrSelecionada?.responsavel?.id || "",
+            solucionador_id: atrSelecionada?.responsavel?.id || "",
             proxima_atr_id: "",
             proximo_resp_id: "",
             observacao: atrSelecionada?.observacao || "",
@@ -301,7 +302,7 @@ const filtrados = useMemo(() => {
   setContratoSelecionado(null);
   setAtrSelecionada(null);
   setFormAtrib({
-    executor_id: "",
+    solucionador_id: "",
     proxima_atr_id: "",
     proximo_resp_id: "",
     observacao: "",
@@ -537,7 +538,7 @@ const handleNovaAtribuicao = async () => {
       entity_type: "contrato",
       entity_id: contratoSelecionado.id,
       responsavel_id: formAtrib.proximo_resp_id,
-      data_inicial: new Date().toISOString().split("T")[0],
+      solucionador_id: formAtrib.solucionador_id,
       prazo: formAtrib.proximo_prazo || null,
     };
 
@@ -562,7 +563,7 @@ const handleNovaAtribuicao = async () => {
 
     setRightMode("atribuicoes");
     setFormAtrib({
-      executor_id: "",
+      solucionador_id: "",
       proxima_atr_id: "",
       proximo_resp_id: "",
       observacao: "",
@@ -573,6 +574,32 @@ const handleNovaAtribuicao = async () => {
     setParteAviso("Erro ao salvar nova atribuição.");
   }
 };
+
+const handleAtualizarAtribuicao = async () => {
+  if (!atrSelecionada?.id) return;
+
+  try {
+    const payload = {
+      prazo: formAtrib.prazo || null,
+      responsavel_id: formAtrib.solucionador_id || null, // Aqui é o campo que aparece como "Responsável" no print
+      observacao: formAtrib.observacao?.trim() || "",
+    };
+
+    await updateAtribuicaoEvento(atrSelecionada.id, payload);
+
+    const atualizado = await fetchContratoById(contratoSelecionado.id);
+    setContratoSelecionado(atualizado);
+    setHistoricoAtribs(atualizado.atribuicoes_evento || []);
+    setRightMode("atribuicoes");
+    setAtrSelecionada(null);
+  } catch (error) {
+    console.error("Erro ao atualizar atribuição:", error);
+    setParteAviso("Erro ao atualizar atribuição.");
+  }
+};
+
+
+
 
 
   
@@ -833,7 +860,7 @@ const handleNovaAtribuicao = async () => {
                           className="ml-2"
                           onClick={() => {
                             setFormAtrib({
-                              executor_id: "",
+                              solucionador_id: "",
                               proxima_atr_id: "",
                               proximo_resp_id: "",
                               observacao: "",
@@ -878,7 +905,7 @@ const handleNovaAtribuicao = async () => {
                             onClick={() => {
                               setAtrSelecionada(a);
                               setFormAtrib({
-                                executor_id: a?.responsavel?.id || "",
+                                solucionador_id: a?.responsavel?.id || "",
                                 proxima_atr_id: "",
                                 proximo_resp_id: "",
                                 observacao: "",
@@ -963,11 +990,11 @@ const handleNovaAtribuicao = async () => {
 
                   </div>              
                   <div className="processo-input-wrapper">
-                    <label className="processo-label">Executor</label>
+                    <label className="processo-label">Responsável</label>
                     <select
                       className="processo-modal-input"
-                      value={formAtrib.executor_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, executor_id: e.target.value })}
+                      value={formAtrib.solucionador_id}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
                       disabled={visualizando}
                     >
                       <option value="">Selecione…</option>
@@ -992,9 +1019,7 @@ const handleNovaAtribuicao = async () => {
                   <div className="processo-right-actions">
                     {!visualizando && (
                       <Button
-                        onClick={async () => {
-                          setRightMode("atribuicoes");
-                        }}
+                        onClick={handleAtualizarAtribuicao}
                       >
                         Atualizar
                       </Button>
@@ -1018,22 +1043,41 @@ const handleNovaAtribuicao = async () => {
 
               ) : rightMode === "novaAtrib" ? (
                 <div className="processo-right-content">
+                  {/* Atribuição Atual */}
+                  <div className="processo-atr-section-title">Atribuição Atual</div>
                   <div className="processo-input-wrapper">
-                    <label className="processo-label">Tipo da próxima atribuição</label>
+                    <label className="processo-label">Solucionador</label>
+                    <select
+                      className="processo-modal-input"
+                      value={formAtrib.solucionador_id}
+                      onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
+                    >
+                      <option value="">Selecione…</option>
+                      {colabs.map(c => (
+                        <option key={c.id} value={c.id}>{c.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+              
+                  {/* Próxima Atribuição */}
+                  <div className="processo-atr-section-title" style={{ marginTop: "1rem" }}>Próxima Atribuição</div>
+              
+                  <div className="processo-input-wrapper">
+                    <label className="processo-label">Status</label>
                     <select
                       className="processo-modal-input"
                       value={formAtrib.proxima_atr_id}
                       onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
                     >
                       <option value="">Selecione…</option>
-                      {(atribs || []).map(a => (
+                      {atribs.map(a => (
                         <option key={a.id} value={a.id}>{a.descricao}</option>
                       ))}
                     </select>
                   </div>
               
                   <div className="processo-input-wrapper">
-                    <label className="processo-label">Responsável da próxima etapa</label>
+                    <label className="processo-label">Responsável</label>
                     <select
                       className="processo-modal-input"
                       value={formAtrib.proximo_resp_id}
@@ -1047,7 +1091,7 @@ const handleNovaAtribuicao = async () => {
                   </div>
               
                   <div className="processo-input-wrapper">
-                    <label className="processo-label">Prazo da próxima atribuição</label>
+                    <label className="processo-label">Prazo</label>
                     <input
                       type="date"
                       className="processo-modal-input"
@@ -1059,22 +1103,18 @@ const handleNovaAtribuicao = async () => {
                   </div>
               
                   <div className="processo-right-actions">
-                    <Button onClick={handleNovaAtribuicao}>
-                      Salvar
-                    </Button>
-
+                    <Button onClick={handleNovaAtribuicao}>Salvar</Button>
                     <Button
                       variant="secondary"
                       onClick={() => {
                         setRightMode("atribuicoes");
-                        setAtrSelecionada(null); // limpa a seleção para não exibir nenhuma atribuição
+                        setAtrSelecionada(null);
                       }}
                     >
                       Cancelar
                     </Button>
                   </div>
                 </div>
-              
               ) : (
                 // ======= MODO PARTES =======
           
