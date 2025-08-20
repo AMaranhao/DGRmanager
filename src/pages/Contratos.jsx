@@ -842,7 +842,7 @@ const handleNovaAtribuicao = async () => {
                             setRightMode("novaAtrib");
                           }}
                         >
-                          Nova Atribuição
+                          Próxima Atribuição
                         </Button>
                       
                       )}

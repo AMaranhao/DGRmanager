@@ -147,7 +147,6 @@ export default function Processos() {
   const [erroModal, setErroModal] = useState("");
   const [tick, setTick] = useState(0);
 
-
   useEffect(() => {
     if (!modalAberto) return;
     (async () => {
@@ -222,11 +221,60 @@ export default function Processos() {
     });
   }, [lista, fTexto, fResp, fStatus, fDataIni, fDataFim]);
 
+
+  async function handleAtualizarAtribuicao() {
+    try {
+      if (!atrSelecionada?.id) return;
+      await updateAtribuicaoEvento(atrSelecionada.id, {
+        executor_id: Number(formAtrib.executor_id),
+        prazo: formAtrib.prazo,
+        observacao: formAtrib.observacao,
+      });
+      const atualizado = await fetchProcessoById(processoSel.id);
+      setProcessoSel(atualizado);
+      setAndamentos(atualizado.atribuicoes_evento || []);
+      setRightMode("list");
+    } catch (e) {
+      console.error(e);
+      setErroModal("Erro ao atualizar atribuição.");
+    }
+  }
+  
+  async function handleCriarAtribuicao() {
+    try {
+      if (!formAtrib.proxima_atr_id || !formAtrib.proximo_resp_id || !formAtrib.prazo) {
+        setErroModal("Preencha todos os campos.");
+        return;
+      }
+      await createAtribuicaoEvento({
+        processo_id: Number(processoSel.id),
+        entity_type: "processo", 
+        atribuicao_id: Number(formAtrib.proxima_atr_id),
+        responsavel_id: Number(formAtrib.proximo_resp_id),
+        data_inicial: new Date().toISOString(),
+        prazo: formAtrib.prazo,
+      });
+      
+      // Após POST, atualize o processo inteiro
+      const atualizado = await fetchProcessoById(processoSel.id);
+      setProcessoSel(atualizado);
+      setAndamentos(atualizado.atribuicoes_evento || []);
+      setRightMode("list");
+      
+    } catch (e) {
+      console.error(e);
+      setErroModal("Erro ao criar atribuição.");
+    }
+  }
+  
+
+
+
   // ===== Aberturas de modal =====
   const abrirNovo = () => {
     setVisualizando(false);
     setEditando(false);
-    setRightMode("partes");
+    setRightMode("list");
     setErroModal("");
     setProcessoSel(null);
     setForm({
@@ -274,11 +322,10 @@ export default function Processos() {
       const data = await fetchProcessoById(id);
       setProcessoSel(data);
       popularFormDoBackend(data);
-      const movs = await fetchAndamentos(id).catch(() => []);
-      setAndamentos(Array.isArray(movs) ? movs : []);
+  
       setVisualizando(true);
       setEditando(false);
-      setRightMode("partes");
+      setRightMode("list");
       setModalAberto(true);
       requestAnimationFrame(() => document.activeElement?.blur());
     } catch (e) {
@@ -287,6 +334,7 @@ export default function Processos() {
       setModalAberto(true);
     }
   };
+  
 
   const abrirEditar = async (id) => {
     try {
@@ -295,16 +343,13 @@ export default function Processos() {
       setProcessoSel(data);
       popularFormDoBackend(data);
   
-      const movs = await fetchAndamentos(id).catch(() => []);
-      setAndamentos(Array.isArray(movs) ? movs : []);
-  
+      // agora usamos diretamente os dados do backend
       setVisualizando(false);
       setEditando(true);
-      setRightMode("partes");
+      setRightMode("list");
       setModalAberto(true);
       setTimeout(() => salvarRef.current?.focus(), 0);
   
-      // defaults para a edição de atribuição:
       const respDefaultId = data?.responsavel_atual?.id ?? data?.responsavel?.id ?? "";
       setFormAtrib({
         executor_id: respDefaultId,
@@ -320,6 +365,7 @@ export default function Processos() {
       setModalAberto(true);
     }
   };
+  
   
 
   // ===== Persistência =====
@@ -553,7 +599,11 @@ const salvar = async () => {
           open={modalAberto}
           onOpenChange={(open) => {
             setModalAberto(open);
-            if (!open) { setRightMode("partes"); setVisualizando(false); }
+            if (!open) {
+              setRightMode("list");
+              setAtrSelecionada(null); // limpa a seleção da atribuição
+              setVisualizando(false);
+            }
           }}
         >
           <DialogOverlay className="processo-dialog-overlay" />
@@ -567,6 +617,7 @@ const salvar = async () => {
           </DialogTrigger>
 
           <DialogContent
+          
             className="processo-modal processo-split-modal processo-no-close processo-dialog-content"
             onOpenAutoFocus={(e) => {
               if (visualizando) {
@@ -575,6 +626,8 @@ const salvar = async () => {
               }
             }}
           >
+        
+
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
 
             {/* Lado esquerdo - só campos do schema */}
@@ -703,96 +756,104 @@ const salvar = async () => {
 
             {/* Lado direito */}
             <div className="processo-modal-split-right">
+
               <div className="flex items-center processo-modal-title">
                 <h5>Atribuições do Processo</h5>
               </div>
 
-              {rightMode !== "editAtrib" ? (
-                
-                
-                <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
-                  {(andamentos?.length ? andamentos : processoSel?.atribuicoes_evento || []).map((a, idx, arr) => {
-                    const ultima = idx === arr.length - 1;
-                    return (
-                      
-                      <li
-                        key={a.id}
-                        className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
-                        onClick={() => {
-                          setAtrSelecionada(a);
-                          setIsUltima(ultima);
-                        
-                          const execDefault = a?.responsavel?.id ?? "";
-                          const nextTypeId  = (atribs && atribs[0]?.id) || "";
-                          const nextRespId  = a?.responsavel?.id || (colabs[0]?.id || "");
-                          const listaAtrs = andamentos?.length ? andamentos : (processoSel?.atribuicoes_evento || []);
-                          const atrAtual   = atrSelecionada || listaAtrs[listaAtrs.length - 1]; 
-                        
-                          setFormAtrib({
-                            executor_id: execDefault,
-                            proxima_atr_id: nextTypeId,
-                            proximo_resp_id: nextRespId,
-                            observacao: "",
-                          });
-                        
-                          setRightMode("editAtrib");
-                        }}
-                        
-                      >
-                        <div className="processo-modal-right-texto">
-                          <div className="atr-desc">{a.atribuicao_descricao}</div>
-
-                          <div className="atr-lista">
-                            <div className="atr-linha">
-                              <span className="atr-label">Definida em</span>
-                              <span className="atr-valor">{fmtDataBR(a.data_inicial) || "-"}</span>
-                            </div>
-                            <div className="atr-linha">
-                              <span className="atr-label">Responsável</span>
-                              <span className="atr-valor">{a.responsavel?.nome ?? "Sem responsável"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-
-                </ul>
-              ) : (
-                // ===== Formulário de Edição / Nova Atribuição =====
-            
-           
+              {rightMode === "list" && (
                 <>
-                  <div className="processo-right-content" style={{ marginTop: "0.75rem" }}>
-                    {/* Atribuição atual */}
-                    {(() => {
-                      const listaAtrs = andamentos?.length ? andamentos : (processoSel?.atribuicoes_evento || []);
-                      if (!listaAtrs.length && !atrSelecionada) return null;
-                      const atrAtual = atrSelecionada || listaAtrs[listaAtrs.length - 1];
+                  <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
+                    {(andamentos || []).map((a, idx, arr) => {
+                      const ultima = idx === arr.length - 1;
                       return (
-                        <div className="processo-atr-section">
-                          <div className="processo-atr-section-title">
-                            Atribuição atual
-                            </div>
-                            <div className="processo-atr-atual">
-                              <div className="atr-linha">
-                                <span className="atr-label">Status Atual</span>
-                                <span className="atr-valor">{atrAtual?.atribuicao_descricao || "-"}</span>
-                              </div>
+                        <li
+                          key={a.id}
+                          className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
+                          onClick={() => {
+                            setAtrSelecionada(a);
+                            setFormAtrib({
+                              executor_id: a?.responsavel?.id ?? "",
+                              prazo: toYMD(a?.prazo),
+                              observacao: a?.observacao ?? "",
+                              proxima_atr_id: "",
+                              proximo_resp_id: "",
+                              ultimaEtapa: false,
+                            });
+                            setRightMode("edit");
+                          }}
+                          
+                        >
+                          <div className="processo-modal-right-texto">
+                            <div className="atr-desc">{a.atribuicao_descricao}</div>
+                            <div className="atr-lista">
                               <div className="atr-linha">
                                 <span className="atr-label">Definida em</span>
-                                <span className="atr-valor">{fmtDataBR(atrAtual?.data_inicial)}</span>
+                                <span className="atr-valor">{fmtDataBR(a.data_inicial)}</span>
                               </div>
                               <div className="atr-linha">
-                                <span className="atr-label">Tempo no Status</span>
-                                <span className="atr-valor">{tempoDecorrido(atrAtual?.data_inicial)}</span>
+                                <span className="atr-label">Prazo</span>
+                                <span className="atr-valor">{fmtDataBR(a.prazo)}</span>
+                              </div>
+                              <div className="atr-linha">
+                                <span className="atr-label">Responsável</span>
+                                <span className="atr-valor">{a.responsavel?.nome || "-"}</span>
                               </div>
                             </div>
-                        </div>
+                          </div>
+                        </li>
                       );
-                    })()}
+                    })}
+                  </ul>
 
-                    {/* Executor da atribuição atual */}
+                  <div className="processo-right-actions">
+                  <Button onClick={() => {
+                    setFormAtrib({
+                      executor_id: "",
+                      proxima_atr_id: "",
+                      proximo_resp_id: "",
+                      prazo: "",
+                      observacao: "",
+                      ultimaEtapa: false,
+                    });
+                    setRightMode("new");
+                  }}>
+                    Próxima Atribuição
+                  </Button>
+
+                  </div>
+                </>
+              )}
+
+              {rightMode === "edit" && atrSelecionada && (
+                <>
+                  <div className="processo-right-content" style={{ marginTop: "0.75rem" }}>
+                    <div className="processo-atr-section">
+                      <div className="processo-atr-section-title">Atribuição atual</div>
+                      <div className="atr-linha">
+                        <span className="atr-label">Status Atual</span>
+                        <span className="atr-valor">{atrSelecionada.atribuicao_descricao}</span>
+                      </div>
+                      <div className="atr-linha">
+                        <span className="atr-label">Definida em</span>
+                        <span className="atr-valor">{fmtDataBR(atrSelecionada.data_inicial)}</span>
+                      </div>
+                      <div className="atr-linha">
+                        <span className="atr-label">Tempo no Status</span>
+                        <span className="atr-valor">{tempoDecorrido(atrSelecionada.data_inicial)}</span>
+                      </div>
+                    </div>
+
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Prazo</label>
+                      <Input
+                        type="date"
+                        className="processo-modal-input"
+                        value={formAtrib.prazo}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+                      />
+                    </div>
+
                     <div className="processo-input-wrapper">
                       <label className="processo-label">Executor</label>
                       <select
@@ -806,8 +867,7 @@ const salvar = async () => {
                         ))}
                       </select>
                     </div>
-              
-                    {/* Observação (2 linhas) */}
+
                     <div className="processo-input-wrapper">
                       <label className="processo-label">Observação</label>
                       <textarea
@@ -815,92 +875,67 @@ const salvar = async () => {
                         rows={2}
                         value={formAtrib.observacao}
                         onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
-                    
                       />
                     </div>
-              
-                    {/* Se for a última, mostrar “Nova atribuição” */}
-                    {isUltima && (
-                      <>
-                        <h6 style={{ marginBottom: 8, marginTop: 12 }}>Nova atribuição</h6>
-              
-                        <div className="processo-input-wrapper">
-                          <label className="processo-label">Tipo da próxima atribuição</label>
-                          <select
-                            className="processo-modal-input"
-                            value={formAtrib.proxima_atr_id}
-                            onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
-                          >
-                            <option value="">Selecione…</option>
-                            {(atribs || []).map(a => (
-                              <option key={a.id} value={a.id}>{a.descricao}</option>
-                            ))}
-                          </select>
-                        </div>
-              
-                        <div className="processo-input-wrapper">
-                          <label className="processo-label">Responsável da próxima etapa</label>
-                          <select
-                            className="processo-modal-input"
-                            value={formAtrib.proximo_resp_id}
-                            onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
-                          >
-                            <option value="">Selecione…</option>
-                            {colabs.map(c => (
-                              <option key={c.id} value={c.id}>{c.nome}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </>
-                    )}
                   </div>
-              
-                  {/* Footer fixo no bottom-right */}
+
                   <div className="processo-right-actions">
-                    <Button variant="secondary" onClick={() => setRightMode("partes")}>
-                      Cancelar
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        try {
-                          if (!atrSelecionada?.id) return;
-              
-                          await updateAtribuicaoEvento(atrSelecionada.id, {
-                            executor_id: formAtrib.executor_id ? Number(formAtrib.executor_id) : null,
-                            observacao: formAtrib.observacao || null,
-                            data_final: new Date().toISOString(),
-                          });
-              
-                          if (isUltima) {
-                            if (!formAtrib.proxima_atr_id || !formAtrib.proximo_resp_id) {
-                              setErroModal("Selecione o tipo e o responsável da próxima etapa.");
-                              return;
-                            }
-                            await createAtribuicaoEvento({
-                              processo_id: Number(processoSel.id),
-                              atribuicao_id: Number(formAtrib.proxima_atr_id),
-                              responsavel_id: Number(formAtrib.proximo_resp_id),
-                              data_inicial: new Date().toISOString(),
-                              observacao: formAtrib.observacao || null,
-                            });
-                          }
-              
-                          const atualizados = await fetchAtribuicoesEvento({ processo_id: processoSel.id }).catch(() => []);
-                          setAndamentos(Array.isArray(atualizados) ? atualizados : []);
-                          setRightMode("partes");
-                          setErroModal("");
-                        } catch (e) {
-                          console.error(e);
-                          setErroModal(e?.message || "Falha ao salvar atribuição.");
-                        }
-                      }}
-                    >
-                      Salvar
-                    </Button>
+                    <Button variant="secondary" onClick={() => setRightMode("list")}>Cancelar</Button>
+                    <Button onClick={handleAtualizarAtribuicao}>Atualizar</Button>
                   </div>
-                </>                   
-            )}
+                </>
+              )}
+
+              {rightMode === "new" && (
+                <>
+                  <div className="processo-right-content" style={{ marginTop: "0.75rem" }}>
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Tipo da próxima atribuição</label>
+                      <select
+                        className="processo-modal-input"
+                        value={formAtrib.proxima_atr_id}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
+                      >
+                        <option value="">Selecione…</option>
+                        {atribs.map((a) => (
+                          <option key={a.id} value={a.id}>{a.descricao}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Responsável da próxima etapa</label>
+                      <select
+                        className="processo-modal-input"
+                        value={formAtrib.proximo_resp_id}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
+                      >
+                        <option value="">Selecione…</option>
+                        {colabs.map(c => (
+                          <option key={c.id} value={c.id}>{c.nome}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Prazo da próxima atribuição</label>
+                      <Input
+                        type="date"
+                        className="processo-modal-input"
+                        value={formAtrib.prazo}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="processo-right-actions">
+                    <Button variant="secondary" onClick={() => setRightMode("list")}>Cancelar</Button>
+                    <Button onClick={handleCriarAtribuicao}>Salvar</Button>
+                  </div>
+                </>
+              )}
             </div>
+
 
 
 

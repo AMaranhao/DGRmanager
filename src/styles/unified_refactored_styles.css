@@ -1207,3 +1207,8 @@ button.absolute.top-4.right-4 {
   justify-content: center;
   white-space: nowrap;
 }
+
+input[type="date"].processo-modal-input {
+  background-color: white !important;
+  color: #111827; /* ajusta o texto para preto */
+}
