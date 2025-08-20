@@ -24,3 +24,7 @@ export async function updateParteAdversa(id, dados) {
 export async function deleteParteAdversa(id) {
   return await del(`${BASE_URL}/${id}`);
 }
+
+export async function fetchParteAdversaByCPF(cpf) {
+  return await get('/parte-adversa-by-cpf', { params: { cpf } });
+}

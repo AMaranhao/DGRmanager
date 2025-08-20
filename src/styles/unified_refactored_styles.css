@@ -995,10 +995,11 @@ button.absolute.top-4.right-4 {
 }
 
 .botao-adicionar-contrato {
-  position: absolute;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  margin-top: 5rem;
+  display: flex;
+  justify-content: flex-start; /* ou center, se quiser centralizar */
+  align-items: center;
+  gap: 0.5rem !important;
+  margin-top: 1rem; /* se quiser manter espaço acima */
 }
 
 
@@ -1050,3 +1051,44 @@ button.absolute.top-4.right-4 {
   margin-left: 1rem;
 }
 
+
+/* Wrapper geral de cada item */
+.atr-item-wrapper {
+  display: flex;
+  align-items: center;  /* <<< muda de flex-start para center */
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  list-style: none;
+  min-height: 60px; /* 🔑 ajustável conforme o layout */
+}
+
+
+/* Área do marcador (bolinha ou check) */
+.atr-marker {
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Bolinha padrão */
+.atr-dot {
+  color: #999;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Check final (azul e em destaque) */
+.atr-check {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Conteúdo textual da atribuição */
+.atr-conteudo {
+  flex: 1;
+}

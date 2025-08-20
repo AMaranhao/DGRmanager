@@ -7,6 +7,7 @@ const BASE_URL = '/atribuicoes';
 const BASE_URL_ACORDO   = '/atribuicoes-acordo';
 const BASE_URL_PROCESSO = '/atribuicoes-processos';
 const BASE_URL_AGENDA   = '/atribuicoes-agenda';
+const BASE_URL_CONTRATOS   = '/atribuicoes-contratos';
 
 //---------------------------------------//
 // Endpoints para get especificos        //
@@ -22,6 +23,10 @@ export async function fetchAtribuicoesProcesso() {
 
 export async function fetchAtribuicoesAgenda() {
   return await get(BASE_URL_AGENDA);
+}
+
+export async function fetchAtribuicoesContratos() {
+  return await get(BASE_URL_CONTRATOS);
 }
 
 //---------------------------------------//
