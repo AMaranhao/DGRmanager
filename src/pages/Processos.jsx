@@ -941,27 +941,22 @@ const salvar = async () => {
                     {p.responsavel_atual?.nome ?? p.responsavel?.nome ?? "-"}
                   </td>
                   <td className="col-acoes-three-buttons">
-                    <Button
-                      variant="secondary"
-                      className="ml-2"
-                      onClick={(e) => { e.currentTarget.blur(); abrirEditar(p.id); }}
-                    >
-                      <Pencil size={16} className="mr-1" />Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="ml-2"
-                      onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(p.id); }}
-                    >
-                      <Eye size={16} className="mr-1" />Detalhar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="ml-2"
-                      onClick={() => excluir(p.id)}
-                    >
-                      <X size={16} className="mr-1" />Excluir
-                    </Button>
+                    <div className="acoes-tabela-wrapper">
+                      <Button
+                        variant="secondary"
+                        className="btn-acao-tabela"
+                        onClick={(e) => { e.currentTarget.blur(); abrirEditar(p.id); }}
+                      >
+                        <Pencil size={16} className="mr-1" />Editar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="btn-acao-tabela"
+                        onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(p.id); }}
+                      >
+                        <Eye size={16} className="mr-1" />Detalhar
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))

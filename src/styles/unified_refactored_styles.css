@@ -1191,3 +1191,19 @@ button.absolute.top-4.right-4 {
   text-overflow: ellipsis;
 }
 
+/* ===== Botões de ação em tabela (layout padrão horizontal) ===== */
+.acoes-tabela-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.btn-acao-tabela {
+  height: 36px;
+  min-width: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
