@@ -989,27 +989,27 @@ const handleNovaAtribuicao = async () => {
                     />
 
                   </div>
-                  {!visualizando && (
-                    <div className="processo-right-actions">
+                  <div className="processo-right-actions">
+                    {!visualizando && (
                       <Button
                         onClick={async () => {
-                          // await updateAtribuicaoContrato(...)
                           setRightMode("atribuicoes");
                         }}
                       >
                         Atualizar
                       </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          setRightMode("atribuicoes");
-                          setAtrSelecionada(null);
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setRightMode("atribuicoes");
+                        setAtrSelecionada(null);
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+
 
 
                 </div>
