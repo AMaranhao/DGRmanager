@@ -527,6 +527,7 @@ cursor: pointer;
 .col-acoes-three-buttons {
   max-width: 15rem !important;
   width: 15rem !important; /* 150px */
+  gap: 0.5rem;
 }
 
 /* Oculta o botão de fechar do modal */
@@ -1092,3 +1093,101 @@ button.absolute.top-4.right-4 {
 .atr-conteudo {
   flex: 1;
 }
+
+
+/* Wrapper horizontal para os três botões */
+.acoes-botoes-wrapper {
+  display: flex;
+  gap: 0.5rem !important; /* equivalente ao gap-2 do Tailwind */
+  align-items: center;
+}
+
+/* Botões com altura e alinhamento */
+.btn-contrato-editar,
+.btn-contrato-detalhar,
+.btn-contrato-inicial {
+  height: 25px;
+  max-height: 25px !important;
+  width: 5rem !important;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Estilos específicos (opcional — se não quiser depender do variant) */
+.btn-contrato-editar {
+  background-color: #f3f4f6; /* cinza claro */
+  color: #111827;
+}
+
+.btn-contrato-detalhar {
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  color: #111827;
+}
+
+.btn-contrato-inicial {
+  background-color: #0f172a;
+  color: #fff;
+}
+
+.tabela-acoes-wrapper {
+  display: flex;
+  gap: 8px; /* define o espaçamento horizontal entre os botões */
+}
+
+.tabela-acao-botao {
+  min-width: 90px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabela-acoes-wrapper {
+  display: flex;
+  gap: 8px; 
+}
+
+.tabela-acao-botao {
+  min-width: 100px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parte-col-nome {
+  width: 250px !important; 
+  max-width: 250px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.parte-col-cpf {
+  width: 80px !important; 
+  max-width: 80px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.parte-col-email {
+  width: 250px !important; 
+  max-width: 250px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.parte-col-telefone {
+  width: 80px !important; 
+  max-width: 80px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

@@ -14,6 +14,8 @@ import { fetchParteAdversaByCPF } from "@/services/ENDPOINTS_ServiceParteAdversa
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
 import { fetchAtribuicoesContratos } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+import { createAtribuicaoEvento } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+
 
 import { createParteContrato } from "@/services/ENDPOINTS_ServicePartesContrato";
 import { fetchContratoById } from "@/services/ENDPOINTS_ServiceContratos";
@@ -519,6 +521,60 @@ const handleAdicionarParte = async () => {
   }
 };
 
+const handleNovaAtribuicao = async () => {
+  if (
+    !contratoSelecionado?.id ||
+    !formAtrib.proxima_atr_id ||
+    !formAtrib.proximo_resp_id
+  ) {
+    setParteAviso("Preencha todos os campos obrigatórios.");
+    return;
+  }
+
+  try {
+    const payload = {
+      atribuicao_id: formAtrib.proxima_atr_id,
+      entity_type: "contrato",
+      entity_id: contratoSelecionado.id,
+      responsavel_id: formAtrib.proximo_resp_id,
+      data_inicial: new Date().toISOString().split("T")[0],
+      prazo: formAtrib.proximo_prazo || null,
+    };
+
+    await createAtribuicaoEvento(payload);
+
+    const atualizado = await fetchContratoById(contratoSelecionado.id);
+    setContratoSelecionado(atualizado);
+    setPartesVinculadas(atualizado.partes_adversas || []);
+
+    const eventos = Array.isArray(atualizado.atribuicoes_evento)
+      ? atualizado.atribuicoes_evento
+      : [];
+    const ordenados = [...eventos].sort((a, b) => {
+      const da = a?.data_inicial ?? "";
+      const db = b?.data_inicial ?? "";
+      if (da && db && da !== db) return da < db ? -1 : 1;
+      return (a?.id ?? 0) - (b?.id ?? 0);
+    });
+
+    setHistoricoAtribs(ordenados);
+    setMostrarHistorico(true);
+
+    setRightMode("atribuicoes");
+    setFormAtrib({
+      executor_id: "",
+      proxima_atr_id: "",
+      proximo_resp_id: "",
+      observacao: "",
+      proximo_prazo: "",
+    });
+  } catch (error) {
+    console.error("Erro ao criar nova atribuição:", error);
+    setParteAviso("Erro ao salvar nova atribuição.");
+  }
+};
+
+
   
   async function carregarContrato(id) {
     try {
@@ -773,9 +829,22 @@ const handleAdicionarParte = async () => {
                   {(editando || visualizando) && contratoSelecionado?.id && (
                     <div className="botao-contrato-painel-adicionar-parte">
                       {!visualizando && (
-                        <Button className="ml-2" onClick={() => setRightMode("novaAtrib")}>
+                        <Button
+                          className="ml-2"
+                          onClick={() => {
+                            setFormAtrib({
+                              executor_id: "",
+                              proxima_atr_id: "",
+                              proximo_resp_id: "",
+                              observacao: "",
+                              proximo_prazo: "",
+                            });
+                            setRightMode("novaAtrib");
+                          }}
+                        >
                           Nova Atribuição
                         </Button>
+                      
                       )}
                     
                       <Button
@@ -889,7 +958,9 @@ const handleAdicionarParte = async () => {
                       onChange={(e) =>
                         setFormAtrib({ ...formAtrib, prazo: e.target.value })
                       }
+                      disabled={visualizando}
                     />
+
                   </div>              
                   <div className="processo-input-wrapper">
                     <label className="processo-label">Executor</label>
@@ -897,12 +968,14 @@ const handleAdicionarParte = async () => {
                       className="processo-modal-input"
                       value={formAtrib.executor_id}
                       onChange={(e) => setFormAtrib({ ...formAtrib, executor_id: e.target.value })}
+                      disabled={visualizando}
                     >
                       <option value="">Selecione…</option>
                       {colabs.map(c => (
                         <option key={c.id} value={c.id}>{c.nome}</option>
                       ))}
                     </select>
+
                   </div>
               
                   <div className="processo-input-wrapper">
@@ -912,27 +985,32 @@ const handleAdicionarParte = async () => {
                       rows={2}
                       value={formAtrib.observacao}
                       onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
+                      readOnly={visualizando}
                     />
+
                   </div>
-                  <div className="processo-right-actions">
-                    <Button
-                      onClick={async () => {
-                        // await updateAtribuicaoContrato(...) // se tiver a função pronta
-                        setRightMode("atribuicoes");
-                      }}
-                    >
-                      Atualizar
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setRightMode("atribuicoes");
-                        setAtrSelecionada(null);
-                      }}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
+                  {!visualizando && (
+                    <div className="processo-right-actions">
+                      <Button
+                        onClick={async () => {
+                          // await updateAtribuicaoContrato(...)
+                          setRightMode("atribuicoes");
+                        }}
+                      >
+                        Atualizar
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={() => {
+                          setRightMode("atribuicoes");
+                          setAtrSelecionada(null);
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  )}
+
 
                 </div>
                 
@@ -981,14 +1059,10 @@ const handleAdicionarParte = async () => {
                   </div>
               
                   <div className="processo-right-actions">
-                    <Button
-                      onClick={async () => {
-                        // await createAtribuicaoContrato(...)
-                        setRightMode("atribuicoes");
-                      }}
-                    >
+                    <Button onClick={handleNovaAtribuicao}>
                       Salvar
                     </Button>
+
                     <Button
                       variant="secondary"
                       onClick={() => {
@@ -1204,7 +1278,7 @@ const handleAdicionarParte = async () => {
               <th className="col-status">Status</th>
               <th className="col-responsavel">Responsável</th>
               <th className="col-lote">Lote</th>
-              <th className="col-acoes-two-buttons">Ações</th>
+              <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -1226,22 +1300,36 @@ const handleAdicionarParte = async () => {
                   */}
 
                   <td className="col-lote">{c.lote ?? "-"}</td>
-                  <td className="col-acoes">
-                    <Button
-                      variant="secondary"
-                      className="ml-2"
-                      onClick={(e) => { e.currentTarget.blur(); abrirEditar(c); }}
-                    >
-                      <Pencil size={16} className="mr-1" />Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="ml-2"
-                      onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(c); }}
+                  <td className="col-acoes-three-buttons">
+                    <div className="tabela-acoes-wrapper">
+                      <Button
+                        variant="secondary"
+                        className="tabela-acao-botao"
+                        onClick={(e) => { e.currentTarget.blur(); abrirEditar(c); }}
                       >
-                      <Eye size={16} className="mr-1" />Detalhar
-                    </Button>
+                        <Pencil size={16} className="mr-1" />Editar
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="tabela-acao-botao"
+                        onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(c); }}
+                      >
+                        <Eye size={16} className="mr-1" />Detalhar
+                      </Button>
+
+                      <Button
+                        variant="default"
+                        className="tabela-acao-botao"
+                        onClick={() => {
+                          console.log("Clicou em Inicial para contrato:", c.id);
+                        }}
+                      >
+                        Inicial
+                      </Button>
+                    </div>
                   </td>
+
                 </tr>
               ))
             ) : (

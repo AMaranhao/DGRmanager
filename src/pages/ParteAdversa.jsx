@@ -174,17 +174,33 @@ const handleDeleteContrato = async (contratoId) => {
       cpf: cpf.replace(/\D/g, ""),
       email: email.trim() !== "" ? email.trim() : null,
       telefone: telefone.trim() !== "" ? telefone.trim() : null,
-      enderecos: enderecos.map((e) => ({
-        id: e.id || null,  // mantém o id se existir, ou null se for novo
-        cep: e.cep.trim(),
-        uf: e.uf.trim().toUpperCase(),
-        cidade: e.cidade.trim(),
-        bairro: e.bairro.trim(),
-        rua: e.rua.trim(),
-        numero: e.numero.trim(),
-        complemento: e.complemento ? e.complemento.trim() : null,
-        principal: e.principal !== undefined ? e.principal : true,
-      })),
+      enderecos: [
+        ...enderecos.map((e) => ({
+          id: e.id || null,
+          cep: e.cep.trim(),
+          uf: e.uf.trim().toUpperCase(),
+          cidade: e.cidade.trim(),
+          bairro: e.bairro.trim(),
+          rua: e.rua.trim(),
+          numero: e.numero.trim(),
+          complemento: e.complemento ? e.complemento.trim() : null,
+          principal: e.principal !== undefined ? e.principal : true,
+        })),
+        ...(adicionandoEndereco && formEndereco.cep?.trim()
+          ? [{
+              id: formEndereco.id || null,
+              cep: formEndereco.cep.trim(),
+              uf: formEndereco.uf.trim().toUpperCase(),
+              cidade: formEndereco.cidade.trim(),
+              bairro: formEndereco.bairro.trim(),
+              rua: formEndereco.rua.trim(),
+              numero: formEndereco.numero.trim(),
+              complemento: formEndereco.complemento?.trim() || null,
+              principal: formEndereco.principal !== undefined ? formEndereco.principal : true,
+            }]
+          : [])
+      ],
+
     };
   
   
@@ -646,49 +662,54 @@ const partesFiltradas = partes.filter((p) => {
         <table className="usuarios-tabela">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>CPF</th>
-              <th>Email</th>
-              <th>Telefone</th>
+              <th className="parte-col-nome">Nome</th>
+              <th className="parte-col-cpf">CPF</th>
+              <th className="parte-col-email">Email</th>
+              <th className="parte-col-telefone">Telefone</th>
               <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
           <tbody>
             {partesFiltradas.map((p) => (
               <tr key={p.id}>
-                <td>{p.nome}</td>
-                <td>{p.cpf}</td>
-                <td>{p.email}</td>
-                <td>{p.telefone}</td>
-                <td className="usuarios-acoes">
-                  <Button
-                    variant="secondary"
-                    onClick={(e) => {
-                      e.currentTarget.blur();  
-                      abrirModalEditar(p);
-                    }}
-                    className="ml-2"
-                  >
-                    <Pencil size={16} className="mr-1" />Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={(e) => {
-                      e.currentTarget.blur();  
-                      abrirModalDetalhar(p);
-                    }}
-                    className="ml-2"
-                  >
-                    <Eye size={16} className="mr-1" />Detalhar
-                  </Button>
-                  <Button
-                    variant="default"
-                    onClick={() => abrirModalContratos(p)}
-                    className="ml-2"
+                <td className="parte-col-nome">{p.nome}</td>
+                <td className="parte-col-cpf">{p.cpf}</td>
+                <td className="parte-col-email">{p.email}</td>
+                <td className="parte-col-telefone">{p.telefone}</td>
+                <td className="col-acoes-three-buttons">
+                  <div className="tabela-acoes-wrapper">
+                    <Button
+                      variant="secondary"
+                      className="tabela-acao-botao"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirModalEditar(p);
+                      }}
                     >
-                    <FileEdit size={16} className="mr-1" />Contratos                  
-                  </Button>
+                      <Pencil size={16} className="mr-1" />Editar
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="tabela-acao-botao"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirModalDetalhar(p);
+                      }}
+                    >
+                      <Eye size={16} className="mr-1" />Detalhar
+                    </Button>
+
+                    <Button
+                      variant="default"
+                      className="tabela-acao-botao"
+                      onClick={() => abrirModalContratos(p)}
+                    >
+                      <FileEdit size={16} className="mr-1" />Contratos
+                    </Button>
+                  </div>
                 </td>
+
               </tr>
             ))}
           </tbody>
