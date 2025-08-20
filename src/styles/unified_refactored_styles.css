@@ -612,7 +612,7 @@ button.absolute.top-4.right-4 {
 }
 
 .processo-atr-section-title {
-  font-size: 0.8125rem;           /* ~13px, pequeno como no print */
+  font-size: 1.2rem;           /* ~13px, pequeno como no print */
   font-weight: 600;
   color: #111827;                 /* gray-900 */
   margin-bottom: 0.25rem;
@@ -1211,4 +1211,12 @@ button.absolute.top-4.right-4 {
 input[type="date"].processo-modal-input {
   background-color: white !important;
   color: #111827; /* ajusta o texto para preto */
+}
+
+.select-disabled-look {
+  background-color: white !important;
+  color: black !important;
+  cursor: default;
+  pointer-events: none;
+  opacity: 1 !important;
 }
