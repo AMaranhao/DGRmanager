@@ -1,4 +1,5 @@
 // src/pages/Processos.jsx
+import React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,13 @@ const norm = (s) =>
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
+
+const LinhaInput = React.memo(({ label, children }) => (
+  <div className="processo-input-wrapper">
+    <label className="processo-label">{label}</label>
+    {children}
+  </div>
+));
 
 function toYMD(raw) {
   if (!raw) return "";
@@ -125,10 +133,7 @@ export default function Processos() {
   // formulário do processo
   const [form, setForm] = useState({
     numero: "",
-    cliente: "",
-    contrato_id: "",
-    contrato_numero: "", 
-    funcionario_id: "",
+    contrato_numero: "",
     data_distribuicao: "",
     data_publicacao: "",
     comarca: "",
@@ -137,6 +142,7 @@ export default function Processos() {
     prazo_fatal: "",
     observacao: ""
   });
+  
 
   const [processoSel, setProcessoSel] = useState(null);
 
@@ -189,10 +195,36 @@ export default function Processos() {
   }, []);
   
   useEffect(() => {
+    if (modalAberto && editando && salvarRef.current) {
+      salvarRef.current.focus();
+    }
+  }, [modalAberto, editando]);
+  
+
+  useEffect(() => {
     if (!modalAberto || rightMode !== "editAtrib") return;
     const id = setInterval(() => setTick((t) => t + 1), 60 * 1000); // a cada 1 min
     return () => clearInterval(id);
   }, [modalAberto, rightMode]);
+
+
+  useEffect(() => {
+    if (!processoSel || !editando) return;
+    setForm({
+      numero: processoSel.numero ?? processoSel.numero_cnj ?? "",
+      contrato_numero: processoSel?.contrato?.numero ?? "",
+      data_distribuicao: toYMD(processoSel.data_distribuicao),
+      data_publicacao: toYMD(processoSel.data_publicacao),
+      comarca: processoSel.comarca ?? "",
+      prazo_juridico: processoSel.prazo_juridico ?? "",
+      prazo_interno: toYMD(processoSel.prazo_interno),
+      prazo_fatal: toYMD(processoSel.prazo_fatal),
+      observacao: processoSel.observacao ?? "",
+    });
+    setPartes((processoSel?.contrato?.partes) || []);
+    setAndamentos(Array.isArray(processoSel?.atribuicoes_evento) ? processoSel.atribuicoes_evento : []);
+  }, [processoSel, editando]);
+  
 
   const filtrados = useMemo(() => {
     const txt = norm(fTexto);
@@ -280,10 +312,7 @@ export default function Processos() {
     setProcessoSel(null);
     setForm({
       numero: "",
-      cliente: "",
-      contrato_id: "",
       contrato_numero: "",
-      funcionario_id: "",
       data_distribuicao: "",
       data_publicacao: "",
       comarca: "",
@@ -295,34 +324,17 @@ export default function Processos() {
     setPartes([]);
     setAndamentos([]);
     setModalAberto(true);
-    setTimeout(() => salvarRef.current?.focus(), 0);
+
   };
 
-  const popularFormDoBackend = (data) => {
-    setForm({
-      numero: data.numero ?? data.numero_cnj ?? "",
-      cliente: data.cliente ?? "",
-      contrato_id: data.contrato_id ?? data?.contrato?.id ?? "",
-      contrato_numero: data?.contrato?.numero ?? "",
-      funcionario_id: data.funcionario_id ?? "",
-      data_distribuicao: data.data_distribuicao ?? "",
-      data_publicacao: data.data_publicacao ?? "",
-      comarca: data.comarca ?? "",
-      prazo_juridico: data.prazo_juridico ?? "",
-      prazo_interno: toYMD(data.prazo_interno) ?? "",
-      prazo_fatal: data.prazo_fatal ?? "",
-      observacao: data.observacao ?? "",
-    });
-    setPartes((data?.contrato?.partes) || []);
-    setAndamentos(Array.isArray(data?.atribuicoes_evento) ? data.atribuicoes_evento : []);
-  };
+
 
   const abrirDetalhar = async (id) => {
     try {
       setErroModal("");
       const data = await fetchProcessoById(id);
       setProcessoSel(data);
-      popularFormDoBackend(data);
+
   
       setVisualizando(true);
       setEditando(false);
@@ -342,14 +354,14 @@ export default function Processos() {
       setErroModal("");
       const data = await fetchProcessoById(id);
       setProcessoSel(data);
-      popularFormDoBackend(data);
+
   
       // agora usamos diretamente os dados do backend
       setVisualizando(false);
       setEditando(true);
       setRightMode("list");
       setModalAberto(true);
-      setTimeout(() => salvarRef.current?.focus(), 0);
+
   
       const respDefaultId = data?.responsavel_atual?.id ?? data?.responsavel?.id ?? "";
       setFormAtrib({
@@ -379,9 +391,18 @@ const salvar = async () => {
 
     // Se quiser garantir número (caso usuário digite texto no campo do contrato):
     const payload = {
-      ...rest,
-      contrato_id: contrato_id ? Number(contrato_id) : undefined,
+      numero: form.numero,
+      cliente: "Finsol",
+      contrato_numero: form.contrato_numero || form.contrato_id || "",
+      data_distribuicao: form.data_distribuicao,
+      data_publicacao: form.data_publicacao,
+      comarca: form.comarca,
+      prazo_juridico: form.prazo_juridico,
+      prazo_interno: form.prazo_interno,
+      prazo_fatal: form.prazo_fatal,
+      observacao: form.observacao
     };
+    
 
     if (editando && processoSel?.id) {
       await updateProcesso(processoSel.id, payload);
@@ -420,12 +441,7 @@ const salvar = async () => {
 
 
   // ===== UI helpers =====
-  const LinhaInput = ({ label, children }) => (
-    <div className="processo-input-wrapper">
-      <label className="processo-label">{label}</label>
-      {children}
-    </div>
-  );
+
 
   const fmtDataBR = (s) => {
     if (!s) return "-";
@@ -617,16 +633,12 @@ const salvar = async () => {
             </Button>
           </DialogTrigger>
 
-          <DialogContent
-          
-            className="processo-modal processo-split-modal processo-no-close processo-dialog-content"
-            onOpenAutoFocus={(e) => {
-              if (visualizando) {
-                e.preventDefault();
-                requestAnimationFrame(() => document.activeElement?.blur());
-              }
-            }}
-          >
+            <DialogContent
+              className="processo-modal processo-split-modal processo-no-close processo-dialog-content"
+              onOpenAutoFocus={(e) => {
+                  e.preventDefault(); 
+              }}
+            >
         
 
             <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
@@ -646,7 +658,7 @@ const salvar = async () => {
                 <LinhaInput label="Número (CNJ)">
                   <Input
                     className="processo-modal-input"
-                    value={form.numero}
+                    value={form.numero || ""}
                     onChange={(e) => setForm({ ...form, numero: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -655,7 +667,7 @@ const salvar = async () => {
                 <LinhaInput label="Contrato (nº ou ID)">
                   <Input
                     className="processo-modal-input"
-                    value={form.contrato_numero || form.contrato_id}   // mostra nº se existir
+                    value={(form.contrato_numero || form.contrato_id || "").toString()}
                     onChange={(e) =>
                       setForm({
                         ...form,
@@ -676,7 +688,7 @@ const salvar = async () => {
                   <Input
                     type="date"
                     className="processo-modal-input"
-                    value={form.data_distribuicao}
+                    value={form.data_distribuicao || ""}
                     onChange={(e) => setForm({ ...form, data_distribuicao: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -686,7 +698,7 @@ const salvar = async () => {
                   <Input
                     type="date"
                     className="processo-modal-input"
-                    value={form.data_publicacao}
+                    value={form.data_publicacao || ""}
                     onChange={(e) => setForm({ ...form, data_publicacao: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -697,7 +709,7 @@ const salvar = async () => {
               <LinhaInput label="Comarca">
                 <Input
                   className="processo-modal-input"
-                  value={form.comarca}
+                  value={form.comarca || ""}
                   onChange={(e) => setForm({ ...form, comarca: e.target.value })}
                   readOnly={visualizando}
                 />
@@ -709,7 +721,7 @@ const salvar = async () => {
                   <Input
                     type="number"
                     className="processo-modal-input"
-                    value={form.prazo_juridico}
+                    value={form.prazo_juridico?.toString() || ""}
                     onChange={(e) => setForm({ ...form, prazo_juridico: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -719,7 +731,7 @@ const salvar = async () => {
                   <Input
                     type="date"
                     className="processo-modal-input"
-                    value={form.prazo_interno}
+                    value={form.prazo_interno || ""}
                     onChange={(e) => setForm({ ...form, prazo_interno: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -729,7 +741,7 @@ const salvar = async () => {
                   <Input
                     type="date"
                     className="processo-modal-input"
-                    value={form.prazo_fatal}
+                    value={form.prazo_fatal || ""}
                     onChange={(e) => setForm({ ...form, prazo_fatal: e.target.value })}
                     readOnly={visualizando}
                   />
@@ -741,7 +753,7 @@ const salvar = async () => {
                 <textarea
                   className="processo-textarea"
                   rows={2}
-                  value={form.observacao}
+                  value={form.observacao || ""}
                   onChange={(e) => setForm({ ...form, observacao: e.target.value })}
                   readOnly={visualizando}
                 />
@@ -808,25 +820,24 @@ const salvar = async () => {
                     })}
                   </ul>
 
-                  <div className="processo-right-actions">
-                  {!visualizando && (
-                    <Button onClick={() => {
-                      setFormAtrib({
-                        solucionador_id: "",
-                        proxima_atr_id: "",
-                        proximo_resp_id: "",
-                        prazo: "",
-                        observacao: "",
-                        ultimaEtapa: false,
-                      });
-                      setRightMode("new");
-                    }}>
-                      Próxima Atribuição
-                    </Button>
-                  )}
+                    <div className="processo-right-actions">
+                      {!visualizando && editando && (
+                        <Button onClick={() => {
+                          setFormAtrib({
+                            solucionador_id: "",
+                            proxima_atr_id: "",
+                            proximo_resp_id: "",
+                            prazo: "",
+                            observacao: "",
+                            ultimaEtapa: false,
+                          });
+                          setRightMode("new");
+                        }}>
+                          Próxima Atribuição
+                        </Button>
+                      )}
+                    </div>
 
-
-                  </div>
                 </>
               )}
 

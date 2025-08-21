@@ -1160,24 +1160,24 @@ button.absolute.top-4.right-4 {
 }
 
 .parte-col-nome {
-  width: 250px !important; 
-  max-width: 250px !important;
+  width: 12rem !important; 
+  max-width: 12rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .parte-col-cpf {
-  width: 80px !important; 
-  max-width: 80px !important;
+  width: 6rem !important; 
+  max-width: 6rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .parte-col-email {
-  width: 250px !important; 
-  max-width: 250px !important;
+  width: 10rem !important; 
+  max-width: 10rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1324,3 +1324,39 @@ input[type="date"].processo-modal-input {
 .col-responsavel-processo {
   width: 12rem !important; /* 120px */
 }
+
+
+/* ===================== */
+/* ===================== */
+/* ===================== */
+
+.col-contratos-numero {
+  width: 5rem !important;
+  min-width: 5rem !important;
+  max-width: 5rem !important;
+}
+
+.col-contratos-valor {
+  width: 4rem !important;
+  min-width: 4rem !important;
+  max-width: 4rem !important;
+}
+
+.col-contratos-status {
+  width: 7rem !important;
+  min-width: 7rem !important;
+  max-width: 7rem !important;
+}
+
+.col-contratos-responsavel {
+  width: 10rem !important;
+  min-width: 10rem !important;
+  max-width: 10rem !important;
+}
+
+.col-contratos-lote {
+  width: 3rem !important;
+  min-width: 3rem !important;
+  max-width: 3rem !important;
+}
+

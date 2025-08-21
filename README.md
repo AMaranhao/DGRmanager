@@ -36,6 +36,34 @@ Inclui automações, controle de prazos, integrações e fluxo de trabalho otimi
   - Exibição ordenada por data.
   - Alternância entre lista de partes e histórico no modal de detalhamento.
 
+### 🔹 Módulo de Processos
+- Listagem de processos com filtros por:
+  - CNJ, Parte ou Comarca
+  - Responsável atual
+  - Status (via atribuição)
+  - Intervalo de prazo interno
+- Modal dividido (split modal):
+  - **Esquerda**: dados do processo (CNJ, contrato, datas, prazos, comarca e observação).
+  - **Direita**: histórico de atribuições (status, responsável e prazos).
+- Controle visual:
+  - Abertura com foco direto no botão "Salvar"
+  - Preenchimento fluido dos campos sem perda de foco
+- Criação e edição com persistência via backend mockado.
+- Exclusão do campo `funcionario_id`; `cliente` fixo como `"Finsol"`.
+- Contrato é informado via `contrato_numero` e resolvido no backend.
+
+- Listagem de contratos ordenada automaticamente por **status** definido via atribuições.
+- Filtros por **status**, **lote** ou busca livre.
+- Cadastro e edição com campos:
+  - Número, Valor, Lote, Observação, Status (Atribuição).
+- Gerenciamento de **partes vinculadas**:
+  - Busca de parte pelo CPF (match direto).
+  - Evita duplicidade de partes no contrato.
+  - Remoção de partes com confirmação e botão dedicado.
+- **Histórico de Atribuições**:
+  - Exibição ordenada por data.
+  - Alternância entre lista de partes e histórico no modal de detalhamento.
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -119,7 +147,6 @@ yarn dev
 
 ## 📌 Roadmap Futuro
 
-- [ ] Implementar módulo **Processos**.
 - [ ] Autenticação JWT com controle de permissões.
 - [ ] Integração com banco de dados real.
 - [ ] Upload e gestão de documentos.

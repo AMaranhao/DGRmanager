@@ -1313,11 +1313,11 @@ const handleAtualizarAtribuicao = async () => {
         <table className="usuarios-tabela contratos-tabela">
           <thead>
             <tr>
-              <th className="col-numero">Número</th>
-              <th className="col-valor">Valor</th>
-              <th className="col-status">Status</th>
-              <th className="col-responsavel">Responsável</th>
-              <th className="col-lote">Lote</th>
+              <th className="col-contratos-numero">Número</th>
+              <th className="col-contratos-valor">Valor</th>
+              <th className="col-contratos-status">Status</th>
+              <th className="col-contratos-responsavel">Responsável</th>
+              <th className="col-contratos-lote">Lote</th>
               <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
@@ -1327,19 +1327,19 @@ const handleAtualizarAtribuicao = async () => {
             ) : filtrados.length ? (
               filtrados.map((c) => (
                 <tr key={c.id}>
-                  <td className="col-numero">{c.numero}</td>
+                  <td className="col-contratos-numero">{c.numero}</td>
 
 
-                  <td className="col-valor">{c._valorBRL}</td>
-                  <td className="col-status">{c._status}</td>
-                  <td className="col-responsavel">{c._responsavel}</td>
+                  <td className="col-contratos-valor">{c._valorBRL}</td>
+                  <td className="col-contratos-status">{c._status}</td>
+                  <td className="col-contratos-responsavel">{c._responsavel}</td>
                   {/*
                   <td className="col-valor">{Number(c.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
                   <td className="col-status">{getStatus(c)}</td>
                   <td className="col-responsavel">{getResponsavel(c)}</td>
                   */}
 
-                  <td className="col-lote">{c.lote ?? "-"}</td>
+                  <td className="col-contratos-lote">{c.lote ?? "-"}</td>
                   <td className="col-acoes-three-buttons">
                   <div className="table-actions">
                     <Button
