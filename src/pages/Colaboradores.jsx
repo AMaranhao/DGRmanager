@@ -119,7 +119,6 @@ export default function Colaboradores() {
       equipe_id: equipeId,
       oab,
       telefone,
-      data_admissao,
     };
 
     if (editando && colaboradorSelecionado) {

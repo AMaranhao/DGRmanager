@@ -994,12 +994,12 @@ const salvar = async () => {
         <table className="usuarios-tabela">
           <thead>
             <tr>
-              <th className="col-cnj">Nº CNJ</th>
-              <th className="col-parte-principal">Parte Principal</th>
-              <th className="col-status">Status</th>
-              <th className="col-comarca">Comarca</th>
-              <th className="col-prazo-interno">Prazo Interno</th>
-              <th className="col-responsavel-processo">Responsável</th>
+              <th className="processo-col-cnj">Nº CNJ</th>
+              <th className="processo-col-parte-principal">Parte Principal</th>
+              <th className="processo-col-status">Status</th>
+              <th className="processo-col-comarca">Comarca</th>
+              <th className="processo-col-prazo-interno">Prazo Interno</th>
+              <th className="processo-col-responsavel-processo">Responsável</th>
               <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
@@ -1009,12 +1009,12 @@ const salvar = async () => {
             ) : filtrados.length ? (
               filtrados.map((p) => (
                 <tr key={p.id}>
-                  <td className="col-cnj">{p.numero ?? p.numero_cnj}</td>
-                  <td className="col-parte-principal">{(getPartePrincipal(p)?.nome) ?? "-"}</td>
-                  <td className="col-status">{p.status_atual ?? "-"}</td>
-                  <td className="col-comarca">{p.comarca ?? "-"}</td>
-                  <td className="col-prazo-interno">{fmtDM(p.prazo_interno)}</td>
-                  <td className="col-responsavel-processo">
+                  <td className="processo-col-cnj">{p.numero ?? p.numero_cnj}</td>
+                  <td className="processo-col-parte-principal">{(getPartePrincipal(p)?.nome) ?? "-"}</td>
+                  <td className="processo-col-status">{p.status_atual ?? "-"}</td>
+                  <td className="processo-col-comarca">{p.comarca ?? "-"}</td>
+                  <td className="processo-col-prazo-interno">{fmtDM(p.prazo_interno)}</td>
+                  <td className="processo-col-responsavel-processo">
                     {p.responsavel_atual?.nome ?? p.responsavel?.nome ?? "-"}
                   </td>
                   <td className="col-acoes-three-buttons">

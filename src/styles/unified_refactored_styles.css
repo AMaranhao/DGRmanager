@@ -1159,38 +1159,6 @@ button.absolute.top-4.right-4 {
   justify-content: center;
 }
 
-.parte-col-nome {
-  width: 12rem !important; 
-  max-width: 12rem !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.parte-col-cpf {
-  width: 6rem !important; 
-  max-width: 6rem !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.parte-col-email {
-  width: 10rem !important; 
-  max-width: 10rem !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.parte-col-telefone {
-  width: 80px !important; 
-  max-width: 80px !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ===== Botões de ação em tabela (layout padrão horizontal) ===== */
 .acoes-tabela-wrapper {
   display: flex;
@@ -1293,36 +1261,40 @@ input[type="date"].processo-modal-input {
   white-space: nowrap;
 }
 
-.col-parte-principal {
-  width: 12rem !important; /* 120px */
+.processo-col-cnj {
+  width: 11rem !important;
+  min-width: 11rem !important;
+  max-width: 11rem !important;
 }
 
-.col-status {
+.processo-col-parte-principal {
+  width: 11rem !important;
+  min-width: 11rem !important;
+  max-width: 11rem !important;
+}
+
+.processo-col-status {
   width: 8rem !important;
   min-width: 8rem !important;
   max-width: 8rem !important;
 }
 
-.col-comarca {
+.processo-col-comarca {
   width: 5rem !important;
   min-width: 5rem !important;
   max-width: 5rem !important;
 }
 
-.col-prazo-interno {
+.processo-col-prazo-interno {
   width: 5rem !important;
   min-width: 5rem !important;
   max-width: 5rem !important;
 }
 
-.col-cnj {
-  width: 12rem !important;
-  min-width: 12rem !important;
-  max-width: 12rem !important;
-}
-
-.col-responsavel-processo {
-  width: 12rem !important; /* 120px */
+.processo-col-responsavel-processo {
+  width: 11rem !important;
+  min-width: 11rem !important;
+  max-width: 11rem !important;
 }
 
 
@@ -1330,33 +1302,57 @@ input[type="date"].processo-modal-input {
 /* ===================== */
 /* ===================== */
 
-.col-contratos-numero {
+.contratos-col-numero {
   width: 5rem !important;
   min-width: 5rem !important;
   max-width: 5rem !important;
 }
 
-.col-contratos-valor {
+.contratos-col-valor {
   width: 4rem !important;
   min-width: 4rem !important;
   max-width: 4rem !important;
 }
 
-.col-contratos-status {
+.contratos-col-status {
   width: 7rem !important;
   min-width: 7rem !important;
   max-width: 7rem !important;
 }
 
-.col-contratos-responsavel {
+.contratos-col-responsavel {
   width: 10rem !important;
   min-width: 10rem !important;
   max-width: 10rem !important;
 }
 
-.col-contratos-lote {
+.contratos-col-lote {
   width: 3rem !important;
   min-width: 3rem !important;
   max-width: 3rem !important;
 }
 
+
+.parte-col-nome {
+  width: 11rem !important;
+  min-width: 11rem !important;
+  max-width: 11rem !important;
+}
+
+.parte-col-cpf {
+  width: 5rem !important;
+  min-width: 5rem !important;
+  max-width: 5rem !important;
+}
+
+.parte-col-email {
+  width: 11rem !important;
+  min-width: 11rem !important;
+  max-width: 11rem !important;
+}
+
+.parte-col-telefone {
+  width: 5rem !important;
+  min-width: 5rem !important;
+  max-width: 5rem !important;
+}
