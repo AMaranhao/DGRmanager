@@ -402,29 +402,31 @@ export default function Colaboradores() {
                 <td>{f.equipe?.nome || "-"}</td>
                 <td><span className={f.ativo ? "" : "usuarios-status-inativo"}>{f.ativo ? "Ativo" : "Inativo"}</span></td>
                 <td className="usuarios-acoes">
-                  <Button variant={f.ativo ? "destructive" : "default"} onClick={() => handleAtivarDesativar(f)} className="ativar-desativar-btn">
-                    <Trash size={18} className="mr-2" />{f.ativo ? "Desativar" : "Ativar"}
-                  </Button>
+                <div className="table-actions">
                   <Button 
                     variant="secondary" 
-                    onClick={(e) => { 
-                      e.currentTarget.blur(); 
-                      abrirModalEditar(f); 
-                    }} 
-                    className="ml-2"
+                    className="table-action-btn"
+                    onClick={() => abrirModalEditar(f)}
                   >
-                    <Pencil size={16} className="mr-1" />Editar
+                    ✏️ Editar
                   </Button>
                   <Button 
                     variant="outline" 
-                    onClick={(e) => { 
-                      e.currentTarget.blur(); 
-                      abrirModalDetalhar(f); 
-                    }} 
-                    className="ml-2"
+                    className="table-action-btn"
+                    onClick={() => abrirModalDetalhar(f)}
                   >
-                    <Eye size={16} className="mr-1" />Detalhar
+                    👁️ Detalhar
                   </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => handleAtivarDesativar(f)}
+                    className={`table-action-btn ${f.ativo ? "btn-desativar" : "btn-ativar"}`}
+                    >
+                    {f.ativo ? "Desativar" : "Ativar"}
+                  </Button>
+                </div>
+
+
                 </td>
               </tr>
             ))}

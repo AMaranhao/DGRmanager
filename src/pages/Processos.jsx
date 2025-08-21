@@ -983,12 +983,12 @@ const salvar = async () => {
         <table className="usuarios-tabela">
           <thead>
             <tr>
-              <th className="col-numero">Nº</th>
-              <th>Parte Principal</th>
-              <th>Status</th>
-              <th>Comarca</th>
-              <th>Prazo Interno</th>
-              <th className="col-responsavel">Resp.</th>
+              <th className="col-cnj">Nº CNJ</th>
+              <th className="col-parte-principal">Parte Principal</th>
+              <th className="col-status">Status</th>
+              <th className="col-comarca">Comarca</th>
+              <th className="col-prazo-interno">Prazo Interno</th>
+              <th className="col-responsavel-processo">Responsável</th>
               <th className="col-acoes-three-buttons">Ações</th>
             </tr>
           </thead>
@@ -998,31 +998,38 @@ const salvar = async () => {
             ) : filtrados.length ? (
               filtrados.map((p) => (
                 <tr key={p.id}>
-                  <td className="col-numero">{p.numero ?? p.numero_cnj}</td>
-                  <td>{(getPartePrincipal(p)?.nome) ?? "-"}</td>
-                  <td>{p.status_atual ?? "-"}</td>
-                  <td>{p.comarca ?? "-"}</td>
-                  <td>{fmtDM(p.prazo_interno)}</td>
-                  <td className="col-responsavel">
+                  <td className="col-cnj">{p.numero ?? p.numero_cnj}</td>
+                  <td className="col-parte-principal">{(getPartePrincipal(p)?.nome) ?? "-"}</td>
+                  <td className="col-status">{p.status_atual ?? "-"}</td>
+                  <td className="col-comarca">{p.comarca ?? "-"}</td>
+                  <td className="col-prazo-interno">{fmtDM(p.prazo_interno)}</td>
+                  <td className="col-responsavel-processo">
                     {p.responsavel_atual?.nome ?? p.responsavel?.nome ?? "-"}
                   </td>
                   <td className="col-acoes-three-buttons">
-                    <div className="acoes-tabela-wrapper">
-                      <Button
-                        variant="secondary"
-                        className="btn-acao-tabela"
-                        onClick={(e) => { e.currentTarget.blur(); abrirEditar(p.id); }}
-                      >
-                        <Pencil size={16} className="mr-1" />Editar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="btn-acao-tabela"
-                        onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(p.id); }}
-                      >
-                        <Eye size={16} className="mr-1" />Detalhar
-                      </Button>
-                    </div>
+                  <div className="table-actions">
+                    <Button
+                      variant="secondary"
+                      className="table-action-btn"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirEditar(p.id);
+                      }}
+                    >
+                      ✏️ Editar
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="table-action-btn"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirDetalhar(p.id);
+                      }}
+                    >
+                      👁️ Detalhar
+                    </Button>
+                  </div>
+
                   </td>
                 </tr>
               ))

@@ -1341,33 +1341,40 @@ const handleAtualizarAtribuicao = async () => {
 
                   <td className="col-lote">{c.lote ?? "-"}</td>
                   <td className="col-acoes-three-buttons">
-                    <div className="tabela-acoes-wrapper">
-                      <Button
-                        variant="secondary"
-                        className="tabela-acao-botao"
-                        onClick={(e) => { e.currentTarget.blur(); abrirEditar(c); }}
-                      >
-                        <Pencil size={16} className="mr-1" />Editar
-                      </Button>
+                  <div className="table-actions">
+                    <Button
+                      variant="secondary"
+                      className="table-action-btn"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirEditar(c);
+                      }}
+                    >
+                      ✏️ Editar
+                    </Button>
 
-                      <Button
-                        variant="outline"
-                        className="tabela-acao-botao"
-                        onClick={(e) => { e.currentTarget.blur(); abrirDetalhar(c); }}
-                      >
-                        <Eye size={16} className="mr-1" />Detalhar
-                      </Button>
+                    <Button
+                      variant="outline"
+                      className="table-action-btn"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirDetalhar(c);
+                      }}
+                    >
+                      👁️ Detalhar
+                    </Button>
 
-                      <Button
-                        variant="default"
-                        className="tabela-acao-botao"
-                        onClick={() => {
-                          console.log("Clicou em Inicial para contrato:", c.id);
-                        }}
-                      >
-                        Inicial
-                      </Button>
-                    </div>
+                    <Button
+                      variant="default"
+                      className="table-action-btn"
+                      onClick={() => {
+                        console.log("Clicou em Inicial para contrato:", c.id);
+                      }}
+                    >
+                      Inicial
+                    </Button>
+                  </div>
+
                   </td>
 
                 </tr>

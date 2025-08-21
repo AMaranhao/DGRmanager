@@ -525,8 +525,8 @@ cursor: pointer;
 }
 
 .col-acoes-three-buttons {
-  max-width: 15rem !important;
-  width: 15rem !important; /* 150px */
+  max-width: 8rem !important;
+  width: 8rem !important; /* 150px */
   gap: 0.5rem;
 }
 
@@ -1219,4 +1219,108 @@ input[type="date"].processo-modal-input {
   cursor: default;
   pointer-events: none;
   opacity: 1 !important;
+}
+
+.colaboradores-acoes-tabela-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-action-btn {
+  width: 5rem !important;
+  justify-content: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.table-action-btn svg,
+.table-action-btn span {
+  margin: 0 !important;
+}
+
+/* Botão vermelho - usado em "Desativar" */
+.btn-desativar {
+  background-color: #dc2626 !important; /* bg-red-600 */
+  color: white !important;
+}
+.btn-desativar:hover {
+  background-color: #b91c1c !important; /* bg-red-700 */
+}
+
+/* Botão preto - usado em "Ativar" */
+.btn-ativar {
+  background-color: #000000 !important; /* bg-black */
+  color: white !important;
+}
+.btn-ativar:hover {
+  background-color: #1f1f1f !important; /* hover:bg-gray-800 */
+}
+
+
+/* Coluna "Status" */
+.usuarios-tabela td.status-col,
+.usuarios-tabela th.status-col {
+  max-width: 120px !important;
+  width: 120px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Coluna "Parte Principal" */
+.usuarios-tabela td.parte-col,
+.usuarios-tabela th.parte-col {
+  max-width: 180px !important;
+  width: 180px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Coluna "Prazo Interno" */
+.usuarios-tabela td.prazo-col,
+.usuarios-tabela th.prazo-col {
+  max-width: 80px !important;
+  width: 80px !important;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.col-parte-principal {
+  width: 12rem !important; /* 120px */
+}
+
+.col-status {
+  width: 8rem !important;
+  min-width: 8rem !important;
+  max-width: 8rem !important;
+}
+
+.col-comarca {
+  width: 5rem !important;
+  min-width: 5rem !important;
+  max-width: 5rem !important;
+}
+
+.col-prazo-interno {
+  width: 5rem !important;
+  min-width: 5rem !important;
+  max-width: 5rem !important;
+}
+
+.col-cnj {
+  width: 12rem !important;
+  min-width: 12rem !important;
+  max-width: 12rem !important;
+}
+
+.col-responsavel-processo {
+  width: 12rem !important; /* 120px */
 }

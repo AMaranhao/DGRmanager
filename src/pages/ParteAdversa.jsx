@@ -677,37 +677,39 @@ const partesFiltradas = partes.filter((p) => {
                 <td className="parte-col-email">{p.email}</td>
                 <td className="parte-col-telefone">{p.telefone}</td>
                 <td className="col-acoes-three-buttons">
-                  <div className="tabela-acoes-wrapper">
-                    <Button
-                      variant="secondary"
-                      className="tabela-acao-botao"
-                      onClick={(e) => {
-                        e.currentTarget.blur();
-                        abrirModalEditar(p);
-                      }}
-                    >
-                      <Pencil size={16} className="mr-1" />Editar
-                    </Button>
+                <div className="table-actions">
+                  <Button
+                    variant="secondary"
+                    className="table-action-btn"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      abrirModalEditar(p);
+                    }}
+                  >
+                    ✏️ Editar
+                  </Button>
 
-                    <Button
-                      variant="outline"
-                      className="tabela-acao-botao"
-                      onClick={(e) => {
-                        e.currentTarget.blur();
-                        abrirModalDetalhar(p);
-                      }}
-                    >
-                      <Eye size={16} className="mr-1" />Detalhar
-                    </Button>
+                  <Button
+                    variant="outline"
+                    className="table-action-btn"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      abrirModalDetalhar(p);
+                    }}
+                  >
+                    👁️ Detalhar
+                  </Button>
 
-                    <Button
-                      variant="default"
-                      className="tabela-acao-botao"
-                      onClick={() => abrirModalContratos(p)}
-                    >
-                      <FileEdit size={16} className="mr-1" />Contratos
-                    </Button>
-                  </div>
+                  <Button
+                    variant="default"
+                    className="table-action-btn"
+                    onClick={() => abrirModalContratos(p)}
+                  >
+                    <FileEdit size={16} className="mr-1" />
+                    Contratos
+                  </Button>
+                </div>
+
                 </td>
 
               </tr>

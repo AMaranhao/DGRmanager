@@ -2067,7 +2067,7 @@ body.dark {
 }
 
 .col-responsavel {
-  min-width: 13.75rem !important; /* 220px */
+  min-width: 10rem !important; /* 220px */
 }
 
 .col-lote {
