@@ -70,7 +70,6 @@ const norm = (s) =>
         valor: "",
         lote: "",
         observacao: "",
-        atribId: "",
       });
     
       // lado direito do modal (partes vinculadas)
@@ -616,23 +615,49 @@ const handleAtualizarAtribuicao = async () => {
 
 
   const salvar = async () => {
-    // TODO: montar payload final
     const payload = {
       numero: String(form.numero).trim(),
       valor: form.valor ? Number(form.valor) : null,
       lote: form.lote ? String(form.lote).trim() : null,
       observacao: form.observacao?.trim() || "",
-      atrib_id: form.atribId || null,
-      // partes_contrato viriam aqui quando formarmos o payload final
     };
-    if (editando) {
-      // você decide de onde vem o id (pode guardar o contrato selecionado num state)
-      // await updateContrato(contratoSelecionado.id, payload);
-    } else {
-      // await createContrato(payload);
+  
+    try {
+      if (editando && contratoSelecionado?.id) {
+        await updateContrato(contratoSelecionado.id, payload);
+      } else {
+        await createContrato(payload);
+      }
+  
+      const contratosRes = await fetchContratos();
+  
+      const decorados = contratosRes.map((c) => {
+        const status = getStatus(c);
+        const resp = getResponsavel(c);
+        const valorBRL = typeof c.valor === "number"
+          ? c.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : "-";
+        return {
+          ...c,
+          _status: status,
+          _responsavel: resp,
+          _valorBRL: valorBRL,
+          _ordemStatus: 99, // ajuste se tiver um Map(ordem)
+        };
+      });
+  
+      decorados.sort((a, b) => a._ordemStatus - b._ordemStatus);
+      setLista(decorados);
+  
+    } catch (error) {
+      console.error("Erro ao salvar contrato:", error);
     }
+  
     setModalAberto(false);
   };
+  
+  
+  
 
   return (
     <div className="dashboard-wrapper">

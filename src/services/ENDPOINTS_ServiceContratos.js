@@ -28,6 +28,8 @@ export async function deleteContrato(id) {
 }
 
 
+
+
 // Busca contrato por número (se existir)
 export async function findContratoByNumero(numero) {
   const url = `${API}/contratos?numero=${encodeURIComponent(numero)}`;

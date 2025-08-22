@@ -24,3 +24,11 @@ export async function updateParteContrato(id, data) {
 export async function deleteParteContrato(id) {
   return await del(`${BASE_URL}/${id}`);
 }
+
+export async function fetchContratoByParte(parte_id) {
+  return await get(`partes-contrato/parte/${parte_id}/contratos`);
+}
+
+export async function createParteAdversaContrato(data) {
+  return await post("/partes-adversa-contrato", data);
+}

@@ -28,7 +28,10 @@ import {
 } from "@/services/ENDPOINTS_ServiceContratos";
 
 import { 
-  deleteParteContrato 
+  deleteParteContrato,
+  fetchPartesContrato,
+  fetchContratoByParte,
+  createParteAdversaContrato,
 } from "@/services/ENDPOINTS_ServicePartesContrato"; // certifique-se de já importar
 
 
@@ -145,6 +148,25 @@ export default function ParteAdversa() {
   setConfirmAttach(false);
   setExistingContrato(null);
 };
+
+useEffect(() => {
+  const carregarContratosDaParte = async () => {
+    if (modalContratosAberto && parteContratosSelecionada?.id) {
+      try {
+        const contratos = await fetchContratoByParte(parteContratosSelecionada.id);
+        setParteContratosSelecionada(prev => ({
+          ...prev,
+          contratos: Array.isArray(contratos) ? contratos : [],
+        }));
+      } catch (error) {
+        console.error("Erro ao buscar contratos da parte:", error);
+      }
+    }
+  };
+
+  carregarContratosDaParte();
+}, [modalContratosAberto, parteContratosSelecionada?.id]);
+
 
 const handleDeleteContrato = async (contratoId) => {
   try {
@@ -757,27 +779,23 @@ const partesFiltradas = partes.filter((p) => {
                   lote: contratoForm.lote || null,
                 });
               } else {
-                const found = await findContratoByNumero(contratoForm.numero.trim());
-
-                if (found && found.id) {
-                  setExistingContrato(found);
-                  setConfirmAttach(true);
-                  setContratoErro(
-                    "Este número de contrato já está cadastrado. Deseja vincular esta parte ao contrato existente?"
-                  );
-                  return;
-                }
-
-                const resp = await createContratoComParte({
+       
+                const resp = await createParteAdversaContrato({
                   numero: contratoForm.numero.trim(),
                   valor: contratoForm.valor ? Number(contratoForm.valor) : null,
                   lote: contratoForm.lote || null,
-                  parte_adversa_id: parteContratosSelecionada.id,
+                  parte_id: parteContratosSelecionada.id,
                   principal: !!contratoForm.principal,
                 });
-
-                createdContrato = resp?.contrato ?? null;
+                
               }
+
+              const contratosAtualizados = await fetchContratoByParte(parteContratosSelecionada.id);
+
+              setParteContratosSelecionada((prev) => ({
+                ...prev,
+                contratos: Array.isArray(contratosAtualizados) ? contratosAtualizados : [],
+              }));
 
               setShowContratoForm(false);
               setConfirmAttach(false);
