@@ -1039,6 +1039,16 @@ const salvar = async () => {
                     >
                       👁️ Detalhar
                     </Button>
+                    <Button
+                      variant="default"
+                      className="table-action-btn"
+                      onClick={() => {
+                        // Aqui você chama sua função para abrir o modal de propostas
+                        // Exemplo: abrirModalPropostas(p.id)
+                      }}
+                    >
+                      💼 Proposta
+                    </Button>
                   </div>
 
                   </td>

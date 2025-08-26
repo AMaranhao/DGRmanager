@@ -801,19 +801,6 @@ const partesFiltradas = partes.filter((p) => {
               setConfirmAttach(false);
               setExistingContrato(null);
 
-              const novoContrato = existingContrato?.id
-                ? existingContrato
-                : (createdContrato ?? {
-                    id: crypto.randomUUID(),
-                    numero: contratoForm.numero.trim(),
-                    lote: contratoForm.lote || null,
-                  });
-
-              setParteContratosSelecionada((prev) => ({
-                ...prev,
-                contratos: [...(prev?.contratos || []), novoContrato],
-              }));
-
               setContratoForm({ numero: "", valor: "", lote: "", principal: true });
             } catch (err) {
               setContratoErro(err?.message || "Falha ao salvar.");

@@ -525,8 +525,9 @@ cursor: pointer;
 }
 
 .col-acoes-three-buttons {
-  max-width: 8rem !important;
-  width: 8rem !important; /* 150px */
+  max-width: 10rem !important;
+  width: 10rem !important; 
+  min-width: 10rem !important;
   gap: 0.5rem;
 }
 
@@ -1261,22 +1262,26 @@ input[type="date"].processo-modal-input {
   white-space: nowrap;
 }
 
+/* ===================== */
+/* ===================== */
+/* ===================== */
+
 .processo-col-cnj {
-  width: 11rem !important;
-  min-width: 11rem !important;
-  max-width: 11rem !important;
-}
-
-.processo-col-parte-principal {
-  width: 11rem !important;
-  min-width: 11rem !important;
-  max-width: 11rem !important;
-}
-
-.processo-col-status {
   width: 8rem !important;
   min-width: 8rem !important;
   max-width: 8rem !important;
+}
+
+.processo-col-parte-principal {
+  width: 9rem !important;
+  min-width: 9rem !important;
+  max-width: 9rem !important;
+}
+
+.processo-col-status {
+  width: 6rem !important;
+  min-width: 6rem !important;
+  max-width: 6rem !important;
 }
 
 .processo-col-comarca {
@@ -1292,15 +1297,13 @@ input[type="date"].processo-modal-input {
 }
 
 .processo-col-responsavel-processo {
-  width: 11rem !important;
-  min-width: 11rem !important;
-  max-width: 11rem !important;
+  width: 9rem !important;
+  min-width: 9rem !important;
+  max-width: 9rem !important;
 }
 
 
-/* ===================== */
-/* ===================== */
-/* ===================== */
+
 
 .contratos-col-numero {
   width: 5rem !important;
