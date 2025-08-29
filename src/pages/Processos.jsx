@@ -25,6 +25,11 @@ import {
   createAtribuicaoEvento,
   updateAtribuicaoEvento,
 } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+import { 
+  createProposta,
+  fetchPropostasByProcesso
+} from "@/services/ENDPOINTS_ServicePropostas";
+
 
 import "@/styles/unified_styles.css";
 import "@/styles/unified_refactored_styles.css";
@@ -128,6 +133,16 @@ export default function Processos() {
     observacao: "",           // observação (para PUT atual e/ou POST próxima)
     ultimaEtapa: false,       // se marcar → só PUT na atual
   });
+
+  const [modalPropostasAberto, setModalPropostasAberto] = useState(false);
+  const [propostasProcesso, setPropostasProcesso] = useState([]);
+  const [mostrandoFormularioProposta, setMostrandoFormularioProposta] = useState(false);
+
+  const [novaProposta, setNovaProposta] = useState({
+    numero_parcelas: "",
+    valor_parcela: "",
+  });
+  
 
 
   // formulário do processo
@@ -272,6 +287,34 @@ export default function Processos() {
     }
   }
   
+  async function handleAdicionarProposta() {
+    try {
+      if (!novaProposta.numero_parcelas || !novaProposta.valor_parcela) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+  
+      const payload = {
+        processo_id: processoSel?.id, // ou outra variável que contenha o ID do processo
+        numero_parcelas: Number(novaProposta.numero_parcelas),
+        valor_parcela: Number(novaProposta.valor_parcela),
+      };
+  
+      await createProposta(payload);
+  
+      // Atualiza lista de propostas
+      const propostas = await fetchPropostasByProcesso(processoSel.id);
+      setPropostasProcesso(propostas);
+  
+      // Limpa o formulário
+      setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
+  
+    } catch (err) {
+      console.error("Erro ao adicionar proposta:", err);
+      alert("Erro ao adicionar proposta.");
+    }
+  }
+
   async function handleCriarAtribuicao() {
     try {
       if (!formAtrib.proxima_atr_id || !formAtrib.proximo_resp_id || !formAtrib.prazo) {
@@ -304,6 +347,19 @@ export default function Processos() {
 
 
   // ===== Aberturas de modal =====
+  const abrirModalPropostas = async (processoId) => {
+    try {
+      const propostas = await fetchPropostasByProcesso(processoId); 
+      setPropostasProcesso(Array.isArray(propostas) ? propostas : []);
+      setModalPropostasAberto(true);
+    } catch (e) {
+      console.error("Erro ao buscar propostas:", e);
+      setPropostasProcesso([]);
+      setModalPropostasAberto(true);
+    }
+  };
+  
+
   const abrirNovo = () => {
     setVisualizando(false);
     setEditando(false);
@@ -463,6 +519,14 @@ const salvar = async () => {
     if (horas >= 1) return `${horas}h ${mins}m`;
     return `${mins}m`;
   };
+
+  function dividirEmColunas(lista, tamanhoColuna = 8) {
+    const colunas = [];
+    for (let i = 0; i < lista.length; i += tamanhoColuna) {
+      colunas.push(lista.slice(i, i + tamanhoColuna));
+    }
+    return colunas;
+  }
   
 
   // buffer p/ adicionar parte no modo "novo"
@@ -987,6 +1051,38 @@ const salvar = async () => {
             {erroModal && <div className="processo-modal-error">{erroModal}</div>}
           </DialogContent>
         </Dialog>
+
+
+        <Dialog open={modalPropostasAberto} onOpenChange={setModalPropostasAberto}>
+          <DialogOverlay className="processo-dialog-overlay" />
+          <DialogContent className="processo-modal processo-no-close propostas-modal-fixed-size">
+            <div className="propostas-modal-body">
+              <DialogTitle className="proposta-modal-title">Propostas</DialogTitle>
+
+              <DialogDescription className="proposta-modal-description">
+                Propostas vinculadas a este processo
+              </DialogDescription>
+
+              <div className="propostas-scroll-wrapper">
+                <div className="propostas-grid">
+                  {propostasProcesso.map((p) => (
+                    <div className="proposta-card" key={p.id}>
+                      <strong>Parcelas:</strong> {p.numero_parcelas}<br />
+                      <strong>Valor:</strong> R$ {p.valor_parcela.toFixed(2)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="processo-right-actions">
+              <Button onClick={() => setMostrandoFormularioProposta(true)}>+ Proposta</Button>
+            </div>
+          </DialogContent>
+
+
+        </Dialog>
+
       </div>
 
       {/* Tabela */}
@@ -1042,10 +1138,7 @@ const salvar = async () => {
                     <Button
                       variant="default"
                       className="table-action-btn"
-                      onClick={() => {
-                        // Aqui você chama sua função para abrir o modal de propostas
-                        // Exemplo: abrirModalPropostas(p.id)
-                      }}
+                      onClick={() => abrirModalPropostas(p.id)}
                     >
                       💼 Proposta
                     </Button>

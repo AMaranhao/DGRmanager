@@ -19,3 +19,13 @@ export async function createProposta(data) {
 export async function updateProposta(id, data) {
   return await put(`${BASE}/${id}`, data);
 }
+
+export async function fetchPropostasByProcesso(processo_id) {
+    try {
+      return await get(`/propostas-processo/${processo_id}`);
+    } catch (error) {
+      console.error("Erro ao buscar propostas por processo:", error);
+      return [];
+    }
+  }
+  

@@ -1359,3 +1359,131 @@ input[type="date"].processo-modal-input {
   min-width: 5rem !important;
   max-width: 5rem !important;
 }
+
+.processo-modal-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.propostas-scroll-wrapper {
+  flex-grow: 1; /* ocupa o restante do espaço */
+  overflow-y: auto;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.propostas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+  gap: 1rem;
+  min-height: 100%;
+}
+
+
+
+.propostas-modal-fixed-size {
+  width: 500px !important;
+  max-width: 500px !important;
+  min-width: 500px !important;
+  height: 600px !important;
+  max-height: 600px !important;
+  min-height: 600px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2rem;
+  overflow: hidden; /* impede o estouro */
+}
+
+.proposta-modal-title {
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  margin-left: 1rem;
+  height: 2rem !important;
+  max-height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.proposta-modal-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+  margin-left: 1rem;
+}
+
+.proposta-modal-title,
+.proposta-modal-description {
+  flex: 0 0 auto;
+}
+
+.processo-right-actions {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin-top: 1rem;
+  margin-right: 1rem;
+}
+
+.propostas-modal-fixed-size {
+  width: 500px !important;
+  height: 580px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.propostas-modal-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.proposta-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  margin-left: 1rem;
+}
+
+.proposta-modal-description {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+}
+
+.propostas-scroll-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.propostas-grid {
+  display: grid;
+  grid-template-rows: repeat(8, auto); /* 8 linhas verticais */
+  grid-auto-flow: column; /* 👉 percorre coluna por coluna, não linha por linha */
+  gap: 1rem;
+}
+
+
+.proposta-card {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  justify-content: center !important;
+  height: 100%;
+  align-items: flex-start;
+
+}
+
+.processo-right-actions {
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-top: 1rem;
+  margin-right: 1rem;
+}
