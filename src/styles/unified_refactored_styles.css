@@ -1607,3 +1607,16 @@ input[type="date"].processo-modal-input {
 }
 
 
+.proposta-aceita {
+  color: red;
+  font-weight: bold;
+}
+
+.proposta-input-grande {
+  width: 300px !important;  /* ajuste como quiser */
+  height: 2rem;
+  font-size: 14px;
+  padding: 0.25rem 0.5rem;
+}
+
+

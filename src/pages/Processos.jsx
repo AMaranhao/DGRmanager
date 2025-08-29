@@ -352,17 +352,19 @@ export default function Processos() {
     try {
       if (!editandoProposta || !processoSel?.id) return;
   
-      if (!vencimentoAcordo || !mesPrimeiroPagamento) {
+      if (!vencimentoAcordo.trim() || !mesPrimeiroPagamento.trim()) {
         alert("Preencha a data de vencimento e o mês do primeiro pagamento.");
         return;
       }
+      
   
       const payload = {
         processo_id: processoSel.id,
         proposta_processo_id: editandoProposta.id,
-        data_vencimento: vencimentoAcordo,
-        mes_primeiro_pagamento: mesPrimeiroPagamento,
+        data_vencimento: vencimentoAcordo.trim(),
+        mes_primeiro_pagamento: mesPrimeiroPagamento.trim(),
       };
+      
   
       await createAcordo(payload);
   
@@ -1134,108 +1136,114 @@ const salvar = async () => {
               </DialogDescription>
 
               <div className="propostas-scroll-wrapper">
-                <div className="propostas-grid">
-                  
-
-                  {(() => {
-                    const todas = [...propostasProcesso];
-
-                    // Se for nova proposta, adiciona um item fictício no fim para renderizar o formulário
-                    if (mostrandoFormularioProposta && !editandoProposta) {
-                      todas.push({ id: "__nova__", numero_parcelas: "", valor_parcela: "" });
-                    }
-
-                    // Agrupa de 8 em 8 para colunas
-                    return dividirEmColunas(todas, 8).map((coluna, colIdx) => (
-                      <div key={colIdx} className="propostas-coluna">
-                        {coluna.map((p) => {
-                          const isEdicao = editandoProposta?.id === p.id;
-                          const isNova = p.id === "__nova__";
-
-                          if ((isEdicao || isNova) && mostrandoFormularioProposta) {
-                            return (
-                              <div key={p.id} className="proposta-formulario">
-                                <div className="proposta-formulario-vertical">
-                                  <div className="proposta-linha-formulario">
-                                    <label>Parcelas:</label>
-                                    <Input
-                                      type="number"
-                                      value={novaProposta.numero_parcelas}
-                                      onChange={(e) =>
-                                        setNovaProposta({ ...novaProposta, numero_parcelas: e.target.value })
-                                      }
-                                    />
-                                  </div>
-
-                                  <div className="proposta-linha-formulario">
-                                    <label>Valor:</label>
-                                    <Input
-                                      type="number"
-                                      step="0.01"
-                                      value={novaProposta.valor_parcela}
-                                      onChange={(e) =>
-                                        setNovaProposta({ ...novaProposta, valor_parcela: e.target.value })
-                                      }
-                                    />
-                                  </div>
-
-                                  <div className="processo-right-actions">
-                                    <Button
-                                      variant="secondary"
-                                      onClick={() => {
-                                        setMostrandoFormularioProposta(false);
-                                        setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
-                                        setEditandoProposta(null);
-                                      }}
-                                    >
-                                      Cancelar
-                                    </Button>
-
-                                    {editandoProposta ? (
-                                      <>
-                                        <Button onClick={handleEditarProposta}>Editar</Button>
-                                        <Button onClick={handleAceitarProposta}>Aceitar</Button>
-                                      </>
-                                    ) : (
-                                      <Button onClick={handleAdicionarProposta}>Adicionar</Button>
-                                    )}
-                                  </div>
-                                </div>
-
-
-                              </div>
-
-
-                            );
+                {mostrandoFormularioProposta ? (
+                  // Formulário isolado — quando clicou numa proposta ou em "+ Proposta"
+                  <div className="proposta-formulario">
+                    <div className="proposta-formulario-vertical">
+                      <div className="proposta-linha-formulario">
+                        <label>Parcelas:</label>
+                        <Input
+                          type="number"
+                          className="proposta-input-grande"
+                          value={novaProposta.numero_parcelas}
+                          onChange={(e) =>
+                            setNovaProposta({ ...novaProposta, numero_parcelas: e.target.value })
                           }
-
-                          return (
-                            <div
-                              key={p.id}
-                              className="proposta-card"
-                              onClick={() => {
-                                setNovaProposta({
-                                  numero_parcelas: p.numero_parcelas.toString(),
-                                  valor_parcela: p.valor_parcela.toFixed(2),
-                                });
-                                setEditandoProposta(p);
-                                setMostrandoFormularioProposta(true);
-                              }}
-                              style={{ cursor: "pointer" }}
-                            >
-                              <strong>Parcelas:</strong> {p.numero_parcelas}<br />
-                              <strong>Valor:</strong> R$ {p.valor_parcela.toFixed(2)}
-                            </div>
-                          );
-                        })}
+                        />
                       </div>
-                    ));
-                  })()}
 
+                      <div className="proposta-linha-formulario">
+                        <label>Valor:</label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          className="proposta-input-grande"
+                          value={novaProposta.valor_parcela}
+                          onChange={(e) =>
+                            setNovaProposta({ ...novaProposta, valor_parcela: e.target.value })
+                          }
+                        />
+                      </div>
 
+                      {editandoProposta && (
+                        <>
+                          <div className="proposta-linha-formulario">
+                            <label>Vencimento do Pagamento:</label>
+                            <Input
+                              type="date"
+                              className="proposta-input-grande"
+                              value={vencimentoAcordo}
+                              onChange={(e) => setVencimentoAcordo(e.target.value)}
+                            />
+                          </div>
 
-                </div>
+                          <div className="proposta-linha-formulario">
+                            <label>Mês Primeiro Pagamento:</label>
+                            <Input
+                              type="month"
+                              className="proposta-input-grande"
+                              value={mesPrimeiroPagamento}
+                              onChange={(e) => setMesPrimeiroPagamento(e.target.value)}
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      <div className="processo-right-actions">
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            setMostrandoFormularioProposta(false);
+                            setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
+                            setEditandoProposta(null);
+                            setVencimentoAcordo("");
+                            setMesPrimeiroPagamento("");
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+
+                        {editandoProposta ? (
+                          <>
+                            <Button onClick={handleEditarProposta}>Editar</Button>
+                            <Button onClick={handleAceitarProposta}>Aceitar</Button>
+                          </>
+                        ) : (
+                          <Button onClick={handleAdicionarProposta}>Adicionar</Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Lista normal de propostas (cards clicáveis)
+                  <div className="propostas-grid">
+                    {dividirEmColunas(propostasProcesso, 8).map((coluna, colIdx) => (
+                      <div key={colIdx} className="propostas-coluna">
+                        {coluna.map((p) => (
+                          <div
+                            key={p.id}
+                            className={`proposta-card ${p.aceita ? "proposta-aceita" : ""}`}
+                            onClick={() => {
+                              setNovaProposta({
+                                numero_parcelas: p.numero_parcelas.toString(),
+                                valor_parcela: p.valor_parcela.toFixed(2),
+                              });
+                              setEditandoProposta(p);
+                              setMostrandoFormularioProposta(true);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                        
+                            <strong>Parcelas:</strong> {p.numero_parcelas}<br />
+                            <strong>Valor:</strong> R$ {p.valor_parcela.toFixed(2)}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
             </div>
 
             {!mostrandoFormularioProposta && (
