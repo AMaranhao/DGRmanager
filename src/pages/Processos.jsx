@@ -18,8 +18,10 @@ import {
   removeParteDoProcesso,
   fetchAndamentos,
 } from "@/services/ENDPOINTS_ServiceProcessos";
+
 import { fetchAtribuicoesProcesso } from "@/services/ENDPOINTS_ServiceAtribuicoes";
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
+
 import {
   fetchAtribuicoesEvento,
   createAtribuicaoEvento,
@@ -30,6 +32,9 @@ import {
   fetchPropostasByProcesso,
   updateProposta,
 } from "@/services/ENDPOINTS_ServicePropostas";
+import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js";
+
+
 
 
 import "@/styles/unified_styles.css";
@@ -139,6 +144,9 @@ export default function Processos() {
   const [propostasProcesso, setPropostasProcesso] = useState([]);
   const [mostrandoFormularioProposta, setMostrandoFormularioProposta] = useState(false);
   const [editandoProposta, setEditandoProposta] = useState(null); // objeto da proposta sendo editada
+  const [vencimentoAcordo, setVencimentoAcordo] = useState("");
+  const [mesPrimeiroPagamento, setMesPrimeiroPagamento] = useState("");
+
 
 
   const [novaProposta, setNovaProposta] = useState({
@@ -289,35 +297,38 @@ export default function Processos() {
       setErroModal("Erro ao atualizar atribuição.");
     }
   }
+
+  const handleAdicionarProposta = async () => {
+    if (!processoSel || !processoSel.id) {
+      alert("Nenhum processo selecionado.");
+      return;
+    }
   
-  async function handleAdicionarProposta() {
     try {
-      if (!novaProposta.numero_parcelas || !novaProposta.valor_parcela) {
-        alert("Preencha todos os campos.");
-        return;
-      }
-  
       const payload = {
-        processo_id: processoSel?.id, // ou outra variável que contenha o ID do processo
+        processo_id: processoSel.id,
         numero_parcelas: Number(novaProposta.numero_parcelas),
         valor_parcela: Number(novaProposta.valor_parcela),
       };
   
       await createProposta(payload);
   
-      // Atualiza lista de propostas
+      // 🔄 Recarrega todas as propostas após o POST
       const propostas = await fetchPropostasByProcesso(processoSel.id);
-      setPropostasProcesso(propostas);
+      setPropostasProcesso(Array.isArray(propostas) ? propostas : []);
   
-      // Limpa o formulário
       setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
-  
+      setMostrandoFormularioProposta(false);
     } catch (err) {
       console.error("Erro ao adicionar proposta:", err);
       alert("Erro ao adicionar proposta.");
     }
-  }
-
+  };
+  
+  
+  
+  
+  
   async function handleEditarProposta() {
     try {
       if (!editandoProposta) return;
@@ -339,19 +350,35 @@ export default function Processos() {
   
   async function handleAceitarProposta() {
     try {
-      if (!editandoProposta) return;
+      if (!editandoProposta || !processoSel?.id) return;
   
-      await updateProposta(editandoProposta.id, { aceita: true });
+      if (!vencimentoAcordo || !mesPrimeiroPagamento) {
+        alert("Preencha a data de vencimento e o mês do primeiro pagamento.");
+        return;
+      }
+  
+      const payload = {
+        processo_id: processoSel.id,
+        proposta_processo_id: editandoProposta.id,
+        data_vencimento: vencimentoAcordo,
+        mes_primeiro_pagamento: mesPrimeiroPagamento,
+      };
+  
+      await createAcordo(payload);
   
       const propostas = await fetchPropostasByProcesso(processoSel.id);
       setPropostasProcesso(propostas);
       setMostrandoFormularioProposta(false);
       setEditandoProposta(null);
+      setVencimentoAcordo("");
+      setMesPrimeiroPagamento("");
     } catch (err) {
       console.error("Erro ao aceitar proposta:", err);
       alert("Erro ao aceitar proposta.");
     }
   }
+  
+  
   
 
   async function handleCriarAtribuicao() {
@@ -388,6 +415,9 @@ export default function Processos() {
   // ===== Aberturas de modal =====
   const abrirModalPropostas = async (processoId) => {
     try {
+      const data = await fetchProcessoById(processoId);
+      setProcessoSel(data); 
+  
       const propostas = await fetchPropostasByProcesso(processoId); 
       setPropostasProcesso(Array.isArray(propostas) ? propostas : []);
       setModalPropostasAberto(true);
@@ -397,6 +427,7 @@ export default function Processos() {
       setModalPropostasAberto(true);
     }
   };
+  
   
 
   const abrirNovo = () => {
