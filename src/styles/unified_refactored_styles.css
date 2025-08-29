@@ -1384,15 +1384,16 @@ input[type="date"].processo-modal-input {
 
 
 .propostas-modal-fixed-size {
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 650px !important;
+  max-width: 650px !important;
+  min-width: 650px !important;
   height: 600px !important;
   max-height: 600px !important;
   min-height: 600px !important;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
+
   padding: 2rem;
   overflow: hidden; /* impede o estouro */
 }
@@ -1427,15 +1428,7 @@ input[type="date"].processo-modal-input {
   margin-right: 1rem;
 }
 
-.propostas-modal-fixed-size {
-  width: 500px !important;
-  height: 580px !important;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 2rem;
-  overflow: hidden;
-}
+
 
 .propostas-modal-body {
   display: flex;
@@ -1465,10 +1458,17 @@ input[type="date"].processo-modal-input {
 }
 
 .propostas-grid {
-  display: grid;
-  grid-template-rows: repeat(8, auto); /* 8 linhas verticais */
-  grid-auto-flow: column; /* 👉 percorre coluna por coluna, não linha por linha */
+  display: flex;
+  flex-direction: row;
   gap: 1rem;
+  justify-content: start;
+  flex-wrap: nowrap; /* impede quebra de linha horizontal */
+}
+
+.propostas-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 
@@ -1487,3 +1487,123 @@ input[type="date"].processo-modal-input {
   margin-top: 1rem;
   margin-right: 1rem;
 }
+
+.proposta-form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.proposta-input-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.proposta-formulario-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  width: 70px;
+  max-width: 50%;
+}
+
+
+.proposta-formulario-vertical label {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.proposta-formulario-vertical input {
+  font-size: 0.85rem;
+  width: 70px;
+  padding: 0.25rem 0.5rem;
+}
+
+.proposta-formulario-vertical-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.proposta-formulario-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100px;
+}
+
+.proposta-formulario-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100px;
+}
+
+.proposta-formulario-vertical label {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.proposta-formulario-vertical input {
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+.proposta-formulario-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.proposta-linha-formulario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.proposta-linha-formulario label {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.proposta-linha-formulario input {
+  width: 80px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.proposta-formulario-vertical {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  gap: 0.85rem;
+}
+
+.proposta-formulario-vertical label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #111827; /* cor igual aos cards */
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.proposta-formulario-vertical input {
+  text-align: right;
+  width: 90px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  padding: 0.15rem 0.5rem;
+}
+
+

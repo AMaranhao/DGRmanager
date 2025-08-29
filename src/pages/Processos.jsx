@@ -27,7 +27,8 @@ import {
 } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
 import { 
   createProposta,
-  fetchPropostasByProcesso
+  fetchPropostasByProcesso,
+  updateProposta,
 } from "@/services/ENDPOINTS_ServicePropostas";
 
 
@@ -137,6 +138,8 @@ export default function Processos() {
   const [modalPropostasAberto, setModalPropostasAberto] = useState(false);
   const [propostasProcesso, setPropostasProcesso] = useState([]);
   const [mostrandoFormularioProposta, setMostrandoFormularioProposta] = useState(false);
+  const [editandoProposta, setEditandoProposta] = useState(null); // objeto da proposta sendo editada
+
 
   const [novaProposta, setNovaProposta] = useState({
     numero_parcelas: "",
@@ -314,6 +317,42 @@ export default function Processos() {
       alert("Erro ao adicionar proposta.");
     }
   }
+
+  async function handleEditarProposta() {
+    try {
+      if (!editandoProposta) return;
+  
+      await updateProposta(editandoProposta.id, {
+        numero_parcelas: Number(novaProposta.numero_parcelas),
+        valor_parcela: Number(novaProposta.valor_parcela),
+      });
+  
+      const propostas = await fetchPropostasByProcesso(processoSel.id);
+      setPropostasProcesso(propostas);
+      setMostrandoFormularioProposta(false);
+      setEditandoProposta(null);
+    } catch (err) {
+      console.error("Erro ao editar proposta:", err);
+      alert("Erro ao editar proposta.");
+    }
+  }
+  
+  async function handleAceitarProposta() {
+    try {
+      if (!editandoProposta) return;
+  
+      await updateProposta(editandoProposta.id, { aceita: true });
+  
+      const propostas = await fetchPropostasByProcesso(processoSel.id);
+      setPropostasProcesso(propostas);
+      setMostrandoFormularioProposta(false);
+      setEditandoProposta(null);
+    } catch (err) {
+      console.error("Erro ao aceitar proposta:", err);
+      alert("Erro ao aceitar proposta.");
+    }
+  }
+  
 
   async function handleCriarAtribuicao() {
     try {
@@ -1065,19 +1104,123 @@ const salvar = async () => {
 
               <div className="propostas-scroll-wrapper">
                 <div className="propostas-grid">
-                  {propostasProcesso.map((p) => (
-                    <div className="proposta-card" key={p.id}>
-                      <strong>Parcelas:</strong> {p.numero_parcelas}<br />
-                      <strong>Valor:</strong> R$ {p.valor_parcela.toFixed(2)}
-                    </div>
-                  ))}
+                  
+
+                  {(() => {
+                    const todas = [...propostasProcesso];
+
+                    // Se for nova proposta, adiciona um item fictício no fim para renderizar o formulário
+                    if (mostrandoFormularioProposta && !editandoProposta) {
+                      todas.push({ id: "__nova__", numero_parcelas: "", valor_parcela: "" });
+                    }
+
+                    // Agrupa de 8 em 8 para colunas
+                    return dividirEmColunas(todas, 8).map((coluna, colIdx) => (
+                      <div key={colIdx} className="propostas-coluna">
+                        {coluna.map((p) => {
+                          const isEdicao = editandoProposta?.id === p.id;
+                          const isNova = p.id === "__nova__";
+
+                          if ((isEdicao || isNova) && mostrandoFormularioProposta) {
+                            return (
+                              <div key={p.id} className="proposta-formulario">
+                                <div className="proposta-formulario-vertical">
+                                  <div className="proposta-linha-formulario">
+                                    <label>Parcelas:</label>
+                                    <Input
+                                      type="number"
+                                      value={novaProposta.numero_parcelas}
+                                      onChange={(e) =>
+                                        setNovaProposta({ ...novaProposta, numero_parcelas: e.target.value })
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="proposta-linha-formulario">
+                                    <label>Valor:</label>
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      value={novaProposta.valor_parcela}
+                                      onChange={(e) =>
+                                        setNovaProposta({ ...novaProposta, valor_parcela: e.target.value })
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="processo-right-actions">
+                                    <Button
+                                      variant="secondary"
+                                      onClick={() => {
+                                        setMostrandoFormularioProposta(false);
+                                        setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
+                                        setEditandoProposta(null);
+                                      }}
+                                    >
+                                      Cancelar
+                                    </Button>
+
+                                    {editandoProposta ? (
+                                      <>
+                                        <Button onClick={handleEditarProposta}>Editar</Button>
+                                        <Button onClick={handleAceitarProposta}>Aceitar</Button>
+                                      </>
+                                    ) : (
+                                      <Button onClick={handleAdicionarProposta}>Adicionar</Button>
+                                    )}
+                                  </div>
+                                </div>
+
+
+                              </div>
+
+
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={p.id}
+                              className="proposta-card"
+                              onClick={() => {
+                                setNovaProposta({
+                                  numero_parcelas: p.numero_parcelas.toString(),
+                                  valor_parcela: p.valor_parcela.toFixed(2),
+                                });
+                                setEditandoProposta(p);
+                                setMostrandoFormularioProposta(true);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <strong>Parcelas:</strong> {p.numero_parcelas}<br />
+                              <strong>Valor:</strong> R$ {p.valor_parcela.toFixed(2)}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ));
+                  })()}
+
+
+
                 </div>
               </div>
             </div>
 
-            <div className="processo-right-actions">
-              <Button onClick={() => setMostrandoFormularioProposta(true)}>+ Proposta</Button>
-            </div>
+            {!mostrandoFormularioProposta && (
+              <div className="processo-right-actions">
+                <Button
+                  onClick={() => {
+                    setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
+                    setEditandoProposta(null);
+                    setMostrandoFormularioProposta(true);
+                  }}
+                >
+                  + Proposta
+                </Button>
+              </div>
+            )}
+
           </DialogContent>
 
 
