@@ -145,7 +145,6 @@ export default function Processos() {
   const [mostrandoFormularioProposta, setMostrandoFormularioProposta] = useState(false);
   const [editandoProposta, setEditandoProposta] = useState(null); // objeto da proposta sendo editada
   const [vencimentoAcordo, setVencimentoAcordo] = useState("");
-  const [mesPrimeiroPagamento, setMesPrimeiroPagamento] = useState("");
 
 
 
@@ -352,17 +351,17 @@ export default function Processos() {
     try {
       if (!editandoProposta || !processoSel?.id) return;
   
-      if (!vencimentoAcordo.trim() || !mesPrimeiroPagamento.trim()) {
-        alert("Preencha a data de vencimento e o mês do primeiro pagamento.");
+      if (!vencimentoAcordo.trim()) {
+        alert("Preencha a data de vencimento.");
         return;
       }
+      
       
   
       const payload = {
         processo_id: processoSel.id,
         proposta_processo_id: editandoProposta.id,
         data_vencimento: vencimentoAcordo.trim(),
-        mes_primeiro_pagamento: mesPrimeiroPagamento.trim(),
       };
       
   
@@ -373,7 +372,6 @@ export default function Processos() {
       setMostrandoFormularioProposta(false);
       setEditandoProposta(null);
       setVencimentoAcordo("");
-      setMesPrimeiroPagamento("");
     } catch (err) {
       console.error("Erro ao aceitar proposta:", err);
       alert("Erro ao aceitar proposta.");
@@ -1168,7 +1166,7 @@ const salvar = async () => {
                       {editandoProposta && (
                         <>
                           <div className="proposta-linha-formulario">
-                            <label>Vencimento do Pagamento:</label>
+                            <label>Vencimento do 1 Pagamento:</label>
                             <Input
                               type="date"
                               className="proposta-input-grande"
@@ -1177,15 +1175,6 @@ const salvar = async () => {
                             />
                           </div>
 
-                          <div className="proposta-linha-formulario">
-                            <label>Mês Primeiro Pagamento:</label>
-                            <Input
-                              type="month"
-                              className="proposta-input-grande"
-                              value={mesPrimeiroPagamento}
-                              onChange={(e) => setMesPrimeiroPagamento(e.target.value)}
-                            />
-                          </div>
                         </>
                       )}
 
@@ -1197,7 +1186,6 @@ const salvar = async () => {
                             setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
                             setEditandoProposta(null);
                             setVencimentoAcordo("");
-                            setMesPrimeiroPagamento("");
                           }}
                         >
                           Cancelar

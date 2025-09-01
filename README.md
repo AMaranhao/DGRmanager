@@ -1,7 +1,7 @@
 # 📚 Sistema Jurídico – DGR Advogados
 
-Sistema administrativo jurídico desenvolvido para gestão de contratos, partes adversas, colaboradores e outros módulos, com foco em escritórios de advocacia.  
-Inclui automações, controle de prazos, integrações e fluxo de trabalho otimizado para uso interno.
+Sistema administrativo jurídico desenvolvido para gestão de contratos, partes adversas, colaboradores, processos e outros módulos, com foco em escritórios de advocacia.  
+Inclui automações, controle de prazos, propostas e acordos, com integrações e fluxo de trabalho otimizado para uso interno.
 
 ---
 
@@ -19,9 +19,11 @@ Inclui automações, controle de prazos, integrações e fluxo de trabalho otimi
 ### 🔹 Módulo de Parte Adversa
 - Listagem com filtros “Com Contrato” / “Sem Contrato”.
 - Visualização de endereços vinculados diretamente no modal.
-- Adição/edição de endereços em **modo split** no modal.
-- Edição rápida de endereços ao clicar na lista.
+- Adição/edição de endereços em **modo split**.
+- Edição rápida ao clicar na lista de endereços.
 - Modal de detalhamento somente leitura.
+- Visualização de contratos vinculados à parte.
+- Painel com atribuições vinculadas aos contratos.
 
 ### 🔹 Módulo de Contratos
 - Listagem de contratos ordenada automaticamente por **status** definido via atribuições.
@@ -32,9 +34,11 @@ Inclui automações, controle de prazos, integrações e fluxo de trabalho otimi
   - Busca de parte pelo CPF (match direto).
   - Evita duplicidade de partes no contrato.
   - Remoção de partes com confirmação e botão dedicado.
-- **Histórico de Atribuições**:
-  - Exibição ordenada por data.
-  - Alternância entre lista de partes e histórico no modal de detalhamento.
+- Painel direito com alternância entre:
+  - Lista de Partes vinculadas
+  - Histórico de Atribuições do contrato.
+- Atribuições com status, prazo e responsável.
+- Criação de nova atribuição com validação de campos obrigatórios.
 
 ### 🔹 Módulo de Processos
 - Listagem de processos com filtros por:
@@ -63,6 +67,24 @@ Inclui automações, controle de prazos, integrações e fluxo de trabalho otimi
 - **Histórico de Atribuições**:
   - Exibição ordenada por data.
   - Alternância entre lista de partes e histórico no modal de detalhamento.
+
+- Cadastro e edição com:
+  - Contrato via campo `contrato_numero` ou `contrato_id`
+  - Cliente fixo como `"Finsol"`
+  - Observações e datas normalizadas (ISO/BR)
+- Atribuições:
+  - Atualização da atual (solucionador, observação, novo prazo)
+  - Criação de nova atribuição com status, responsável e prazo
+  - Exibição de tempo decorrido no status atual
+- Vinculação de partes ao processo (nome, CPF, tipo)
+- Modal de propostas:
+  - Exibição em grid com colunas
+  - Destaque visual em **vermelho** para propostas já aceitas
+  - Adição de nova proposta com número de parcelas e valor
+  - Edição inline de proposta selecionada
+  - Criação de acordo diretamente da proposta, com:
+    - Campo de vencimento do pagamento (`date`)
+    - Campo de mês do primeiro pagamento (`month`)
 
 ---
 
@@ -120,11 +142,15 @@ yarn install
 
 ### 4️⃣ Configurar o Backend/Mock
 - Verifique se o [Mockoon](https://mockoon.com/) está rodando com os endpoints definidos:
-  - `/colaboradores`
-  - `/parte-adversa`
-  - `/contratos`
-  - `/atribuicoes`
-- Configure a URL base no arquivo `src/services/apiService.js`.
+  * `/colaboradores`
+  * `/parte-adversa`
+  * `/contratos`
+  * `/processos`
+  * `/atribuicoes`
+  * `/atribuicoes-evento`
+  * `/propostas-processo`
+  * `/acordos`
+* Configure a URL base em `src/services/apiService.js`.
 
 ### 5️⃣ Rodar o Projeto
 ```bash
@@ -138,19 +164,21 @@ yarn dev
 
 ## 🧩 Padrões de Código
 
-- **Services**: todos seguem o padrão `fetchX`, `createX`, `updateX`, `deleteX`.
-- **Modal Split**: modais com lado esquerdo (dados principais) e lado direito (entidades vinculadas).
-- **Estilização**: classes CSS unificadas, evitando duplicação entre módulos.
-- **Filtros e Pesquisa**: sempre controlados por estados locais e `useMemo` para performance.
+* **Services**: `fetchX`, `createX`, `updateX`, `deleteX`
+* **Modal Split**: esquerda = dados principais | direita = entidades vinculadas
+* **Estilos Unificados**: reaproveitamento com `.processo-*`, `.usuarios-*`, etc.
+* **Filtros**: sempre com `useMemo` para performance
+* **Campos de data**: normalizados em formato ISO para envio (`YYYY-MM-DD`) e exibidos em BR (`DD/MM`)
 
 ---
 
 ## 📌 Roadmap Futuro
 
-- [ ] Autenticação JWT com controle de permissões.
-- [ ] Integração com banco de dados real.
-- [ ] Upload e gestão de documentos.
-- [ ] Dashboards analíticos por cliente/contrato.
+* [ ] Autenticação JWT com permissões por tipo de usuário
+* [ ] Upload e gestão de documentos
+* [ ] Dashboards com indicadores por cliente
+* [ ] Integração com banco de dados real
+* [ ] Módulo de Acordos (em desenvolvimento)
 
 ---
 

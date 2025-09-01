@@ -1,0 +1,14 @@
+/* src/styles/components_styles.css */
+
+.dia-selecionado {
+    background-color: #2563eb !important; /* Azul */
+    color: white !important;
+    border-radius: 9999px;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+  }
+  
