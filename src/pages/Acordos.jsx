@@ -1,7 +1,7 @@
 // src/pages/Acordos.jsx
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Pencil, Check } from "lucide-react";
+import { Eye, Pencil, Check, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,12 +76,8 @@ export default function Acordos() {
     (async () => {
       setLoading(true);
       try {
-        const resposta = await fetchAcordosUnificados();
-
-          setLista(Array.isArray(resposta.acordos) ? resposta.acordos : []);
-          setAtribs(Array.isArray(resposta.atribuicoes) ? resposta.atribuicoes : []);
-          setColabs(Array.isArray(resposta.colaboradores) ? resposta.colaboradores : []);
-
+        const acordosRes = await fetchAcordosUnificados();
+        setLista(Array.isArray(acordosRes) ? acordosRes : []);
       } finally {
         setLoading(false);
       }
@@ -93,10 +89,10 @@ export default function Acordos() {
     return lista.filter((a) => {
       const parte = norm(a.parte_adversa?.nome);
       const contrato = norm(a.contrato?.numero);
-      const status = norm(a.status);
-      return termo ? parte.includes(termo) || contrato.includes(termo) || status.includes(termo) : true;
+      return termo ? parte.includes(termo) || contrato.includes(termo) : true;
     });
   }, [lista, fBusca]);
+  
 
   const abrirDetalhar = async (acordo) => {
     setVisualizando(true);
@@ -144,53 +140,80 @@ export default function Acordos() {
 
       {/* Filtros */}
       <div className="usuarios-header">
-        <Input
-          className="dashboard-select dashboard-filtro-usuario-input"
-          placeholder="Parte, Contrato ou Status"
-          value={fBusca}
-          onChange={(e) => setFBusca(e.target.value)}
-        />
+        <div className="dashboard-filtro-group" style={{ position: "relative" }}>
+          <Input
+            className="dashboard-select dashboard-filtro-usuario-input"
+            placeholder="Contrato ou Parte"
+            value={fBusca}
+            onChange={(e) => setFBusca(e.target.value)}
+            title="Buscar por contrato ou parte"
+          />
+          {fBusca && (
+            <button
+              onClick={() => setFBusca("")}
+              className="dashboard-filtro-clear"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+
       </div>
 
       {/* Tabela */}
       <div className="usuarios-tabela-wrapper">
         <table className="usuarios-tabela">
-          <thead>
-            <tr>
-              <th>Contrato</th>
-              <th>Parte Adversa</th>
-              <th>Telefone</th>
-              <th>Último Pagamento</th>
-              <th>Parcela em Aberto</th>
-              <th>Valor Residual</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={7}>Carregando…</td></tr>
-            ) : filtrados.length ? (
-              filtrados.map((a) => (
-                <tr key={a.acordo_id}>
-                  <td>{a.contrato?.numero}</td>
-                  <td>{a.parte_adversa?.nome}</td>
-                  <td>{a.telefone}</td>
-                  <td>{a.ultimo_pagamento || "—"}</td>
-                  <td>{a.parcela_em_aberto?.numero}</td>
-                  <td>{a.valor_residual?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                  <td>
-                    <div className="table-actions">
-                      <Button variant="secondary" onClick={() => abrirEditar(a)}>✏️ Editar</Button>
-                      <Button variant="outline" onClick={() => abrirDetalhar(a)}>👁️ Detalhar</Button>
-                      <Button variant="default" onClick={() => console.log("Atualizar", a.acordo_id)}>🔄 Atualizar</Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan={7}>Nenhum acordo encontrado.</td></tr>
-            )}
-          </tbody>
+        <thead>
+          <tr>
+            <th>Contrato</th>
+            <th>Parte Adversa</th>
+            <th>Telefone</th>
+            <th>Último Pgt</th>
+            <th>Última em Aberto</th>
+            <th>Parcela</th>
+            <th>Valor Residual</th>
+            <th className="col-acoes-three-buttons">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr><td colSpan={8}>Carregando…</td></tr>
+          ) : filtrados.length ? (
+            filtrados.map((a) => (
+              <tr key={a.acordo_id}>
+                <td>{a.contrato?.numero}</td>
+                <td>{a.parte_adversa?.nome}</td>
+                <td>{a.telefone}</td>
+                <td>{a.ultima_parcela_paga?.data_pagamento || "—"}</td>
+                <td>{a.parcela_em_aberto?.data_vencimento || "—"}</td>
+                <td>
+                  {a.parcela_em_aberto?.numero && a.proposta?.numero_parcelas
+                    ? `${a.parcela_em_aberto.numero}/${a.proposta.numero_parcelas}`
+                    : "—"}
+                </td>
+                <td>
+                  {a.valor_residual != null
+                    ? a.valor_residual.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })
+                    : "—"}
+                </td>
+                <td>
+                  <div className="table-actions">
+                    <Button variant="secondary" onClick={() => abrirEditar(a)}>✏️ Editar</Button>
+                    <Button variant="outline" onClick={() => abrirDetalhar(a)}>👁️ Detalhar</Button>
+                    <Button variant="default" onClick={() => console.log("Atualizar", a.acordo_id)}>🔄 Atualizar</Button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr><td colSpan={8}>Nenhum acordo encontrado.</td></tr>
+          )}
+        </tbody>
+
         </table>
       </div>
 

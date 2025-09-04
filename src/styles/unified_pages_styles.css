@@ -935,6 +935,7 @@
   max-height: 1.25rem !important;
   padding-right: 2rem;
   width: 12.5rem;
+  max-width: 12.5rem;
 }
 
 input[type="date"].dashboard-select {
