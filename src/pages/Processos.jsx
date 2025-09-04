@@ -1264,7 +1264,7 @@ const salvar = async () => {
               <th className="processo-col-parte-principal">Parte Principal</th>
               <th className="processo-col-status">Status</th>
               <th className="processo-col-comarca">Comarca</th>
-              <th className="processo-col-prazo-interno">Prazo Interno</th>
+              <th className="processo-col-prazo-interno">Prazo</th>
               <th className="processo-col-responsavel-processo">Responsável</th>
               <th className="col-acoes-three-buttons">Ações</th>
             </tr>

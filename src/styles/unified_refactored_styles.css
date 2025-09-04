@@ -1267,15 +1267,15 @@ input[type="date"].processo-modal-input {
 /* ===================== */
 
 .processo-col-cnj {
-  width: 7rem !important;
-  min-width: 7rem !important;
-  max-width: 7rem !important;
+  width: 8rem !important;
+  min-width: 8rem !important;
+  max-width: 8rem !important;
 }
 
 .processo-col-parte-principal {
-  width: 11rem !important;
-  min-width: 11rem !important;
-  max-width: 11rem !important;
+  width: 8rem !important;
+  min-width: 8rem !important;
+  max-width: 8rem !important;
 }
 
 .processo-col-status {
@@ -1291,15 +1291,15 @@ input[type="date"].processo-modal-input {
 }
 
 .processo-col-prazo-interno {
-  width: 4rem !important;
-  min-width: 4rem !important;
-  max-width: 4rem !important;
+  width: 2rem !important;
+  min-width: 2rem !important;
+  max-width: 2rem !important;
 }
 
 .processo-col-responsavel-processo {
-  width: 9rem !important;
-  min-width: 9rem !important;
-  max-width: 9rem !important;
+  width: 8rem !important;
+  min-width: 8rem !important;
+  max-width: 8rem !important;
 }
 
 
