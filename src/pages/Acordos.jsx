@@ -337,6 +337,7 @@ const norm = (s) =>
                 <p><strong>Status:</strong> {parcelaSelecionada.pago ? "Pago" : "Em aberto"}</p>
               </div>
             )}
+
  
             {abaPagamentos === "novo" && parcelaSelecionada && (
               <div className="acordo-pag-novo-form">
@@ -591,13 +592,12 @@ export default function Acordos() {
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
         <DialogOverlay className="dialog-overlay" />
           <DialogContent className="acordo-modal-container">
-            <DialogTitle id="acordo-modal-title">
-              <VisuallyHidden>Informações do Acordo</VisuallyHidden>
+            <DialogTitle>
+              <VisuallyHidden>{visualizando ? "Detalhar Acordo" : "Editar Acordo"}</VisuallyHidden>
             </DialogTitle>
-            <DialogDescription id="acordo-modal-description">
-              <VisuallyHidden>Atribuições e dados do acordo selecionado</VisuallyHidden>
+            <DialogDescription>
+              <VisuallyHidden>Informações do acordo selecionado</VisuallyHidden>
             </DialogDescription>
-
 
             <div className="acordo-modal-split">
               {/* ESQUERDA */}
@@ -628,25 +628,7 @@ export default function Acordos() {
 
       <Dialog open={modalParcelasAberto} onOpenChange={setModalParcelasAberto}>
         <DialogOverlay className="dialog-overlay" />
-        <DialogContent
-          className="acordo-modal-container"
-          aria-labelledby="parcelas-modal-title"
-          aria-describedby="parcelas-modal-description"
-        >
-          {/* Título acessível */}
-          <DialogTitle asChild>
-            <h2 id="parcelas-modal-title" style={{ position: 'absolute', left: '-9999px' }}>
-              Parcelas do Acordo
-            </h2>
-          </DialogTitle>
-
-          {/* Descrição acessível */}
-          <DialogDescription asChild>
-            <p id="parcelas-modal-description" style={{ position: 'absolute', left: '-9999px' }}>
-              Informações detalhadas das parcelas e seus pagamentos
-            </p>
-          </DialogDescription>
-
+        <DialogContent className="acordo-modal-container">
           <div className="acordo-modal-split">
             <ModalLeftParcelas
               parcelas={parcelas}
@@ -662,8 +644,6 @@ export default function Acordos() {
           </div>
         </DialogContent>
       </Dialog>
-
-
 
     </div>
   );
