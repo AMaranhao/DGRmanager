@@ -2029,3 +2029,50 @@ input[type="date"].processo-modal-input {
 .acordo-pag-detalhe {
   padding: 1rem 0;
 }
+
+.acordo-modal-titulo {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.acordo-modal-subtitulo {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.acordo-col-contrato {
+  width: 110px;
+  text-align: center;
+}
+
+.acordo-col-parte {
+  width: 200px;
+}
+
+.acordo-col-telefone {
+  width: 120px;
+  text-align: center;
+}
+
+.acordo-col-ultimo,
+.acordo-col-emaberto {
+  width: 130px;
+  text-align: center;
+}
+
+.acordo-col-parcela {
+  width: 100px;
+  text-align: center;
+}
+
+.acordo-col-residual {
+  width: 140px;
+  text-align: right;
+}
+
+.acordo-col-acoes {
+  width: 180px;
+  text-align: center;
+}

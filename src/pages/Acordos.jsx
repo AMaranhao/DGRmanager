@@ -338,6 +338,7 @@ const norm = (s) =>
               </div>
             )}
 
+
  
             {abaPagamentos === "novo" && parcelaSelecionada && (
               <div className="acordo-pag-novo-form">
@@ -535,55 +536,56 @@ export default function Acordos() {
       {/* Tabela */}
       <div className="usuarios-tabela-wrapper">
         <table className="usuarios-tabela">
-        <thead>
-          <tr>
-            <th>Contrato</th>
-            <th>Parte Adversa</th>
-            <th>Telefone</th>
-            <th>Último Pgt</th>
-            <th>Última em Aberto</th>
-            <th>Parcela</th>
-            <th>Valor Residual</th>
-            <th className="col-acoes-three-buttons">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr><td colSpan={8}>Carregando…</td></tr>
-          ) : filtrados.length ? (
-            filtrados.map((a) => (
-              <tr key={a.acordo_id}>
-                <td>{a.contrato?.numero}</td>
-                <td>{a.parte_adversa?.nome}</td>
-                <td>{a.telefone}</td>
-                <td>{a.ultima_parcela_paga?.data_pagamento || "—"}</td>
-                <td>{a.parcela_em_aberto?.data_vencimento || "—"}</td>
-                <td>
-                  {a.parcela_em_aberto?.numero && a.proposta?.numero_parcelas
-                    ? `${a.parcela_em_aberto.numero}/${a.proposta.numero_parcelas}`
-                    : "—"}
-                </td>
-                <td>
-                  {a.valor_residual != null
-                    ? a.valor_residual.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })
-                    : "—"}
-                </td>
-                <td>
-                  <div className="table-actions">
-                    <Button variant="secondary" onClick={() => abrirEditar(a)}>✏️ Editar</Button>
-                    <Button variant="outline" onClick={() => abrirDetalhar(a)}>👁️ Detalhar</Button>
-                    <Button variant="default" onClick={() => abrirModalParcelas(a.acordo_id)}>🔄 Parcelas</Button>
-                    </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr><td colSpan={8}>Nenhum acordo encontrado.</td></tr>
-          )}
-        </tbody>
+          <thead>
+            <tr>
+              <th className="acordo-col-contrato">Contrato</th>
+              <th className="acordo-col-parte">Parte Adversa</th>
+              <th className="acordo-col-telefone">Telefone</th>
+              <th className="acordo-col-ultimo">Último Pgt</th>
+              <th className="acordo-col-emaberto">Última em Aberto</th>
+              <th className="acordo-col-parcela">Parcela</th>
+              <th className="acordo-col-residual">Valor Residual</th>
+              <th className="acordo-col-acoes">Ações</th>
+            </tr>
+          </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={8}>Carregando…</td></tr>
+              ) : filtrados.length ? (
+                filtrados.map((a) => (
+                  <tr key={a.acordo_id}>
+                    <td className="acordo-col-contrato">{a.contrato?.numero}</td>
+                    <td className="acordo-col-parte">{a.parte_adversa?.nome}</td>
+                    <td className="acordo-col-telefone">{a.telefone}</td>
+                    <td className="acordo-col-ultimo">{a.ultima_parcela_paga?.data_pagamento || "—"}</td>
+                    <td className="acordo-col-emaberto">{a.parcela_em_aberto?.data_vencimento || "—"}</td>
+                    <td className="acordo-col-parcela">
+                      {a.parcela_em_aberto?.numero && a.proposta?.numero_parcelas
+                        ? `${a.parcela_em_aberto.numero}/${a.proposta.numero_parcelas}`
+                        : "—"}
+                    </td>
+                    <td className="acordo-col-residual">
+                      {a.valor_residual != null
+                        ? a.valor_residual.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })
+                        : "—"}
+                    </td>
+                    <td className="acordo-col-acoes">
+                      <div className="table-actions">
+                        <Button variant="secondary" onClick={() => abrirEditar(a)}>✏️ Editar</Button>
+                        <Button variant="outline" onClick={() => abrirDetalhar(a)}>👁️ Detalhar</Button>
+                        <Button variant="default" onClick={() => abrirModalParcelas(a.acordo_id)}>🔄 Parcelas</Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={8}>Nenhum acordo encontrado.</td></tr>
+              )}
+            </tbody>
+
 
         </table>
       </div>
@@ -629,6 +631,15 @@ export default function Acordos() {
       <Dialog open={modalParcelasAberto} onOpenChange={setModalParcelasAberto}>
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className="acordo-modal-container">
+          
+          <DialogTitle asChild>
+            <h2 className="acordo-modal-titulo">Parcelas do Acordo</h2>
+          </DialogTitle>
+          
+          <DialogDescription asChild>
+            <p className="acordo-modal-subtitulo">Informações detalhadas das parcelas e seus pagamentos</p>
+          </DialogDescription>
+
           <div className="acordo-modal-split">
             <ModalLeftParcelas
               parcelas={parcelas}
@@ -644,6 +655,7 @@ export default function Acordos() {
           </div>
         </DialogContent>
       </Dialog>
+
 
     </div>
   );
