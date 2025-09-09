@@ -191,14 +191,15 @@ const norm = (s) =>
         <div className="acordo-modal-split-right">
           {/* Cabeçalho fixo (sempre visível) */}
           <div className="acordo-right-header">
-            <p className="dashboard-heading">
+            <h2 className="acordo-modal-title">
               {rightMode === "editarAtrib"
                 ? "Atribuições do Acordo"
                 : rightMode === "novaAtrib"
                 ? "Atribuições do Acordo"
                 : "Atribuições do Acordo"}
-            </p>
+            </h2>
           </div>
+
       
           {/* Modo: visualizar atribuições */}
           {rightMode === "visualizarAtrib" && (
@@ -219,7 +220,7 @@ const norm = (s) =>
                             status_atual: a.atribuicao_descricao,
                             data_inicial: a.data_inicial,
                             prazo: a.prazo ?? "",
-                            solucionador_id: a?.solucionador?.id ?? "",
+                            responsavel_id: a?.responsavel?.id ?? "",  // ⬅️ Corrigido aqui
                             observacao: a?.observacao ?? "",
                           });
                           setRightMode("editarAtrib");
@@ -265,7 +266,7 @@ const norm = (s) =>
             <div className="acordo-right-wrapper">
               <div className="acordo-right-content">
                 <div className="acordo-atr-section">
-                  <p className="acordo-atr-section-title">Atribuição atual</p>
+                  <p className="acordo-atr-section-title">Atribuição Atual</p>
                   <div className="acordo-atr-linha">
                     <span className="acordo-atr-label">Status Atual</span>
                     <span className="acordo-atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
@@ -301,11 +302,11 @@ const norm = (s) =>
                 </div>
       
                 <div className="acordo-input-wrapper">
-                  <label className="acordo-label">Solucionador</label>
+                  <label className="acordo-label">Responsável</label>
                   <select
                     className="acordo-modal-input"
-                    value={formAtrib.solucionador_id}
-                    onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
+                    value={formAtrib.responsavel_id}
+                    onChange={(e) => setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })}
                   >
                     <option value="">Selecione…</option>
                     {colabs.map((c) => (
@@ -352,7 +353,7 @@ const norm = (s) =>
                     </select>
                   </div>
       
-                  <div className="acordo-atr-section-title" style={{ marginTop: "1rem" }}>Próxima Atribuição</div>
+                  <div className="acordo-atr-section-title" style={{ marginTop: "2rem" }}>Próxima Atribuição</div>
       
                   <div className="acordo-input-wrapper">
                     <label className="acordo-label">Status</label>
@@ -619,6 +620,7 @@ export default function Acordos() {
       entity_id: acordoSelecionado.acordo_id,
       prazo: formAtrib.prazo,
       observacao: formAtrib.observacao,
+      responsavel_id: formAtrib.responsavel_id,
       solucionador_id: formAtrib.solucionador_id,
     };
   };

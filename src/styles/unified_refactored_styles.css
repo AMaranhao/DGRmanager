@@ -1812,8 +1812,9 @@ input[type="date"].processo-modal-input {
   flex: 1;
   overflow-y: auto;
   margin-top: 0.5rem;
-  margin-bottom: 4rem; /* espaço para não esconder o botão */
+  margin-bottom: 2rem; /* espaço para não esconder o botão */
   padding-right: 4px; /* para compensar scroll */
+  height: 25rem;
 }
 
 
@@ -2094,6 +2095,7 @@ input[type="date"].processo-modal-input {
   gap: 0.5rem;
   align-items: flex-start;
   flex-wrap: nowrap;         /* mantém lado a lado no desktop */
+  margin-bottom: 2rem;
 }
 
 
@@ -2148,7 +2150,8 @@ input[type="date"].acordo-modal-input {
 }
 
 .acordo-right-content {
-  padding: 1.25rem;
+  padding: 1rem;
+  height: 25rem;
 }
 
 .acordo-atr-section {
@@ -2238,12 +2241,21 @@ input[type="date"].acordo-modal-input {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.5rem; /* 8px para cima, direita, baixo e esquerda */
+
   background: #ffffff; /* ou #f9f9f9 para o painel direito */
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden; /* impede “vazamentos” de conteúdo */
 }
+
+.acordo-modal-split-left {
+  padding: 0rem 0.5rem 0.5rem 0rem; /* top, right, bottom, left */
+}
+
+.acordo-modal-split-right {
+  padding: 0rem 1rem 0.5rem 0.5rem; /* top, right, bottom, left */
+}
+
 
 .acordo-modal-split-right {
   background: #f9f9f9;
@@ -2287,5 +2299,15 @@ input[type="date"].acordo-modal-input {
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 1.25rem;
+}
+
+
+.acordo-modal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  padding-bottom: 1rem;
+  line-height: 1.3;
 }
 
