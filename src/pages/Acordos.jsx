@@ -414,68 +414,120 @@ const norm = (s) =>
     function ModalLeftParcelas({ parcelas, parcelaSelecionada, setParcelaSelecionada }) {
       return (
         <div className="acordo-modal-split-left">
-          <h5 className="dashboard-heading">Parcelas</h5>
-          <ul className="acordo-parcela-lista">
-            {parcelas.map((p, idx) => (
-              <li
-                key={idx}
-                className={`acordo-parcela-item ${parcelaSelecionada?.numero_parcela === p.numero_parcela ? "selecionada" : ""}`}
-                onClick={() => setParcelaSelecionada(p)}
-              >
-                <div className="acordo-parcela-linha">
-                  <span>Parcela {p.numero}</span>
-                  <span>{p.data_vencimento ? new Date(p.data_vencimento).toLocaleDateString("pt-BR") : "—"}</span>
-                  <span>{p.valor_parcela?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "—"}</span>
-                  <span>{p.pago ? "✅" : "—"}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <DialogTitle className="acordo-modal-title">
+            Parcelas do Acordo
+          </DialogTitle>
+    
+          <DialogDescription className="acordo-modal-description">
+            Clique em uma parcela para ver ou registrar um pagamento.
+          </DialogDescription>
+    
+          <div className="acordo-modal-parcelas">
+            <ul className="acordo-parcela-lista">
+              {parcelas.map((p, idx) => (
+                <li
+                  key={idx}
+                  className={`acordo-parcela-item ${parcelaSelecionada?.numero_parcela === p.numero_parcela ? "selecionada" : ""}`}
+                  onClick={() => setParcelaSelecionada(p)}
+                >
+                  <div className="acordo-parcela-linha">
+                    <span>{p.vencimento ? new Date(p.vencimento).toLocaleDateString("pt-BR") : "—"}</span>
+                    <span>{p.valor_parcela?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "—"}</span>
+                    <span>{p.status === "pago" ? "✅" : "—"}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       );
     }
+    
     
     function ModalRightPagamentos({ pagamentos, parcelaSelecionada, abaPagamentos, setAbaPagamentos }) {
       return (
         <div className="acordo-modal-split-right">
-          <div className="acordo-pag-tabs">
-            <button onClick={() => setAbaPagamentos("lista")}>Pagamentos</button>
-            <button onClick={() => setAbaPagamentos("detalhe")} disabled={!parcelaSelecionada}>Detalhar</button>
-            <button onClick={() => setAbaPagamentos("novo")} disabled={!parcelaSelecionada}>Novo Pagamento</button>
+          {/* Cabeçalho */}
+          <div className="acordo-right-header">
+            <h2 className="acordo-modal-title">Pagamentos</h2>
           </div>
     
-          <div className="acordo-pag-conteudo">
-            {abaPagamentos === "lista" && (
-              <ul className="acordo-pag-lista">
-                {pagamentos.map((pg, idx) => (
-                  <li key={idx} className="acordo-pag-item">
-                    <span>{new Date(pg.data_pagamento).toLocaleDateString("pt-BR")}</span>
-                    <span>{pg.valor_pago.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+          {/* Abas de navegação */}
+          <div className="acordo-pag-tabs">
+            <button onClick={() => setAbaPagamentos("lista")} className={abaPagamentos === "lista" ? "ativo" : ""}>
+              Pagamentos
+            </button>
+            <button onClick={() => setAbaPagamentos("detalhe")} disabled={!parcelaSelecionada} className={abaPagamentos === "detalhe" ? "ativo" : ""}>
+              Detalhar
+            </button>
+            <button onClick={() => setAbaPagamentos("novo")} disabled={!parcelaSelecionada} className={abaPagamentos === "novo" ? "ativo" : ""}>
+              Novo Pagamento
+            </button>
+          </div>
     
-            {abaPagamentos === "detalhe" && parcelaSelecionada && (
-              <div className="acordo-pag-detalhe">
-                <p><strong>Parcela:</strong> {parcelaSelecionada.numero_parcela}</p>
-                <p><strong>Vencimento:</strong> {new Date(parcelaSelecionada.data_vencimento).toLocaleDateString("pt-BR")}</p>
-                <p><strong>Valor:</strong> {parcelaSelecionada.valor_parcela?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "—"}</p>
-                <p><strong>Status:</strong> {parcelaSelecionada.pago ? "Pago" : "Em aberto"}</p>
-              </div>
-            )}
-
-
- 
-            {abaPagamentos === "novo" && parcelaSelecionada && (
-              <div className="acordo-pag-novo-form">
-                <p>Formulário de inserção de pagamento (a implementar)</p>
-              </div>
-            )}
+          {/* Conteúdo scrollável */}
+          <div className="acordo-right-scroll">
+            <div className="acordo-right-content">
+              {abaPagamentos === "lista" && (
+                <ul className="acordo-pag-lista">
+                  {pagamentos.map((pg, idx) => (
+                    <li key={idx} className="acordo-pag-item">
+                      <span className="pag-data">{new Date(pg.data_pagamento).toLocaleDateString("pt-BR")}</span>
+                      <span className="pag-valor">{pg.valor_pago.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+    
+              {abaPagamentos === "detalhe" && parcelaSelecionada && (
+                <div className="acordo-pag-detalhe">
+                  <div className="acordo-atr-linha">
+                    <span className="acordo-atr-label">Parcela</span>
+                    <span className="acordo-atr-valor">{parcelaSelecionada.numero_parcela}</span>
+                  </div>
+                  <div className="acordo-atr-linha">
+                    <span className="acordo-atr-label">Vencimento</span>
+                    <span className="acordo-atr-valor">{new Date(parcelaSelecionada.data_vencimento).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                  <div className="acordo-atr-linha">
+                    <span className="acordo-atr-label">Valor</span>
+                    <span className="acordo-atr-valor">
+                      {parcelaSelecionada.valor_parcela?.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }) ?? "—"}
+                    </span>
+                  </div>
+                  <div className="acordo-atr-linha">
+                    <span className="acordo-atr-label">Status</span>
+                    <span className="acordo-atr-valor">{parcelaSelecionada.pago ? "Pago" : "Em aberto"}</span>
+                  </div>
+                </div>
+              )}
+    
+              {abaPagamentos === "novo" && parcelaSelecionada && (
+                <div className="acordo-pag-novo-form">
+                  <label className="acordo-label">Data do Pagamento</label>
+                  <input type="date" className="acordo-modal-input" />
+    
+                  <label className="acordo-label">Valor Pago</label>
+                  <input type="text" className="acordo-modal-input" />
+    
+                  <label className="acordo-label">Observações</label>
+                  <textarea rows={2} className="acordo-textarea" />
+    
+                  <div className="acordo-modal-right-footer">
+                    <Button variant="secondary" onClick={() => setAbaPagamentos("lista")}>Cancelar</Button>
+                    <Button>Registrar Pagamento</Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       );
     }
+    
     
     
     
@@ -805,13 +857,7 @@ export default function Acordos() {
         <DialogOverlay className="dialog-overlay" />
         <DialogContent className="acordo-modal-container">
           
-          <DialogTitle asChild>
-            <h2 className="acordo-modal-titulo">Parcelas do Acordo</h2>
-          </DialogTitle>
-          
-          <DialogDescription asChild>
-            <p className="acordo-modal-subtitulo">Informações detalhadas das parcelas e seus pagamentos</p>
-          </DialogDescription>
+
 
           <div className="acordo-modal-split">
             <ModalLeftParcelas
