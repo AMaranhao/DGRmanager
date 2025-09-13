@@ -412,36 +412,66 @@ const norm = (s) =>
     
     
     function ModalLeftParcelas({ parcelas, parcelaSelecionada, setParcelaSelecionada }) {
+      const linhas = 7;
+      const colunas = Math.ceil(parcelas.length / linhas);
+    
+      // Distribui as parcelas em colunas verticais
+      const colunasDeParcelas = Array.from({ length: colunas }, (_, colIdx) =>
+        parcelas.slice(colIdx * linhas, colIdx * linhas + linhas)
+      );
+    
       return (
         <div className="acordo-modal-split-left">
-          <DialogTitle className="acordo-modal-title">
-            Parcelas do Acordo
-          </DialogTitle>
+          <DialogTitle className="acordo-modal-title">Parcelas do Acordo</DialogTitle>
     
           <DialogDescription className="acordo-modal-description">
             Clique em uma parcela para ver ou registrar um pagamento.
           </DialogDescription>
     
           <div className="acordo-modal-parcelas">
-            <ul className="acordo-parcela-lista">
-              {parcelas.map((p, idx) => (
-                <li
-                  key={idx}
-                  className={`acordo-parcela-item ${parcelaSelecionada?.numero_parcela === p.numero_parcela ? "selecionada" : ""}`}
-                  onClick={() => setParcelaSelecionada(p)}
-                >
-                  <div className="acordo-parcela-linha">
-                    <span>{p.vencimento ? new Date(p.vencimento).toLocaleDateString("pt-BR") : "—"}</span>
-                    <span>{p.valor_parcela?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "—"}</span>
-                    <span>{p.status === "pago" ? "✅" : "—"}</span>
+            {colunasDeParcelas.map((coluna, colIdx) => (
+              <div className="acordo-parcela-coluna" key={colIdx}>
+                {coluna.map((parcela, idx) => (
+                  <div
+                    key={idx}
+                    className={`acordo-parcela-item ${
+                      parcelaSelecionada?.numero_parcela === parcela.numero_parcela
+                        ? "selecionada"
+                        : ""
+                    }`}
+                    onClick={() => setParcelaSelecionada(parcela)}
+                  >
+                    <div className="acordo-parcela-linha">
+                      <span className="parcela-check">
+                        {parcela.status === "pago" ? "✅" : "•"}
+                      </span>
+                      <div className="parcela-duas-linhas">
+                        <span className="parcela-data">
+                          {parcela.vencimento
+                            ? new Date(parcela.vencimento).toLocaleDateString("pt-BR")
+                            : "—"}
+                        </span>
+                        <span className="parcela-valor">
+                          {parcela.valor_parcela?.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }) ?? "—"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       );
     }
+    
+    
+    
+    
+    
     
     
     function ModalRightPagamentos({ pagamentos, parcelaSelecionada, abaPagamentos, setAbaPagamentos }) {

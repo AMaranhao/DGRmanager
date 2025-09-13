@@ -2325,9 +2325,76 @@ input[type="date"].acordo-modal-input {
 }
 
 
+
+
+
+
+
 .acordo-modal-parcelas {
-  height: 490px; /* altura fixa */
+  height: 540px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
   margin-top: 1rem;
   border-radius: 8px;
+}
+
+
+.acordo-parcela-item {
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 0.3rem 0.4rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  transition: background 0.2s ease;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.acordo-parcela-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.acordo-parcela-item:hover {
+  background-color: #ececec;
+}
+
+.acordo-parcela-item.selecionada {
+  background-color: #dfefff;
+}
+
+.acordo-parcela-linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.parcela-check {
+  font-size: 1rem;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+
+.parcela-duas-linhas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.parcela-data {
+  font-weight: 500;
+}
+
+.parcela-valor {
+  font-size: 0.75rem;
+  color: #555;
 }
