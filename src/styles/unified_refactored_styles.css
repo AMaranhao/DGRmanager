@@ -2398,3 +2398,51 @@ input[type="date"].acordo-modal-input {
   font-size: 0.75rem;
   color: #555;
 }
+
+.acordo-right-content {
+  display: flex;
+  justify-content: center;     /* Centraliza horizontalmente (opcional) */
+  align-items: center;         /* Centraliza verticalmente */
+  height: 100%;                /* Garante que ocupe todo o espaço disponível */
+  padding: 16px;               /* Mantém o padding existente */
+}
+
+.acordo-pag-detalhe {
+  width: 100%;                 /* Ou um valor fixo como 480px, se preferir */
+  max-width: 300px;
+  padding-top: 0rem;       /* 🔼 empurra levemente para baixo, mas não muito */
+  margin-bottom: 6rem;
+}
+
+.acordo-atr-label {
+  font-weight: bold;
+}
+
+/* Estilos de status com cor + negrito */
+.status-pago {
+  color: #28a745; /* verde */
+}
+
+.status-em_atraso {
+  color: #dc3545; /* vermelho */
+}
+
+.status-pendente {
+  color: #ffc107; /* amarelo */
+}
+
+.status-icon {
+  vertical-align: middle;
+}
+
+.status-icon-pago {
+  color: #22c55e; /* verde */
+}
+
+.status-icon-atraso {
+  color: #dc2626; /* vermelho */
+}
+
+.status-pendente {
+  color: #facc15; /* amarelo, se quiser aplicar */
+}
