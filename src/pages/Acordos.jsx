@@ -592,24 +592,25 @@ const norm = (s) =>
                         {parcelaSelecionada.status === "pendente" && <>Pendente</>}
                       </span>
                     </div>
-                    {editandoPagamento && (
-                      <div className="pagamento-formulario" style={{ marginTop: "24px" }}>
-                        <input
-                          type="date"
-                          value={dataPagamento}
-                          onChange={(e) => setDataPagamento(e.target.value)}
-                          className="acordo-modal-input"
-                          placeholder="Data do Pagamento"
-                        />
-                        <input
-                          type="number"
-                          value={valorPago}
-                          onChange={(e) => setValorPago(e.target.value)}
-                          className="acordo-modal-input"
-                          placeholder="Valor Pago"
-                        />
-                      </div>
-                    )}
+                      {editandoPagamento && (
+                        <div className="pagamento-formulario">
+                          <input
+                            type="date"
+                            value={dataPagamento}
+                            onChange={(e) => setDataPagamento(e.target.value)}
+                            className="acordo-modal-input"
+                            placeholder="Data do Pagamento"
+                          />
+                          <input
+                            type="number"
+                            value={valorPago}
+                            onChange={(e) => setValorPago(e.target.value)}
+                            className="acordo-modal-input"
+                            placeholder="Valor Pago"
+                          />
+                        </div>
+                      )}
+
                   </div>
 
                   
