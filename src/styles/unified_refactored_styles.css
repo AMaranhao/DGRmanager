@@ -2446,3 +2446,24 @@ input[type="date"].acordo-modal-input {
 .status-pendente {
   color: #facc15; /* amarelo, se quiser aplicar */
 }
+
+.pagamento-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.acordo-formulario-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.acordo-modal-input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+

@@ -1,7 +1,7 @@
 // src/pages/Acordos.jsx
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Pencil, Check, X, AlertCircle } from "lucide-react";
+import { Eye, Pencil, Check, X, AlertCircle, CheckCircle } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import {
 
 import {
   fetchPagamentosAcordo,
+  updatePagamentoAcordo,
 } from "@/services/ENDPOINTS_ServiceAcordoPagamento";
 
 import {
@@ -443,7 +444,11 @@ const norm = (s) =>
                   >
                     <div className="acordo-parcela-linha">
                       <span className="parcela-check">
-                        {parcela.status === "pago" ? "✅" : "•"}
+                        {parcela.status === "pago" && "✅"}
+                        {parcela.status === "em_atraso" && (
+                          <span style={{ color: "red", fontWeight: "bold" }}>❗</span>
+                        )}
+                        {parcela.status !== "pago" && parcela.status !== "em_atraso" && "•"}
                       </span>
                       <div className="parcela-duas-linhas">
                         <span className="parcela-data">
@@ -477,7 +482,36 @@ const norm = (s) =>
     function ModalRightPagamentos({ pagamentos, parcelaSelecionada }) {
       // Soma os pagamentos da parcela selecionada
       const totalPago = pagamentos.reduce((soma, pg) => soma + pg.valor_pago, 0);
-    
+      const [editandoPagamento, setEditandoPagamento] = useState(false);
+      const [dataPagamento, setDataPagamento] = useState("");
+      const [valorPago, setValorPago] = useState("");
+
+      const handleCancelar = () => {
+        setEditandoPagamento(false);
+        setDataPagamento("");
+        setValorPago("");
+      };
+
+      const handleSalvar = async () => {
+        if (!dataPagamento || !valorPago) {
+          alert("Preencha todos os campos.");
+          return;
+        }
+
+        try {
+          await updatePagamentoAcordo(parcelaSelecionada.id, {
+            data_pagamento: dataPagamento,
+            valor_pago: parseFloat(valorPago),
+          });
+          handleCancelar(); // limpa e fecha formulário
+          // Se tiver um recarregamento automático dos dados:
+          // await recarregarPagamentos();
+        } catch (error) {
+          alert("Erro ao salvar pagamento.");
+          console.error(error);
+        }
+      };
+
       // Última data de pagamento (se houver)
       const ultimaDataPagamento = pagamentos.length > 0
         ? new Date(pagamentos[pagamentos.length - 1].data_pagamento).toLocaleDateString("pt-BR")
@@ -494,76 +528,126 @@ const norm = (s) =>
           <div className="acordo-right-scroll">
             <div className="acordo-right-content">
               {parcelaSelecionada ? (
-                <div className="acordo-pag-detalhe">
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Parcela</span>
-                    <span className="acordo-atr-valor">{parcelaSelecionada.numero_parcela}</span>
+                <>
+                  <div className="acordo-pag-detalhe">
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Parcela</span>
+                      <span className="acordo-atr-valor">{parcelaSelecionada.numero_parcela}</span>
+                    </div>
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Data do Vencimento</span>
+                      <span className="acordo-atr-valor">
+                        {new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")}
+                      </span>
+                    </div>
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Data do Pagamento</span>
+                      <span className="acordo-atr-valor">
+                        {parcelaSelecionada.data_pagamento
+                          ? new Date(parcelaSelecionada.data_pagamento).toLocaleDateString("pt-BR")
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Valor</span>
+                      <span className="acordo-atr-valor">
+                        {parcelaSelecionada.valor_parcela?.toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        }) ?? "—"}
+                      </span>
+                    </div>
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Valor Pago</span>
+                      <span className="acordo-atr-valor">
+                        {(parcelaSelecionada.valor_pago ?? 0).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </span>
+                    </div>
+                    <div className="acordo-atr-linha">
+                      <span className="acordo-atr-label">Status</span>
+                      <span
+                        className={`acordo-atr-valor status-${parcelaSelecionada.status}`}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {parcelaSelecionada.status === "pago" && (
+                          <>
+                            <CheckCircle size={16} className="status-icon status-icon-pago" />
+                            Pago
+                          </>
+                        )}
+                        {parcelaSelecionada.status === "em_atraso" && (
+                          <>
+                            <AlertCircle size={16} className="status-icon status-icon-atraso" />
+                            Em Atraso
+                          </>
+                        )}
+                        {parcelaSelecionada.status === "pendente" && <>Pendente</>}
+                      </span>
+                    </div>
+                    {editandoPagamento && (
+                      <div className="pagamento-formulario" style={{ marginTop: "24px" }}>
+                        <input
+                          type="date"
+                          value={dataPagamento}
+                          onChange={(e) => setDataPagamento(e.target.value)}
+                          className="acordo-modal-input"
+                          placeholder="Data do Pagamento"
+                        />
+                        <input
+                          type="number"
+                          value={valorPago}
+                          onChange={(e) => setValorPago(e.target.value)}
+                          className="acordo-modal-input"
+                          placeholder="Valor Pago"
+                        />
+                      </div>
+                    )}
                   </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Data do Vencimento</span>
-                    <span className="acordo-atr-valor">{new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")}</span>
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Data do Pagamento</span>
-                    <span className="acordo-atr-valor">
-                      {parcelaSelecionada.data_pagamento
-                        ? new Date(parcelaSelecionada.data_pagamento).toLocaleDateString("pt-BR")
-                        : "—"}
-                    </span>
 
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Valor</span>
-                    <span className="acordo-atr-valor">
-                      {parcelaSelecionada.valor_parcela?.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      }) ?? "—"}
-                    </span>
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Valor Pago</span>
-                    <span className="acordo-atr-valor">
-                      {(parcelaSelecionada.valor_pago ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                    </span>
-
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Status</span>
-                    <span
-                      className={`acordo-atr-valor status-${parcelaSelecionada.status}`}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: "bold" }}
-                    >
-                      {parcelaSelecionada.status === "pago" && (
-                        <>
-                          <CheckCircle size={16} className="status-icon status-icon-pago" />
-                          Pago
-                        </>
-                      )}
-                      {parcelaSelecionada.status === "em_atraso" && (
-                        <>
-                          <AlertCircle size={16} className="status-icon status-icon-atraso" />
-                          Em Atraso
-                        </>
-                      )}
-                      {parcelaSelecionada.status === "pendente" && (
-                        <>Pendente</>
-                      )}
-                    </span>
-                  </div>
-                </div>
+                  
+                </>
               ) : (
-                <p className="acordo-pag-empty">Selecione uma parcela para visualizar os pagamentos.</p>
+                <p className="acordo-pag-empty">
+                  Selecione uma parcela para visualizar os pagamentos.
+                </p>
               )}
+
+              
             </div>
           </div>
     
           {/* Rodapé com botão */}
-          {parcelaSelecionada && (
-            <div className="acordo-modal-right-footer">
-              <Button>Realizar Pagamento</Button>
-            </div>
-          )}
+            {parcelaSelecionada && (
+              <div className="acordo-modal-right-footer">
+                {!editandoPagamento ? (
+                  <Button onClick={() => setEditandoPagamento(true)}>
+                    Realizar Pagamento
+                  </Button>
+                ) : (
+                  
+                  <div className="acordo-formulario-botoes">
+                  <Button onClick={handleCancelar} variant="ghost">Cancelar</Button>
+                  <Button
+                    onClick={handleSalvar}
+                    disabled={!dataPagamento || !valorPago}
+                  >
+                    Salvar
+                  </Button>
+
+                </div>
+                  
+                )}
+              </div>
+            )}
+
         </div>
       );
     }
@@ -731,6 +815,26 @@ export default function Acordos() {
     };
   };
 
+  const handleSalvarPagamento = async () => {
+    if (!dataPagamentoInput || !valorPagoInput) {
+      setErro("Preencha todos os campos obrigatórios.");
+      return;
+    }
+  
+    try {
+      await updatePagamentoAcordo(parcelaSelecionada.id, {
+        data_pagamento: dataPagamentoInput,
+        valor_pago: parseFloat(valorPagoInput.replace(",", "."))
+      });
+  
+      setEditandoPagamento(false);
+      setErro("");
+      recarregarParcelas(); // Atualize sua tabela e painel após alteração
+    } catch (err) {
+      console.error(err);
+      setErro("Erro ao salvar o pagamento.");
+    }
+  };
 
   const handleEditarAtribuicao = async () => {
     try {
