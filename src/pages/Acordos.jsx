@@ -479,9 +479,8 @@ const norm = (s) =>
     
     
     
-    function ModalRightPagamentos({ pagamentos, parcelaSelecionada }) {
+    function ModalRightPagamentos({ parcelaSelecionada, recarregarParcelas }) {
       // Soma os pagamentos da parcela selecionada
-      const totalPago = pagamentos.reduce((soma, pg) => soma + pg.valor_pago, 0);
       const [editandoPagamento, setEditandoPagamento] = useState(false);
       const [dataPagamento, setDataPagamento] = useState("");
       const [valorPago, setValorPago] = useState("");
@@ -503,19 +502,16 @@ const norm = (s) =>
             data_pagamento: dataPagamento,
             valor_pago: parseFloat(valorPago),
           });
-          handleCancelar(); // limpa e fecha formulário
-          // Se tiver um recarregamento automático dos dados:
-          // await recarregarPagamentos();
+          handleCancelar(); // limpa campos
+          await recarregarParcelas(); // atualiza os dados no frontend
+          
         } catch (error) {
           alert("Erro ao salvar pagamento.");
           console.error(error);
         }
       };
 
-      // Última data de pagamento (se houver)
-      const ultimaDataPagamento = pagamentos.length > 0
-        ? new Date(pagamentos[pagamentos.length - 1].data_pagamento).toLocaleDateString("pt-BR")
-        : "—";
+ 
     
       return (
         <div className="acordo-modal-split-right">
@@ -674,7 +670,6 @@ export default function Acordos() {
   const [modalParcelasAberto, setModalParcelasAberto] = useState(false);
   const [acordoIdParcelas, setAcordoIdParcelas] = useState(null);
   const [parcelas, setParcelas] = useState([]);
-  const [pagamentos, setPagamentos] = useState([]);
   const [parcelaSelecionada, setParcelaSelecionada] = useState(null);
   const [abaPagamentos, setAbaPagamentos] = useState("lista");
 
@@ -685,10 +680,8 @@ export default function Acordos() {
   
     try {
       const resParcelas = await fetchModalParcelasByAcordoId(acordo_id);
-      const resPagamentos = await fetchPagamentosAcordo(acordo_id);
   
       setParcelas(resParcelas);
-      setPagamentos(resPagamentos);
       setModalParcelasAberto(true);
     } catch (err) {
       console.error("Erro ao abrir modal de parcelas", err);
@@ -804,6 +797,17 @@ export default function Acordos() {
       console.error("Erro ao atualizar acordo:", err);
     }
   };
+
+  const recarregarParcelas = async () => {
+    if (!acordoIdParcelas) return;
+    try {
+      const novasParcelas = await fetchModalParcelasByAcordoId(acordoIdParcelas);
+      setParcelas(novasParcelas);
+    } catch (err) {
+      console.error("Erro ao recarregar parcelas", err);
+    }
+  };
+  
   
   const montarPayloadAtribuicao = () => {
     return {
@@ -1025,10 +1029,10 @@ export default function Acordos() {
               setParcelaSelecionada={setParcelaSelecionada}
             />
             <ModalRightPagamentos
-              pagamentos={pagamentos}
               parcelaSelecionada={parcelaSelecionada}
               abaPagamentos={abaPagamentos}
               setAbaPagamentos={setAbaPagamentos}
+              recarregarParcelas={recarregarParcelas}
             />
           </div>
         </DialogContent>

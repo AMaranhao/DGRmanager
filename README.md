@@ -86,6 +86,19 @@ Inclui automações, controle de prazos, propostas e acordos, com integrações 
     - Campo de vencimento do pagamento (`date`)
     - Campo de mês do primeiro pagamento (`month`)
 
+### 🔹 Acordos 
+- Listagem de acordos com dados unificados:
+  - Contrato, Parte, Telefone, Último Pagamento, Parcela em Aberto e Valor Residual.
+- Modal dividido (split modal):
+  - **Esquerda**: dados do acordo e proposta vinculada.
+  - **Direita**: histórico de atribuições com possibilidade de edição.
+- Modal de Parcelas e Pagamentos:
+  - Visualização em colunas.
+  - Destaques visuais para parcelas pagas, pendentes e em atraso.
+  - Formulário inline para realizar pagamento, renderizado abaixo das informações principais da parcela.
+  - Rodapé com botões de ação adaptativos.
+- Recarregamento automático da lista de parcelas após cada novo pagamento.
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
