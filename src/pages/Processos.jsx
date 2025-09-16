@@ -24,10 +24,12 @@ import { fetchTiposEventoProcesso } from "@/services/ENDPOINTS_ServiceProcessos"
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
 import {
-  fetchAtribuicoesEvento,
   createAtribuicaoEvento,
   updateAtribuicaoEvento,
 } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+  
+import { fetchAtribuicoesProcesso } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+
 import { 
   createProposta,
   fetchPropostasByProcesso,
@@ -111,6 +113,8 @@ export default function Processos() {
 
   const [fStatus, setFStatus] = useState("");
   const [tiposEvento, setTiposEvento] = useState([]);
+  const [tiposAtribuicao, setTiposAtribuicao] = useState([]);
+
 
   // modal
   const [modalAberto, setModalAberto] = useState(false);
@@ -135,11 +139,13 @@ export default function Processos() {
   const [atrSelecionada, setAtrSelecionada] = useState(null); // a que foi clicada
   const [isUltima, setIsUltima] = useState(false);            // se é a última da lista
   const [formAtrib, setFormAtrib] = useState({
-    solucionador_id: "",          // quem executou (fecha a atual)
-    proxima_atr_id: "",       // id do tipo da próxima atribuição
-    proximo_resp_id: "",      // colaborador responsável pela próxima
-    observacao: "",           // observação (para PUT atual e/ou POST próxima)
-    ultimaEtapa: false,       // se marcar → só PUT na atual
+    solucionador_id: "",
+    proxima_atr_id: "",
+    proximo_resp_id: "",
+    observacao: "",
+    ultimaEtapa: false,
+    prazo: "",          // já existia no fluxo "new"
+    horario: "",        // ✅ novo campo
   });
 
   const [modalPropostasAberto, setModalPropostasAberto] = useState(false);
@@ -186,9 +192,21 @@ export default function Processos() {
       try {
         const c = await fetchColaboradores();
         setColabs(Array.isArray(c) ? c : []);
-      } catch { setColabs([]); }
+      } catch {
+        setColabs([]);
+      }
+  
+      try {
+        const a = await fetchAtribuicoesProcesso();
+        setTiposAtribuicao(Array.isArray(a) ? a : []);
+      } catch {
+        setTiposAtribuicao([]);
+      }
     })();
   }, [modalAberto]);
+  
+  
+  
 
   useEffect(() => {
     (async () => {
@@ -237,14 +255,19 @@ export default function Processos() {
       data_distribuicao: toYMD(processoSel.data_distribuicao),
       data_publicacao: toYMD(processoSel.data_publicacao),
       comarca: processoSel.comarca ?? "",
-      prazo_juridico: processoSel.prazo_juridico ?? "",
-      prazo_interno: toYMD(processoSel.prazo_interno),
-      prazo_fatal: toYMD(processoSel.prazo_fatal),
-      observacao: processoSel.observacao ?? "",
+      // 🔽 Aqui é o ponto onde entra
+      etapa_tipo: processoSel.processo_evento?.tipo?.tipo ?? "",
+      etapa_publicacao: toYMD(processoSel.processo_evento?.data_publicacao),
+      prazo_juridico: processoSel.processo_evento?.prazo_juridico ?? "",
+      prazo_interno: toYMD(processoSel.processo_evento?.prazo_interno),
+      prazo_fatal: toYMD(processoSel.processo_evento?.prazo_fatal),
+      observacao: processoSel.processo_evento?.observacao ?? ""
     });
     setPartes((processoSel?.contrato?.partes) || []);
     setAndamentos(Array.isArray(processoSel?.atribuicoes_evento) ? processoSel.atribuicoes_evento : []);
   }, [processoSel, editando]);
+  
+  
   
 
   const filtrados = useMemo(() => {
@@ -280,6 +303,7 @@ export default function Processos() {
     try {
       if (!atrSelecionada?.id) return;
       await updateAtribuicaoEvento(atrSelecionada.id, {
+        entity_type: "processo_evento",
         responsavel_id: Number(formAtrib.solucionador_id),
         prazo: formAtrib.prazo,
         observacao: formAtrib.observacao,
@@ -385,14 +409,16 @@ export default function Processos() {
         return;
       }
       await createAtribuicaoEvento({
-        processo_id: Number(processoSel.id),
-        entity_type: "processo", 
+        processo_evento_id: Number(processoSel.processo_evento?.id),
+        entity_type: "processo_evento",
         solucionador_id: Number(formAtrib.solucionador_id),
         atribuicao_id: Number(formAtrib.proxima_atr_id),
         responsavel_id: Number(formAtrib.proximo_resp_id),
         data_inicial: new Date().toISOString(),
         prazo: formAtrib.prazo,
+        horario: formAtrib.horario || null,   // ✅ novo campo sendo enviado
       });
+      
       
       // Após POST, atualize o processo inteiro
       const atualizado = await fetchProcessoById(processoSel.id);
@@ -520,10 +546,14 @@ const salvar = async () => {
       data_distribuicao: form.data_distribuicao,
       data_publicacao: form.data_publicacao,
       comarca: form.comarca,
-      prazo_juridico: form.prazo_juridico,
-      prazo_interno: form.prazo_interno,
-      prazo_fatal: form.prazo_fatal,
-      observacao: form.observacao
+      processo_evento: {
+        tipo: { tipo: form.etapa_tipo },
+        data_publicacao: form.etapa_publicacao,
+        prazo_juridico: form.prazo_juridico,
+        prazo_interno: form.prazo_interno,
+        prazo_fatal: form.prazo_fatal,
+        observacao: form.observacao
+      }
     };
     
 
@@ -785,110 +815,138 @@ const salvar = async () => {
 
               {/* Linha 1 - CNJ e Número do Contrato */}
               {/* Linha 1 - CNJ e Contrato */}
-              <div className="processo-input-row">
-                <LinhaInput label="Número (CNJ)">
-                  <Input
-                    className="processo-modal-input"
-                    value={form.numero || ""}
-                    onChange={(e) => setForm({ ...form, numero: e.target.value })}
+                <div className="processo-input-row">
+                  <LinhaInput label="Número (CNJ)">
+                    <Input
+                      className="processo-modal-input"
+                      value={form.numero || ""}
+                      onChange={(e) => setForm({ ...form, numero: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+
+                  <LinhaInput label="Contrato (nº ou ID)">
+                    <Input
+                      className="processo-modal-input"
+                      value={(form.contrato_numero || form.contrato_id || "").toString()}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          contrato_id: e.target.value,
+                          contrato_numero: ""
+                        })
+                      }
+                      placeholder="Ex.: C-2025-021 (ou ID)"
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+                </div>
+
+                {/* Linha 2 - Distribuição, Publicação e Comarca */}
+                <div className="processo-input-row triple">
+                  <LinhaInput label="Data de Distribuição">
+                    <Input
+                      type="date"
+                      className="processo-modal-input"
+                      value={form.data_distribuicao || ""}
+                      onChange={(e) => setForm({ ...form, data_distribuicao: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+
+                  <LinhaInput label="Data de Publicação">
+                    <Input
+                      type="date"
+                      className="processo-modal-input"
+                      value={form.data_publicacao || ""}
+                      onChange={(e) => setForm({ ...form, data_publicacao: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+
+                  <LinhaInput label="Comarca">
+                    <Input
+                      className="processo-modal-input"
+                      value={form.comarca || ""}
+                      onChange={(e) => setForm({ ...form, comarca: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+                </div>
+
+                {/* Nova seção - Etapa do Processo */}
+                <h4 className="processo-section-title">Etapa do Processo</h4>
+                  <div className="processo-input-row">
+                    <LinhaInput label="Etapa">
+                      <select
+                        className="processo-modal-input"
+                        value={form.etapa_tipo || ""}
+                        onChange={(e) => setForm({ ...form, etapa_tipo: e.target.value })}
+                        disabled={visualizando}
+                      >
+                        <option value="">Selecione…</option>
+                        {tiposEvento.map((t) => (
+                          <option key={t.id} value={t.tipo}>
+                            {t.tipo}
+                          </option>
+                        ))}
+                      </select>
+                    </LinhaInput>
+                    <LinhaInput label="Publicação">
+                      <Input
+                        type="date"
+                        className="processo-modal-input"
+                        value={form.etapa_publicacao || ""}
+                        onChange={(e) => setForm({ ...form, etapa_publicacao: e.target.value })}
+                        readOnly={visualizando}
+                      />
+                    </LinhaInput>
+                  </div>
+
+                {/* Linha 4 - Prazos */}
+                <div className="processo-input-row triple">
+                  <LinhaInput label="Prazo Jurídico (dias)">
+                    <Input
+                      type="number"
+                      className="processo-modal-input"
+                      value={form.prazo_juridico?.toString() || ""}
+                      onChange={(e) => setForm({ ...form, prazo_juridico: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+
+                  <LinhaInput label="Prazo Interno">
+                    <Input
+                      type="date"
+                      className="processo-modal-input"
+                      value={form.prazo_interno || ""}
+                      onChange={(e) => setForm({ ...form, prazo_interno: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+
+                  <LinhaInput label="Prazo Fatal">
+                    <Input
+                      type="date"
+                      className="processo-modal-input"
+                      value={form.prazo_fatal || ""}
+                      onChange={(e) => setForm({ ...form, prazo_fatal: e.target.value })}
+                      readOnly={visualizando}
+                    />
+                  </LinhaInput>
+                </div>
+
+                {/* Observação */}
+                <LinhaInput label="Observação">
+                  <textarea
+                    className="processo-textarea"
+                    rows={2}
+                    value={form.observacao || ""}
+                    onChange={(e) => setForm({ ...form, observacao: e.target.value })}
                     readOnly={visualizando}
                   />
                 </LinhaInput>
 
-                <LinhaInput label="Contrato (nº ou ID)">
-                  <Input
-                    className="processo-modal-input"
-                    value={(form.contrato_numero || form.contrato_id || "").toString()}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        contrato_id: e.target.value,   // se digitar, usamos como ID
-                        contrato_numero: ""            // digitou manualmente → limpa nº
-                      })
-                    }
-                    placeholder="Ex.: C-2025-021 (ou ID)"
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-              </div>
-
-
-              {/* Linha 2 - Datas */}
-              <div className="processo-input-row">
-                <LinhaInput label="Data de Distribuição">
-                  <Input
-                    type="date"
-                    className="processo-modal-input"
-                    value={form.data_distribuicao || ""}
-                    onChange={(e) => setForm({ ...form, data_distribuicao: e.target.value })}
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-
-                <LinhaInput label="Data de Publicação">
-                  <Input
-                    type="date"
-                    className="processo-modal-input"
-                    value={form.data_publicacao || ""}
-                    onChange={(e) => setForm({ ...form, data_publicacao: e.target.value })}
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-              </div>
-
-              {/* Linha 3 - Comarca */}
-              <LinhaInput label="Comarca">
-                <Input
-                  className="processo-modal-input"
-                  value={form.comarca || ""}
-                  onChange={(e) => setForm({ ...form, comarca: e.target.value })}
-                  readOnly={visualizando}
-                />
-              </LinhaInput>
-
-              {/* Linha 4 - Prazos */}
-              <div className="processo-input-row triple">
-                <LinhaInput label="Prazo Jurídico (dias)">
-                  <Input
-                    type="number"
-                    className="processo-modal-input"
-                    value={form.prazo_juridico?.toString() || ""}
-                    onChange={(e) => setForm({ ...form, prazo_juridico: e.target.value })}
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-
-                <LinhaInput label="Prazo Interno">
-                  <Input
-                    type="date"
-                    className="processo-modal-input"
-                    value={form.prazo_interno || ""}
-                    onChange={(e) => setForm({ ...form, prazo_interno: e.target.value })}
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-
-                <LinhaInput label="Prazo Fatal">
-                  <Input
-                    type="date"
-                    className="processo-modal-input"
-                    value={form.prazo_fatal || ""}
-                    onChange={(e) => setForm({ ...form, prazo_fatal: e.target.value })}
-                    readOnly={visualizando}
-                  />
-                </LinhaInput>
-              </div>
-
-              {/* Observação */}
-              <LinhaInput label="Observação">
-                <textarea
-                  className="processo-textarea"
-                  rows={2}
-                  value={form.observacao || ""}
-                  onChange={(e) => setForm({ ...form, observacao: e.target.value })}
-                  readOnly={visualizando}
-                />
-              </LinhaInput>
 
 
               {!visualizando && (
@@ -951,23 +1009,26 @@ const salvar = async () => {
                     })}
                   </ul>
 
-                    <div className="processo-right-actions">
-                      {!visualizando && editando && (
-                        <Button onClick={() => {
+                  <div className="processo-right-actions">
+                    {!visualizando && editando && (
+                      <Button
+                        onClick={() => {
                           setFormAtrib({
                             solucionador_id: "",
                             proxima_atr_id: "",
                             proximo_resp_id: "",
                             prazo: "",
+                            horario: "",      // ✅ zera o horário ao abrir o form
                             observacao: "",
                             ultimaEtapa: false,
                           });
                           setRightMode("new");
-                        }}>
-                          Próxima Atribuição
-                        </Button>
-                      )}
-                    </div>
+                        }}
+                      >
+                        Próxima Atribuição
+                      </Button>
+                    )}
+                  </div>
 
                 </>
               )}
@@ -1001,6 +1062,18 @@ const salvar = async () => {
                         readOnly={visualizando}
                       />
                     </div>
+
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Horário Agendado</label>
+                      <Input
+                        type="datetime-local"
+                        className="processo-modal-input"
+                        value={formAtrib.horario}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, horario: e.target.value })}
+                        readOnly={visualizando}
+                      />
+                    </div>
+
 
                     <div className="processo-input-wrapper">
                       <label className="processo-label">Solucionador</label>
@@ -1063,16 +1136,17 @@ const salvar = async () => {
 
                     <div className="processo-input-wrapper">
                       <label className="processo-label">Status</label>
-                      <select
-                        className="processo-modal-input"
-                        value={formAtrib.proxima_atr_id}
-                        onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
-                      >
-                        <option value="">Selecione…</option>
-                        {tiposEvento.map((t) => (
-                          <option key={t.id} value={t.id}>{t.tipo}</option>
-                        ))}
-                      </select>
+                        <select
+                          className="processo-modal-input"
+                          value={formAtrib.proxima_atr_id}
+                          onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
+                        >
+                          <option value="">Selecione…</option>
+                          {tiposAtribuicao.map((t) => (
+                            <option key={t.id} value={t.id}>{t.descricao}</option>
+                          ))}
+                        </select>
+
                     </div>
 
                     <div className="processo-input-wrapper">
@@ -1098,7 +1172,17 @@ const salvar = async () => {
                         onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
                       />
                     </div>
+                    {/* ✅ NOVO CAMPO */}
+                    <div className="processo-input-wrapper">
+                      <label className="processo-label">Horário Agendado</label>
+                      <Input
+                        type="datetime-local"
+                        className="processo-modal-input"
+                        value={formAtrib.horario}
+                        onChange={(e) => setFormAtrib({ ...formAtrib, horario: e.target.value })}
+                      />
                     </div>
+                  </div>
 
 
                   <div className="processo-right-actions">

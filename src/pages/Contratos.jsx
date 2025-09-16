@@ -949,6 +949,11 @@ const handleAtualizarAtribuicao = async () => {
                             <div className="atr-conteudo">
                               <div className="atr-desc">{a.atribuicao_descricao}</div>
                               <div className="atr-lista">
+                                {a?.status && (
+                                  <div className="atr-linha">
+                                    <span className="atr-status">{a.status}</span>
+                                  </div>
+                                )}
                                 <div className="atr-linha">
                                   <span className="atr-label">Definida em</span>
                                   <span className="atr-valor">{dataStr}</span>

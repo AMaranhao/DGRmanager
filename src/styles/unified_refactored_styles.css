@@ -1134,6 +1134,24 @@ button.absolute.top-4.right-4 {
   color: #fff;
 }
 
+.atr-status {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  display: block;
+  text-transform: lowercase;
+}
+
+.atr-status.em_andamento {
+  color: #1d4ed8; /* azul */
+}
+
+.atr-status.finalizado {
+  color: #22c55e; /* verde */
+}
+
+
+
+
 .tabela-acoes-wrapper {
   display: flex;
   gap: 8px; /* define o espaçamento horizontal entre os botões */
