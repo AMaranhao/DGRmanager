@@ -40,3 +40,8 @@ export async function updateProcesso(id, data) {
 export async function deleteProcesso(id) {
   return await del(`${BASE_URL}/${id}`);
 }
+
+// 🔹 Novo endpoint para tipos de evento
+export async function fetchTiposEventoProcesso() {
+  return await get("/tipo-processo-evento");
+}

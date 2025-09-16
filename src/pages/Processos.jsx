@@ -19,7 +19,8 @@ import {
   fetchAndamentos,
 } from "@/services/ENDPOINTS_ServiceProcessos";
 
-import { fetchAtribuicoesProcesso } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+import { fetchTiposEventoProcesso } from "@/services/ENDPOINTS_ServiceProcessos";
+
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
 import {
@@ -90,12 +91,13 @@ function getPartePrincipal(proc) {
   return autor || partes[0] || null;
 }
 
-function fmtDM(raw) {
+function fmtDMY(raw) {
   const ymd = toYMD(raw);
   if (!ymd) return "-";
   const [yyyy, mm, dd] = ymd.split("-");
-  return `${dd}/${mm}`;
+  return `${dd}/${mm}/${yyyy.slice(-2)}`; // dd/mm/aa
 }
+
 
 export default function Processos() {
   const [lista, setLista] = useState([]);
@@ -108,7 +110,7 @@ export default function Processos() {
   const [fDataFim, setFDataFim] = useState("");
 
   const [fStatus, setFStatus] = useState("");
-  const [atribs, setAtribs] = useState([]);
+  const [tiposEvento, setTiposEvento] = useState([]);
 
   // modal
   const [modalAberto, setModalAberto] = useState(false);
@@ -203,21 +205,15 @@ export default function Processos() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await fetchAtribuicoesProcesso();
-        setAtribs(Array.isArray(data) ? data : []);
+        const data = await fetchTiposEventoProcesso();
+        setTiposEvento(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.error("Falha ao carregar atribuições:", e);
-        setAtribs([]);
-      }
-      try {
-        const users = await fetchColaboradores();
-        setColabs(Array.isArray(users) ? users : []);
-      } catch (e) {
-        console.error("Falha ao carregar colaboradores:", e);
-        setColabs([]);
+        console.error("Falha ao carregar tipos de evento:", e);
+        setTiposEvento([]);
       }
     })();
   }, []);
+  
   
   useEffect(() => {
     if (modalAberto && editando && salvarRef.current) {
@@ -263,8 +259,9 @@ export default function Processos() {
       const alvoResp = norm(p?.responsavel_atual?.nome ?? p?.responsavel?.nome ?? "");
       const okResp = resp ? alvoResp.includes(resp) : true;
 
-      const alvoStatus = norm(p?.status_atual ?? "");
+      const alvoStatus = norm(p?.processo_evento?.tipo?.tipo ?? "");
       const okStatus = status ? alvoStatus === status : true;
+
 
       const prazoYMD = toYMD(p?.prazo_interno);
       const iniYMD   = toYMD(fDataIni);
@@ -695,9 +692,9 @@ const salvar = async () => {
               title="Filtrar por status"
             >
               <option value="">Todos os Status</option>
-              {(atribs || []).map((a) => (
-                <option key={a.id} value={a.descricao}>{a.descricao}</option>
-              ))}
+                {(tiposEvento || []).map((t) => (
+                  <option key={t.id} value={t.tipo}>{t.tipo}</option>
+                ))}
             </select>
             {fStatus && (
               <button
@@ -1072,8 +1069,8 @@ const salvar = async () => {
                         onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
                       >
                         <option value="">Selecione…</option>
-                        {atribs.map((a) => (
-                          <option key={a.id} value={a.id}>{a.descricao}</option>
+                        {tiposEvento.map((t) => (
+                          <option key={t.id} value={t.id}>{t.tipo}</option>
                         ))}
                       </select>
                     </div>
@@ -1277,9 +1274,13 @@ const salvar = async () => {
                 <tr key={p.id}>
                   <td className="processo-col-cnj">{p.numero ?? p.numero_cnj}</td>
                   <td className="processo-col-parte-principal">{(getPartePrincipal(p)?.nome) ?? "-"}</td>
-                  <td className="processo-col-status">{p.status_atual ?? "-"}</td>
+                  <td className="processo-col-status">
+                    {p.processo_evento?.tipo?.tipo ?? "-"}
+                  </td>
                   <td className="processo-col-comarca">{p.comarca ?? "-"}</td>
-                  <td className="processo-col-prazo-interno">{fmtDM(p.prazo_interno)}</td>
+                  <td className="processo-col-prazo-interno">
+                    {fmtDMY(p.processo_evento?.prazo_fatal)}
+                  </td>
                   <td className="processo-col-responsavel-processo">
                     {p.responsavel_atual?.nome ?? p.responsavel?.nome ?? "-"}
                   </td>
