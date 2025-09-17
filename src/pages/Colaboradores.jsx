@@ -247,10 +247,18 @@ export default function Colaboradores() {
                 Novo Colaborador
               </Button>
             </DialogTrigger>
-          <DialogContent
-            className="dashboard-modal dashboard-no-close"
-            onOpenAutoFocus={(e) => e.preventDefault()}
-          >
+            <DialogContent
+              className="dashboard-modal dashboard-no-close"
+              onOpenAutoFocus={(e) => {
+                if (modoVisualizacao || editando) {
+                  e.preventDefault(); // Impede foco automático
+                  requestAnimationFrame(() => {
+                    document.activeElement?.blur(); // Garante que nada fique focado
+                  });
+                }
+              }}
+            >
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
