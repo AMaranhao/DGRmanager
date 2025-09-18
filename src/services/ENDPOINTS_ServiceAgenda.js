@@ -8,6 +8,11 @@ export async function getAgenda(params = {}) {
   return await get(BASE_URL, { params });
 }
 
+// GET /agenda-definicao → dados auxiliares para renderizar a agenda (status, tipos, cores, etc)
+export async function getAgendaDefinicao() {
+  return await get(`${BASE_URL}-definicao`);
+}
+
 // GET /agenda/:colaborador_id → compromissos filtrados por colaborador
 export async function getAgendaByColaborador(colaborador_id) {
   return await get(`${BASE_URL}/colaborador/${colaborador_id}`);

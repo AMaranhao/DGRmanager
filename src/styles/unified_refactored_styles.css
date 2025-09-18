@@ -2538,14 +2538,7 @@ input[type="date"].acordo-modal-input {
   gap: 0.5rem; /* espaço entre ícone e texto */
 }
 
-/* Tabs (linha de botões) */
-.agenda-main-header {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
+
 
 /* Seções */
 .agenda-section {
@@ -2705,3 +2698,65 @@ input[type="date"].acordo-modal-input {
 }
 
 .dark .agenda-item-meta { color: #9ca3af; }
+
+
+.agenda-main-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+
+
+.agenda-nav-center {
+  display: flex;
+  justify-content: center; /* centraliza dentro do espaço da esquerda */
+  align-items: center;
+  flex: 1; /* ocupa espaço central */
+  gap: 0.5rem;
+}
+
+.agenda-tabs {
+  display: flex;
+  justify-content: flex-end;
+  align-self: flex-end;  
+  gap: 0.5rem;
+}
+
+
+.agenda-grid-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.agenda-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.agenda-arrow:hover {
+  background: #f3f4f6;
+}
+
+.agenda-arrow.left {
+  left: -3rem; /* ajuste conforme seu layout */
+}
+
+.agenda-arrow.right {
+  right: -3rem; /* ajuste conforme seu layout */
+}
