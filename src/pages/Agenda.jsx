@@ -2,6 +2,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 
+import { useAuth } from "@/contexts/AuthContext";
 
 import { getAgenda, getAgendaDefinicao } from "@/services/ENDPOINTS_ServiceAgenda";
 
@@ -239,6 +240,13 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset }) {
 export default function Agenda() {
   const [abaAtiva, setAbaAtiva] = useState("pessoal");
   const [semanaOffset, setSemanaOffset] = useState(0);
+
+  const { user } = useAuth(); // 👈 agora vem do contexto
+
+  useEffect(() => {
+    console.log("🔎 Usuário logado:", user);
+  }, [user]);
+
 
   const tituloAba = {
     pessoal: "👤 Minha Agenda",

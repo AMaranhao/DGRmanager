@@ -47,19 +47,24 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
 
       if (data?.token && data?.refreshToken) {
+        // 🔒 Tokens ficam separados
         localStorage.setItem('token', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-
+      
+        // 👤 User contém só informações de perfil
         const userData = {
+          id: data.id,
           nome: data.nome,
           cargo: data.cargo,
           permissoes: data.permissoes || [],
         };
-
+      
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
+      
         navigate('/agenda');
-      } else {
+      }
+       else {
         throw new Error('Usuário ou senha inválidos');
       }
     } catch (error) {
