@@ -60,7 +60,7 @@ export default function Sidebar() {
     <aside className="sidebar noprint">
       {/* Logo */}
       <Link to="/agenda" className="sidebar-logo-container">
-        <img src="/logo_dgr.png" alt="Logo DGR" className="sidebar-logo" />
+        <img src="/TyrHub_Sidebar.png" alt="Logo DGR" className="sidebar-logo" />
       </Link>
 
       {/* Ícones */}

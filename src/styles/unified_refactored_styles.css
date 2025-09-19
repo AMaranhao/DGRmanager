@@ -2674,6 +2674,7 @@ input[type="date"].acordo-modal-input {
 .agenda-card-title {
   font-weight: 600;
   margin-bottom: 0.5rem;
+  margin-top: 0.05rem !important;
   text-align: center;
   width: 100%;
 }
@@ -2695,19 +2696,42 @@ input[type="date"].acordo-modal-input {
 }
 
 .agenda-item {
-  width: 90%;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;   /* organiza entity/descrição em cima e responsável embaixo */
+  justify-content: center;  /* centraliza verticalmente */
+  align-items: flex-start;  /* alinha texto à esquerda */
+  width: 230px;              /* ocupa toda largura do card */
+  height: 40px;             /* altura fixa → ajuste se quiser maior/menor */
+  padding: 0.25rem 0.5rem;  /* espaço interno */
+  margin-bottom: 0rem;   /* espaçamento entre os itens */
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  font-weight: 500;
 }
 
-.agenda-item-text { font-weight: 500; }
-.agenda-item-meta { font-size: 0.75rem; color: #555; }
+.agenda-item-horario {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;  /* cinza escuro */
+}
 
-/* Cores específicas */
+.agenda-item-topo {
+  font-weight: 600;
+  color: #111827; /* cinza bem escuro */
+  margin-bottom: 0.2rem;
+}
+
+.agenda-item-responsavel {
+  font-size: 0.75rem;
+  color: #374151; /* cinza médio */
+}
+
+/* cores */
 .agenda-item-vermelho { background: #fee2e2; }
 .agenda-item-azul { background: #dbeafe; }
 .agenda-item-verde { background: #dcfce7; }
+
 
 /* Dark mode */
 .dark .agenda-tabela-wrapper,

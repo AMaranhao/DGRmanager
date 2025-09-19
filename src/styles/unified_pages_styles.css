@@ -497,7 +497,7 @@
 
 .login-header {
   /* espaço entre as imagens */
-    padding-right: 1rem;
+    padding-right: 2.5rem;
   align-items: center;
   display: flex;
   gap: 1rem;
@@ -511,7 +511,7 @@
 
 .login-logo-cliente.grande {
   /* maior */
-  height: 4rem;
+  height: 8rem;
 }
 
 .login-logo-dgr.grande {

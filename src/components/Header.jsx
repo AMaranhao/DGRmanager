@@ -33,10 +33,14 @@ export default function Header() {
 
       <div className="header-center">
         <h1 className="header-title-with-logo">
-          <span>DGR Manager - </span>
+          <img
+            src={"/TyrHub_sem_fundo.png"}
+            alt="Logo TyrHub"
+            className="header-logo"
+          />
           <img
             src={isDark ? "/logo_finsol_dark.png" : "/logo_finsol.png"}
-            alt="Logo HC"
+            alt="Logo Finsol"
             className="header-logo"
           />
         </h1>

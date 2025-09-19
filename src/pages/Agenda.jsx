@@ -157,42 +157,106 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
                   month: "2-digit",
                 })}
               </h3>
-              <ul className="agenda-lista">
-                {(() => {
-                  const chave = dia.toISOString().split("T")[0];
-                  const eventos = compromissosPorDia[chave] || [];
+                <ul className="agenda-lista">
+                  {(() => {
+                    const chave = dia.toISOString().split("T")[0];
+                    let eventos = compromissosPorDia[chave] || [];
 
-                  if (eventos.length === 0) {
+                    if (eventos.length === 0) {
+                      return (
+                        <li className="agenda-item agenda-item-azul">
+                          <span className="agenda-item-texto">🔵 Nenhum compromisso</span>
+                        </li>
+                      );
+                    }
+
+                    // ---- ORDENAR EVENTOS ----
+                    eventos = [...eventos].sort((a, b) => {
+                      const isAudA =
+                        a.entity_type === "processo" &&
+                        a.descricao?.toLowerCase().includes("audiencia");
+                      const isAudB =
+                        b.entity_type === "processo" &&
+                        b.descricao?.toLowerCase().includes("audiencia");
+
+                      if (isAudA && !isAudB) return -1;
+                      if (!isAudA && isAudB) return 1;
+
+                      if (isAudA && isAudB) {
+                        const hA = a.horario ? new Date(a.horario).getTime() : 0;
+                        const hB = b.horario ? new Date(b.horario).getTime() : 0;
+                        return hA - hB;
+                      }
+
+                      if (a.status === "pendente" && b.status !== "pendente") return -1;
+                      if (b.status === "pendente" && a.status !== "pendente") return 1;
+
+                      if (a.status === "resolvido" && b.status !== "resolvido") return 1;
+                      if (b.status === "resolvido" && a.status !== "resolvido") return -1;
+
+                      return 0;
+                    });
+
+                    // ---- LIMITAR EXIBIÇÃO ----
+                    const temMais = eventos.length > 8;
+                    const eventosVisiveis = temMais ? eventos.slice(0, 7) : eventos;
+
                     return (
-                      <li className="agenda-item agenda-item-azul">
-                        <p className="agenda-item-text">🔵 Nenhum compromisso</p>
-                      </li>
-                    );
-                  }
+                      <>
+                        {eventosVisiveis.map((evento, i) => {
+                          let corClasse = "";
+                          switch (evento.status) {
+                            case "com_hora":
+                              corClasse = "agenda-item-vermelho";
+                              break;
+                            case "resolvido":
+                              corClasse = "agenda-item-verde";
+                              break;
+                            case "pendente":
+                            default:
+                              corClasse = "agenda-item-azul";
+                              break;
+                          }
+                          
 
-                  return eventos.map((evento, i) => {
-                    const corClasse =
-                      evento.status === "com_hora"
-                        ? "agenda-item-vermelho"
-                        : evento.status === "pendente"
-                        ? "agenda-item-azul"
-                        : "agenda-item-verde";
+                          const horario =
+                            evento.entity_type === "processo" &&
+                            evento.descricao?.toLowerCase().includes("audiencia") &&
+                            evento.horario
+                              ? new Date(evento.horario).toLocaleTimeString("pt-BR", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : null;
 
-                    return (
-                      <li key={i} className={`agenda-item ${corClasse}`}>
-                        <p className="agenda-item-text">
-                          {evento.descricao}
-                        </p>
-                        {evento.responsavel?.nome && (
-                          <p className="agenda-item-meta">
-                            Resp.: {evento.responsavel.nome}
-                          </p>
+                          return (
+                            <li key={i} className={`agenda-item ${corClasse}`}>
+                              <span className="agenda-item-texto">
+                                {evento.entity_type} → {evento.descricao}
+                                {horario ? ` ${horario}` : ""}
+                              </span>
+                              <div>{evento.responsavel?.nome || "—"}</div>
+                            </li>
+                          );
+                        })}
+
+                        {temMais && (
+                          <li
+                            className="agenda-item agenda-item-azul cursor-pointer"
+                            onClick={() => {
+                              setEventosExtras(eventos);
+                              setMostrarModal(true);
+                            }}
+                          >
+                            <span className="agenda-item-texto">+ Mais Atribuições</span>
+                          </li>
                         )}
-                      </li>
+                      </>
                     );
-                  });
-                })()}
-              </ul>
+                  })()}
+
+                </ul>
+
             </div>
           ))}
         </div>
@@ -212,10 +276,13 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
 
 
 
+
 function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
   const diasSemana = getDiasSemana(semanaOffset);
   const [compromissos, setCompromissos] = useState([]);
   const [colaboradores, setColaboradores] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [eventosExtras, setEventosExtras] = useState([]);
 
   useEffect(() => {
     async function carregarColaboradores() {
@@ -271,7 +338,7 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
         </button>
 
         <div className="agenda-grid">
-          {diasSemana.map((dia, idx) => (
+          {diasSemana.slice(0, 7).map((dia, idx) => (
             <div key={idx} className="agenda-card">
               <h3 className="agenda-card-title">
                 {dia.toLocaleDateString("pt-BR", {
@@ -280,44 +347,126 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
                   month: "2-digit",
                 })}
               </h3>
-              <ul className="agenda-lista">
-                {(() => {
-                  const chave = dia.toISOString().split("T")[0];
-                  const eventos = compromissosPorDia[chave] || [];
+                <ul className="agenda-lista">
+                  {(() => {
+                    const chave = dia.toISOString().split("T")[0];
+                    let eventos = compromissosPorDia[chave] || [];
 
-                  if (eventos.length === 0) {
+                    if (eventos.length === 0) {
+                      return (
+                        <li className="agenda-item agenda-item-azul">
+                          <span className="agenda-item-texto">🔵 Nenhum compromisso</span>
+                        </li>
+                      );
+                    }
+
+                    // ---- ORDENAR EVENTOS ----
+                    eventos = [...eventos].sort((a, b) => {
+                      const isAudA =
+                        a.entity_type === "processo" &&
+                        a.descricao?.toLowerCase().includes("audiencia");
+                      const isAudB =
+                        b.entity_type === "processo" &&
+                        b.descricao?.toLowerCase().includes("audiencia");
+
+                      if (isAudA && !isAudB) return -1;
+                      if (!isAudA && isAudB) return 1;
+
+                      if (isAudA && isAudB) {
+                        const hA = a.horario ? new Date(a.horario).getTime() : 0;
+                        const hB = b.horario ? new Date(b.horario).getTime() : 0;
+                        return hA - hB;
+                      }
+
+                      if (a.status === "pendente" && b.status !== "pendente") return -1;
+                      if (b.status === "pendente" && a.status !== "pendente") return 1;
+
+                      if (a.status === "resolvido" && b.status !== "resolvido") return 1;
+                      if (b.status === "resolvido" && a.status !== "resolvido") return -1;
+
+                      return 0;
+                    });
+
+                    // ---- LIMITAR EXIBIÇÃO ----
+                    const temMais = eventos.length > 8;
+                    const eventosVisiveis = temMais ? eventos.slice(0, 7) : eventos;
+
                     return (
-                      <li className="agenda-item agenda-item-azul">
-                        <p className="agenda-item-text">🔵 Nenhum compromisso</p>
-                      </li>
-                    );
-                  }
+                      <>
+                        {eventosVisiveis.map((evento, i) => {
+                          let corClasse = "";
+                          switch (evento.status) {
+                            case "com_hora":
+                              corClasse = "agenda-item-vermelho";
+                              break;
+                            case "resolvido":
+                              corClasse = "agenda-item-verde";
+                              break;
+                            case "pendente":
+                            default:
+                              corClasse = "agenda-item-azul";
+                              break;
+                          }
+                          
 
-                  return eventos.map((evento, i) => {
-                    const corClasse =
-                      evento.status === "com_hora"
-                        ? "agenda-item-vermelho"
-                        : evento.status === "pendente"
-                        ? "agenda-item-azul"
-                        : "agenda-item-verde";
+                          const horario =
+                            evento.entity_type === "processo" &&
+                            evento.descricao?.toLowerCase().includes("audiencia") &&
+                            evento.horario
+                              ? new Date(evento.horario).toLocaleTimeString("pt-BR", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : null;
 
-                    return (
-                      <li key={i} className={`agenda-item ${corClasse}`}>
-                        <p className="agenda-item-text">
-                          {evento.descricao}
-                        </p>
-                        {evento.responsavel?.nome && (
-                          <p className="agenda-item-meta">
-                            Resp.: {evento.responsavel.nome}
-                          </p>
+                          return (
+                            <li key={i} className={`agenda-item ${corClasse}`}>
+                              <span className="agenda-item-texto">
+                                {evento.entity_type} → {evento.descricao}
+                                {horario ? ` ${horario}` : ""}
+                              </span>
+                              <div>{evento.responsavel?.nome || "—"}</div>
+                            </li>
+                          );
+                        })}
+
+                        {temMais && (
+                          <li
+                            className="agenda-item agenda-item-azul cursor-pointer"
+                            onClick={() => {
+                              setEventosExtras(eventos);
+                              setMostrarModal(true);
+                            }}
+                          >
+                            <span className="agenda-item-texto">+ Mais Atribuições</span>
+                          </li>
                         )}
-                      </li>
+                      </>
                     );
-                  });
-                })()}
-              </ul>
+                  })()}
+
+                </ul>
+
             </div>
           ))}
+
+          {/* Card extra */}
+          {diasSemana.length > 7 && (
+            <div
+              className="agenda-card agenda-card-extra"
+              onClick={() => {
+                const extras = diasSemana.slice(7).map((dia) => {
+                  const chave = dia.toISOString().split("T")[0];
+                  return compromissosPorDia[chave] || [];
+                }).flat();
+                setEventosExtras(extras);
+                setMostrarModal(true);
+              }}
+            >
+              <h3 className="agenda-card-title">+ Mais</h3>
+              <p className="agenda-item-texto">Clique para ver atribuições extras</p>
+            </div>
+          )}
         </div>
 
         <button
@@ -327,9 +476,35 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
           ➡️
         </button>
       </div>
+
+      {/* Modal */}
+      {mostrarModal && (
+        <div className="agenda-modal-overlay" onClick={() => setMostrarModal(false)}>
+          <div className="agenda-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="agenda-modal-title">Atribuições Extras</h3>
+            <ul className="agenda-modal-lista">
+              {eventosExtras.map((evento, idx) => (
+                <li key={idx} className="agenda-item agenda-item-azul">
+                  <span className="agenda-item-texto">
+                    {evento.entity_type} → {evento.descricao}
+                  </span>
+                  <div>{evento.responsavel?.nome || "—"}</div>
+                </li>
+              ))}
+            </ul>
+            <button
+              className="agenda-modal-fechar"
+              onClick={() => setMostrarModal(false)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 

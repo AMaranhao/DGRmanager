@@ -72,7 +72,7 @@ export default function LoginPage() {
       <div className="login-box">
       <div className="login-header">
         <img src="/logo_dgr.png" alt="Logo principal" className="login-logo-dgr grande" />
-        <img src="/logo_finsol.png" alt="Logo Finsol" className="login-logo-cliente grande" />
+        <img src="/TyrHub_sem_fundo.png" alt="Logo Finsol" className="login-logo-cliente grande" />
       </div>
 
 
