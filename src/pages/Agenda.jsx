@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 
 import { useAuth } from "@/contexts/AuthContext";
 
-import { getAgenda, getAgendaDefinicao } from "@/services/ENDPOINTS_ServiceAgenda";
+import { getAgenda, getAgendaByColaborador, getAgendaDefinicao } from "@/services/ENDPOINTS_ServiceAgenda";
+import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
+
 
 import "@/styles/unified_refactored_styles.css";
 
@@ -29,6 +31,21 @@ function getDiasSemana(offset = 0) {
 
 
 function AgendaDesignacao() {
+  const [definicoes, setDefinicoes] = useState([]);
+
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const resDefinicao = await getAgendaDefinicao();
+        setDefinicoes(resDefinicao);
+      } catch (err) {
+        console.error("Erro ao carregar designações:", err);
+      }
+    }
+
+    carregarDados();
+  }, []);
+
   return (
     <div className="agenda-section">
       <div className="agenda-tabela-wrapper">
@@ -43,21 +60,38 @@ function AgendaDesignacao() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="agenda-col-tipo">processo</td>
-              <td className="agenda-col-descricao">Audiência</td>
-              <td className="agenda-col-responsavel">—</td>
-              <td className="agenda-col-numero">08111-89.2025.8.17.0001</td>
-              <td className="agenda-col-acoes">
-                <div className="agenda-acoes-wrapper">
-                  <select className="agenda-input agenda-select">
-                    <option>Selecione</option>
-                  </select>
-                  <input type="date" className="agenda-input agenda-date" />
-                  <Button size="sm" className="tabela-acao-botao">Salvar</Button>
-                </div>
-              </td>
-            </tr>
+            {definicoes.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="agenda-col-vazio">
+                  Nenhuma definição encontrada
+                </td>
+              </tr>
+            ) : (
+              definicoes.map((item, idx) => (
+                <tr key={idx}>
+                  <td className="agenda-col-tipo">{item.entity_type}</td>
+                  <td className="agenda-col-descricao">{item.descricao}</td>
+                  <td className="agenda-col-responsavel">
+                    {item.responsavel?.nome || "—"}
+                  </td>
+                  <td className="agenda-col-numero">{item.entidade?.numero}</td>
+                  <td className="agenda-col-acoes">
+                    <div className="agenda-acoes-wrapper">
+                      <select className="agenda-input agenda-select">
+                        <option>Selecione</option>
+                      </select>
+                      <input
+                        type="date"
+                        className="agenda-input agenda-date"
+                      />
+                      <Button size="sm" className="tabela-acao-botao">
+                        Salvar
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -66,40 +100,35 @@ function AgendaDesignacao() {
 }
 
 
+
 function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const diasSemana = getDiasSemana(semanaOffset);
   const [compromissos, setCompromissos] = useState([]);
-  const [definicoes, setDefinicoes] = useState({});
+  const { user } = useAuth();
 
   useEffect(() => {
     async function carregarDados() {
       try {
-        const [resAgenda, resDefinicao] = await Promise.all([
-          getAgenda(),
-          getAgendaDefinicao()
-        ]);
-
-        setCompromissos(resAgenda);         // lista de compromissos
-        setDefinicoes(resDefinicao);        // ex: tipos, status, cores etc
-
+        if (!user?.id) return;
+        const resAgenda = await getAgendaByColaborador(user.id);
+        setCompromissos(resAgenda);
       } catch (err) {
-        console.error("Erro ao carregar agenda:", err);
+        console.error("Erro ao carregar agenda pessoal:", err);
       }
     }
 
     carregarDados();
-  }, []);
+  }, [user]);
 
   const compromissosPorDia = useMemo(() => {
     const mapa = {};
-
     diasSemana.forEach((dia) => {
-      const chave = dia.toISOString().split("T")[0]; // yyyy-mm-dd
+      const chave = dia.toISOString().split("T")[0];
       mapa[chave] = [];
     });
 
     compromissos.forEach((evento) => {
-      const data = evento.data?.split("T")[0];
+      const data = evento.data_definida?.split("T")[0];
       if (mapa[data]) {
         mapa[data].push(evento);
       }
@@ -108,11 +137,9 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
     return mapa;
   }, [diasSemana, compromissos]);
 
-
   return (
     <div className="agenda-section">
       <div className="agenda-grid-wrapper">
-        {/* Botão Esquerda */}
         <button
           className="agenda-arrow left"
           onClick={() => setSemanaOffset(semanaOffset - 1)}
@@ -120,88 +147,6 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
           ⬅️
         </button>
 
-        {/* Grid de Dias */}
-        <div className="agenda-grid">
-          {diasSemana.map((dia, idx) => (
-            <div key={idx} className="agenda-card">
-              <h3 className="agenda-card-title">
-                {dia.toLocaleDateString("pt-BR", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                })}
-              </h3>
-                <ul className="agenda-lista">
-                  {(() => {
-                    const chave = dia.toISOString().split("T")[0];
-                    const eventos = compromissosPorDia[chave] || [];
-
-                    if (eventos.length === 0) {
-                      return (
-                        <li className="agenda-item agenda-item-azul">
-                          <p className="agenda-item-text">🔵 Nenhum compromisso</p>
-                        </li>
-                      );
-                    }
-
-                    return eventos.map((evento, i) => {
-                      const tipo = evento.tipo || "default";
-                      const corClasse =
-                        tipo === "audiencia"
-                          ? "agenda-item-vermelho"
-                          : tipo === "atribuição"
-                          ? "agenda-item-azul"
-                          : "agenda-item-verde"; // ajuste conforme sua definição
-
-                      return (
-                        <li key={i} className={`agenda-item ${corClasse}`}>
-                          <p className="agenda-item-text">
-                            {evento.icone || "🔹"} {evento.titulo || evento.descricao}
-                          </p>
-                          {evento.responsavel && (
-                            <p className="agenda-item-meta">Resp.: {evento.responsavel}</p>
-                          )}
-                        </li>
-                      );
-                    });
-                  })()}
-                </ul>
-
-            </div>
-          ))}
-        </div>
-
-        {/* Botão Direita */}
-        <button
-          className="agenda-arrow right"
-          onClick={() => setSemanaOffset(semanaOffset + 1)}
-        >
-          ➡️
-        </button>
-      </div>
-
-    </div>
-  );
-}
-
-
-
-
-function AgendaEquipe({ semanaOffset, setSemanaOffset }) {
-  const diasSemana = getDiasSemana(semanaOffset);
-
-  return (
-    <div className="agenda-section">
-      <div className="agenda-grid-wrapper">
-        {/* Botão Esquerda */}
-        <button
-          className="agenda-arrow left"
-          onClick={() => setSemanaOffset(semanaOffset - 1)}
-        >
-          ⬅️
-        </button>
-
-        {/* Grid de Dias */}
         <div className="agenda-grid">
           {diasSemana.map((dia, idx) => (
             <div key={idx} className="agenda-card">
@@ -213,15 +158,45 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset }) {
                 })}
               </h3>
               <ul className="agenda-lista">
-                <li className="agenda-item agenda-item-azul">
-                  <p className="agenda-item-text">🔵 Nenhum compromisso</p>
-                </li>
+                {(() => {
+                  const chave = dia.toISOString().split("T")[0];
+                  const eventos = compromissosPorDia[chave] || [];
+
+                  if (eventos.length === 0) {
+                    return (
+                      <li className="agenda-item agenda-item-azul">
+                        <p className="agenda-item-text">🔵 Nenhum compromisso</p>
+                      </li>
+                    );
+                  }
+
+                  return eventos.map((evento, i) => {
+                    const corClasse =
+                      evento.status === "com_hora"
+                        ? "agenda-item-vermelho"
+                        : evento.status === "pendente"
+                        ? "agenda-item-azul"
+                        : "agenda-item-verde";
+
+                    return (
+                      <li key={i} className={`agenda-item ${corClasse}`}>
+                        <p className="agenda-item-text">
+                          {evento.descricao}
+                        </p>
+                        {evento.responsavel?.nome && (
+                          <p className="agenda-item-meta">
+                            Resp.: {evento.responsavel.nome}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
           ))}
         </div>
 
-        {/* Botão Direita */}
         <button
           className="agenda-arrow right"
           onClick={() => setSemanaOffset(semanaOffset + 1)}
@@ -229,24 +204,156 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset }) {
           ➡️
         </button>
       </div>
-
-
     </div>
   );
 }
 
 
 
+
+
+function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
+  const diasSemana = getDiasSemana(semanaOffset);
+  const [compromissos, setCompromissos] = useState([]);
+  const [colaboradores, setColaboradores] = useState([]);
+
+  useEffect(() => {
+    async function carregarColaboradores() {
+      try {
+        const res = await fetchColaboradores();
+        setColaboradores(res);
+      } catch (err) {
+        console.error("Erro ao carregar colaboradores:", err);
+      }
+    }
+    carregarColaboradores();
+  }, []);
+
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const resAgenda = await getAgenda();
+        setCompromissos(resAgenda);
+      } catch (err) {
+        console.error("Erro ao carregar agenda da equipe:", err);
+      }
+    }
+    carregarDados();
+  }, []);
+
+  const compromissosPorDia = useMemo(() => {
+    const mapa = {};
+    diasSemana.forEach((dia) => {
+      const chave = dia.toISOString().split("T")[0];
+      mapa[chave] = [];
+    });
+
+    compromissos.forEach((evento) => {
+      const data = evento.data_definida?.split("T")[0];
+      if (mapa[data]) {
+        if (!responsavelFiltro || evento.responsavel?.id === Number(responsavelFiltro)) {
+          mapa[data].push(evento);
+        }
+      }
+    });
+
+    return mapa;
+  }, [diasSemana, compromissos, responsavelFiltro]);
+
+  return (
+    <div className="agenda-section">
+      <div className="agenda-grid-wrapper">
+        <button
+          className="agenda-arrow left"
+          onClick={() => setSemanaOffset(semanaOffset - 1)}
+        >
+          ⬅️
+        </button>
+
+        <div className="agenda-grid">
+          {diasSemana.map((dia, idx) => (
+            <div key={idx} className="agenda-card">
+              <h3 className="agenda-card-title">
+                {dia.toLocaleDateString("pt-BR", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                })}
+              </h3>
+              <ul className="agenda-lista">
+                {(() => {
+                  const chave = dia.toISOString().split("T")[0];
+                  const eventos = compromissosPorDia[chave] || [];
+
+                  if (eventos.length === 0) {
+                    return (
+                      <li className="agenda-item agenda-item-azul">
+                        <p className="agenda-item-text">🔵 Nenhum compromisso</p>
+                      </li>
+                    );
+                  }
+
+                  return eventos.map((evento, i) => {
+                    const corClasse =
+                      evento.status === "com_hora"
+                        ? "agenda-item-vermelho"
+                        : evento.status === "pendente"
+                        ? "agenda-item-azul"
+                        : "agenda-item-verde";
+
+                    return (
+                      <li key={i} className={`agenda-item ${corClasse}`}>
+                        <p className="agenda-item-text">
+                          {evento.descricao}
+                        </p>
+                        {evento.responsavel?.nome && (
+                          <p className="agenda-item-meta">
+                            Resp.: {evento.responsavel.nome}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  });
+                })()}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="agenda-arrow right"
+          onClick={() => setSemanaOffset(semanaOffset + 1)}
+        >
+          ➡️
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+// src/pages/Agenda.jsx
 export default function Agenda() {
   const [abaAtiva, setAbaAtiva] = useState("pessoal");
   const [semanaOffset, setSemanaOffset] = useState(0);
+  const [colaboradores, setColaboradores] = useState([]);
+  const [responsavelFiltro, setResponsavelFiltro] = useState("");
 
-  const { user } = useAuth(); // 👈 agora vem do contexto
+  const { user } = useAuth();
 
   useEffect(() => {
-    console.log("🔎 Usuário logado:", user);
-  }, [user]);
-
+    async function carregarColaboradores() {
+      try {
+        const res = await fetchColaboradores();
+        setColaboradores(res);
+      } catch (err) {
+        console.error("Erro ao carregar colaboradores:", err);
+      }
+    }
+    carregarColaboradores();
+  }, []);
 
   const tituloAba = {
     pessoal: "👤 Minha Agenda",
@@ -258,30 +365,50 @@ export default function Agenda() {
     <div className="agenda-main-wrapper">
       <h3 className="agenda-heading">{tituloAba[abaAtiva]}</h3>
 
-      {/* Cabeçalho com navegação e tabs */}
-      <div className="agenda-main-header">
+      {/* Cabeçalho com tabs e filtro */}
+      <div className="agenda-main-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* Botões de navegação */}
         <div className="agenda-tabs">
           <Button
             variant={abaAtiva === "pessoal" ? "default" : "outline"}
+            className="agenda-tabs-btn"
             onClick={() => setAbaAtiva("pessoal")}
           >
             👤 Minha Agenda
           </Button>
           <Button
             variant={abaAtiva === "equipe" ? "default" : "outline"}
+            className="agenda-tabs-btn"
             onClick={() => setAbaAtiva("equipe")}
           >
             👥 Agenda da Equipe
           </Button>
           <Button
             variant={abaAtiva === "designacao" ? "default" : "outline"}
+            className="agenda-tabs-btn"
             onClick={() => setAbaAtiva("designacao")}
           >
             📋 Designação
           </Button>
+          {/* Filtro aparece só na aba equipe */}
+          {abaAtiva === "equipe" && (
+            <select
+              value={responsavelFiltro}
+              onChange={(e) => setResponsavelFiltro(e.target.value)}
+              className="agenda-select"
+            >
+              <option value="">Todos os responsáveis</option>
+              {colaboradores.map((colab) => (
+                <option key={colab.id} value={colab.id}>
+                  {colab.nome}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
-      </div>
 
+
+      </div>
 
       {/* Renderização condicional */}
       {abaAtiva === "pessoal" && (
@@ -294,9 +421,9 @@ export default function Agenda() {
         <AgendaEquipe
           semanaOffset={semanaOffset}
           setSemanaOffset={setSemanaOffset}
+          responsavelFiltro={responsavelFiltro} // passa filtro como prop
         />
       )}
-
       {abaAtiva === "designacao" && <AgendaDesignacao />}
     </div>
   );

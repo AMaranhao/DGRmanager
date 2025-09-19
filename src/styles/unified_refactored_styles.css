@@ -2608,8 +2608,41 @@ input[type="date"].acordo-modal-input {
   background: white;
 }
 
-.agenda-select { min-width: 120px; }
+
 .agenda-date { min-width: 140px; }
+
+/* ======================== */
+/*   Select Padrão Agenda   */
+/* ======================== */
+.agenda-select {
+  background-color: white !important;
+  border-radius: 9999px !important;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: #111827; 
+  font-size: 0.9rem;
+  height: 2.25rem !important; /* altura total */
+  padding: 0 2rem 0 0.75rem;  /* remove padding-top/bottom, só lateral */
+  line-height: 2.25rem !important; /* igual à altura → centraliza */
+  width: 13rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='gray' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  background-position: right 0.75rem center;
+
+  /* Força centralização */
+  display: flex;
+  align-items: center;
+}
+
+/* Dark mode */
+.dark .agenda-select {
+  background-color: #1f2937;
+  border: 1px solid #4b5563;
+  color: #f9fafb;
+}
+
 
 /* ========================= */
 /*   Agenda – Grid & Cards   */
@@ -2700,13 +2733,7 @@ input[type="date"].acordo-modal-input {
 .dark .agenda-item-meta { color: #9ca3af; }
 
 
-.agenda-main-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
+
 
 
 
@@ -2718,12 +2745,7 @@ input[type="date"].acordo-modal-input {
   gap: 0.5rem;
 }
 
-.agenda-tabs {
-  display: flex;
-  justify-content: flex-end;
-  align-self: flex-end;  
-  gap: 0.5rem;
-}
+
 
 
 .agenda-grid-wrapper {
@@ -2759,4 +2781,65 @@ input[type="date"].acordo-modal-input {
 
 .agenda-arrow.right {
   right: -3rem; /* ajuste conforme seu layout */
+}
+
+
+
+
+
+
+
+
+
+.agenda-main-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: center;
+
+}
+
+.agenda-tabs {
+  display: flex;
+  align-self: flex-start !important;  
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.agenda-tabs-btn {
+  align-self: flex-start !important;  
+  height: 2.25rem !important;       /* aumentei um pouco a altura */
+  min-height: 2.25rem !important;
+  padding: 0.75rem 1.25rem !important;
+  line-height: 1.5rem !important;
+  font-size: 0.95rem;
+  border-radius: 9999px !important;
+  background: white;
+  border: 1px solid #d1d5db;
+  color: #2f4674;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estado ativo → azul da sidebar (#2f4674) */
+.agenda-tabs-btn.active {
+  background-color: #2f4674 !important;
+  color: white !important;
+  border-color: #2f4674 !important;
+}
+
+/* Ícones dentro dos botões ativos → ficam brancos */
+.agenda-tabs-btn.active svg {
+  color: white !important;
+  fill: white !important;
+}
+
+
+
+
+.agenda-tabs-filter {
+  align-self: flex-end !important;  
 }

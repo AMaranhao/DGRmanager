@@ -15,8 +15,9 @@ export async function getAgendaDefinicao() {
 
 // GET /agenda/:colaborador_id → compromissos filtrados por colaborador
 export async function getAgendaByColaborador(colaborador_id) {
-  return await get(`${BASE_URL}/colaborador/${colaborador_id}`);
+  return await get(`${BASE_URL}/${colaborador_id}`);
 }
+
 
 // GET /agenda/:id → detalhe de um compromisso
 export async function getCompromissoById(id) {
