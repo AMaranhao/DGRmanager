@@ -4,8 +4,15 @@ import { Button } from "@/components/ui/button";
 
 import { useAuth } from "@/contexts/AuthContext";
 
-import { getAgenda, getAgendaByColaborador, getAgendaDefinicao } from "@/services/ENDPOINTS_ServiceAgenda";
-import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
+import { 
+  getAgenda, 
+  getAgendaByColaborador, 
+  getAgendaDefinicao,
+  updateAgendaDefinicao,
+} from "@/services/ENDPOINTS_ServiceAgenda";
+import { 
+  fetchColaboradores 
+} from "@/services/ENDPOINTS_ServiceColaboradores";
 
 
 import "@/styles/unified_refactored_styles.css";
@@ -32,19 +39,57 @@ function getDiasSemana(offset = 0) {
 
 function AgendaDesignacao() {
   const [definicoes, setDefinicoes] = useState([]);
+  const [colaboradores, setColaboradores] = useState([]);
+  const [edicoes, setEdicoes] = useState({}); 
+  // { [idItem]: { responsavel_id, data_definida_atribuicao_evento } }
 
   useEffect(() => {
     async function carregarDados() {
       try {
-        const resDefinicao = await getAgendaDefinicao();
+        const [resDefinicao, resColabs] = await Promise.all([
+          getAgendaDefinicao(),
+          fetchColaboradores()
+        ]);
         setDefinicoes(resDefinicao);
+        setColaboradores(resColabs);
+
+        // inicializa edições com valores atuais
+        const inicial = {};
+        resDefinicao.forEach((item) => {
+          inicial[item.id] = {
+            responsavel_id: item.responsavel?.id || "",
+            data_definida_atribuicao_evento: item.data_definida_atribuicao_evento || "",
+          };
+        });
+        setEdicoes(inicial);
       } catch (err) {
-        console.error("Erro ao carregar designações:", err);
+        console.error("Erro ao carregar dados da designação:", err);
       }
     }
 
     carregarDados();
   }, []);
+
+  const handleChange = (id, campo, valor) => {
+    setEdicoes((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], [campo]: valor },
+    }));
+  };
+
+  const handleSalvar = async (item) => {
+    try {
+      const dados = edicoes[item.id];
+      await updateAgendaDefinicao(item.id, {
+        responsavel_id: Number(dados.responsavel_id),
+        data_definida_atribuicao_evento: dados.data_definida_atribuicao_evento,
+      });
+      alert("Designação atualizada com sucesso!");
+    } catch (err) {
+      console.error("Erro ao atualizar designação:", err);
+      alert("Falha ao salvar designação.");
+    }
+  };
 
   return (
     <div className="agenda-section">
@@ -67,24 +112,49 @@ function AgendaDesignacao() {
                 </td>
               </tr>
             ) : (
-              definicoes.map((item, idx) => (
-                <tr key={idx}>
-                  <td className="agenda-col-tipo">{item.entity_type}</td>
-                  <td className="agenda-col-descricao">{item.descricao}</td>
-                  <td className="agenda-col-responsavel">
-                    {item.responsavel?.nome || "—"}
-                  </td>
-                  <td className="agenda-col-numero">{item.entidade?.numero}</td>
-                  <td className="agenda-col-acoes">
+              definicoes.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.entity_type}</td>
+                  <td>{item.descricao}</td>
+                  <td>{item.responsavel?.nome || "—"}</td>
+                  <td>{item.entidade?.numero}</td>
+                  <td>
                     <div className="agenda-acoes-wrapper">
-                      <select className="agenda-input agenda-select">
-                        <option>Selecione</option>
+                      <select
+                        className="agenda-input agenda-select"
+                        value={edicoes[item.id]?.responsavel_id || ""}
+                        onChange={(e) =>
+                          handleChange(item.id, "responsavel_id", e.target.value)
+                        }
+                      >
+                        <option value="">Responsável</option>
+                        {colaboradores.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.nome}
+                          </option>
+                        ))}
                       </select>
+
                       <input
                         type="date"
                         className="agenda-input agenda-date"
+                        value={
+                          edicoes[item.id]?.data_definida_atribuicao_evento || ""
+                        }
+                        onChange={(e) =>
+                          handleChange(
+                            item.id,
+                            "data_definida_atribuicao_evento",
+                            e.target.value
+                          )
+                        }
                       />
-                      <Button size="sm" className="tabela-acao-botao">
+
+                      <Button
+                        size="sm"
+                        className="tabela-acao-botao"
+                        onClick={() => handleSalvar(item)}
+                      >
                         Salvar
                       </Button>
                     </div>
@@ -98,6 +168,7 @@ function AgendaDesignacao() {
     </div>
   );
 }
+
 
 
 

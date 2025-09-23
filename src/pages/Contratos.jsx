@@ -8,17 +8,35 @@ import {
   Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogOverlay,
 } from "@/components/ui/dialog";
 
-import { fetchContratos, createContrato, updateContrato } from "@/services/ENDPOINTS_ServiceContratos";
-import { fetchParteAdversaByCPF } from "@/services/ENDPOINTS_ServiceParteAdversa"; // GET /parte-adversa?termo=...
+import { 
+  fetchContratos, 
+  createContrato, 
+  updateContrato, 
+  fetchContratoById } 
+from "@/services/ENDPOINTS_ServiceContratos";
 
-import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
+import { 
+  fetchParteAdversaByCPF 
+} from "@/services/ENDPOINTS_ServiceParteAdversa"; // GET /parte-adversa?termo=...
 
-import { fetchAtribuicoesContratos } from "@/services/ENDPOINTS_ServiceAtribuicoes";
-import { createAtribuicaoEvento, updateAtribuicaoEvento } from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+import { 
+  fetchColaboradores 
+} from "@/services/ENDPOINTS_ServiceColaboradores";
+
+import { 
+  fetchAtribuicoesContratos 
+} from "@/services/ENDPOINTS_ServiceAtribuicoes";
+
+import { 
+  createAtribuicaoEvento, 
+  updateAtribuicaoEvento 
+} from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
 
 
-import { createParteContrato } from "@/services/ENDPOINTS_ServicePartesContrato";
-import { fetchContratoById } from "@/services/ENDPOINTS_ServiceContratos";
+import { 
+  createParteContrato 
+} from "@/services/ENDPOINTS_ServicePartesContrato";
+
 
 import "@/styles/unified_styles.css";
 import "@/styles/unified_refactored_styles.css";

@@ -22,14 +22,11 @@ import {
 } from "@/services/ENDPOINTS_ServiceParteAdversa";
 
 import {
-  findContratoByNumero,
   createParteContrato,
-  createContratoComParte,
 } from "@/services/ENDPOINTS_ServiceContratos";
 
 import { 
   deleteParteContrato,
-  fetchPartesContrato,
   fetchContratoByParte,
   createParteAdversaContrato,
 } from "@/services/ENDPOINTS_ServicePartesContrato"; // certifique-se de já importar

@@ -13,6 +13,12 @@ export async function getAgendaDefinicao() {
   return await get(`${BASE_URL}-definicao`);
 }
 
+// Atualiza responsável e data de uma atribuição vinculada
+export async function updateAgendaDefinicao(id, dados) {
+  // dados esperado: { responsavel_id, data_definida_atribuicao_evento }
+  return await put(`${BASE_URL}-definicao/${id}`, dados);
+}
+
 // GET /agenda/:colaborador_id → compromissos filtrados por colaborador
 export async function getAgendaByColaborador(colaborador_id) {
   return await get(`${BASE_URL}/${colaborador_id}`);

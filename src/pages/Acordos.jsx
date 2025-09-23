@@ -13,7 +13,6 @@ import {
 import {
   fetchAcordosUnificados,
   fetchAcordoUnificadoById,
-  fetchAcordos,
   updateAcordo,
 } from "@/services/ENDPOINTS_ServiceAcordos";
 
@@ -22,7 +21,6 @@ import {
 } from "@/services/ENDPOINTS_ServiceParcelasAcordo";
 
 import {
-  fetchPagamentosAcordo,
   updatePagamentoAcordo,
 } from "@/services/ENDPOINTS_ServiceAcordoPagamento";
 

@@ -13,10 +13,6 @@ import {
   fetchProcessoById,
   createProcesso,
   updateProcesso,
-  deleteProcesso,
-  createParteAoProcesso,
-  removeParteDoProcesso,
-  fetchAndamentos,
 } from "@/services/ENDPOINTS_ServiceProcessos";
 
 import { fetchTiposEventoProcesso } from "@/services/ENDPOINTS_ServiceProcessos";
@@ -286,7 +282,7 @@ export default function Processos() {
       const okStatus = status ? alvoStatus === status : true;
 
 
-      const prazoYMD = toYMD(p?.prazo_interno);
+      const prazoYMD = toYMD(p?.processo_evento?.prazo_fatal);
       const iniYMD   = toYMD(fDataIni);
       const fimYMD   = toYMD(fDataFim);
 
@@ -564,19 +560,7 @@ const salvar = async () => {
       const newId = created?.id;
 
       // Vincula partes somente se houver
-      if (newId && partes?.length) {
-        for (const p of partes) {
-          try {
-            await createParteAoProcesso(newId, {
-              cpf: p.cpf,
-              nome: p.nome,
-              tipo_parte: p.tipo_parte || "Autor",
-            });
-          } catch (e) {
-            console.error("Erro ao vincular parte:", e);
-          }
-        }
-      }
+
     }
 
     setModalAberto(false);
