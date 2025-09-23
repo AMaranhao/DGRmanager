@@ -366,6 +366,15 @@ cursor: pointer;
   box-sizing: border-box;
 }
 
+.processo-modal-input-prazo-juridico {
+  max-width: 6rem !important;
+}
+
+.processo-modal-input-etapa {
+  max-width: 16rem !important;
+  min-width: 16rem !important;
+}
+
 .processo-input-wrapper {
   display: flex;
   flex-direction: column;

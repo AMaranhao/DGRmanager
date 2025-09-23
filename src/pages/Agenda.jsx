@@ -84,10 +84,7 @@ function AgendaDesignacao() {
         responsavel_id: Number(dados.responsavel_id),
         data_definida_atribuicao_evento: dados.data_definida_atribuicao_evento,
       });
-      alert("Designação atualizada com sucesso!");
     } catch (err) {
-      console.error("Erro ao atualizar designação:", err);
-      alert("Falha ao salvar designação.");
     }
   };
 

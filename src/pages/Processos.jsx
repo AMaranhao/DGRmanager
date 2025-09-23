@@ -302,8 +302,10 @@ export default function Processos() {
         entity_type: "processo_evento",
         responsavel_id: Number(formAtrib.solucionador_id),
         prazo: formAtrib.prazo,
+        horario: formAtrib.horario || null,
         observacao: formAtrib.observacao,
       });
+      
       const atualizado = await fetchProcessoById(processoSel.id);
       setProcessoSel(atualizado);
       setAndamentos(atualizado.atribuicoes_evento || []);
@@ -412,7 +414,7 @@ export default function Processos() {
         responsavel_id: Number(formAtrib.proximo_resp_id),
         data_inicial: new Date().toISOString(),
         prazo: formAtrib.prazo,
-        horario: formAtrib.horario || null,   // ✅ novo campo sendo enviado
+        horario: formAtrib.horario || null,   // ✅ já está certo
       });
       
       
@@ -961,11 +963,13 @@ const salvar = async () => {
                             setFormAtrib({
                               solucionador_id: a?.responsavel?.id ?? "",
                               prazo: toYMD(a?.prazo),
+                              horario: a?.horario ? a.horario.slice(0,16) : "", // datetime-local espera formato yyyy-MM-ddTHH:mm
                               observacao: a?.observacao ?? "",
                               proxima_atr_id: "",
                               proximo_resp_id: "",
                               ultimaEtapa: false,
                             });
+                            
                             setRightMode("edit");
                           }}
                           
