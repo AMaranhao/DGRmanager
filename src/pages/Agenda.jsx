@@ -1,6 +1,11 @@
 // src/pages/Agenda.jsx
 import React from "react";
-import { useEffect, useState, useMemo } from "react";
+import { 
+  useEffect, 
+  useState, 
+  useMemo,
+  useRef, 
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -15,7 +20,19 @@ import {
   fetchAtribuicoesProcesso,
   fetchAtribuicoesContratos,
   } from "@/services/ENDPOINTS_ServiceAtribuicoes";
-  import { fetchTiposEventoProcesso } from "@/services/ENDPOINTS_ServiceProcessos";
+  
+import { 
+  fetchTiposEventoProcesso,
+  fetchProcessoById  
+} from "@/services/ENDPOINTS_ServiceProcessos";
+
+import { 
+  fetchContratoById 
+} from "@/services/ENDPOINTS_ServiceContratos";
+
+import { 
+  fetchAcordoById 
+} from "@/services/ENDPOINTS_ServiceAcordos";
 
 import { 
   getAgenda, 
@@ -23,12 +40,10 @@ import {
   getAgendaDefinicao,
   updateAgendaDefinicao,
 } from "@/services/ENDPOINTS_ServiceAgenda";
+
 import { 
   fetchColaboradores 
 } from "@/services/ENDPOINTS_ServiceColaboradores";
-import { 
-  fetchProcessoById 
-} from "@/services/ENDPOINTS_ServiceProcessos";
 
 
 import "@/styles/unified_refactored_styles.css";
@@ -61,172 +76,268 @@ function getDiasSemana(offset = 0) {
 
 // src/pages/Agenda.jsx
 
-function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, setEventoSelecionado }) {
+function ModalLeftProcesso({ 
+  form, 
+  setForm, 
+  visualizando, 
+  salvar, 
+  tiposEvento, 
+  setEventoSelecionado 
+}) {
   return (
     <div className="processo-form-wrapper">
-      {/* Linha 1 - CNJ e Contrato */}
-      <h4 className="agenda-modal-section-title">Processo</h4>
-      <div className="processo-input-row">
-        <LinhaInput label="Número (CNJ)">
+      <div className="agenda-modal-left-content">
+        {/* Linha 1 - CNJ e Contrato */}
+        <h4 className="agenda-modal-section-title">Processo</h4>
+        <div className="processo-input-row">
+          <LinhaInput label="Número (CNJ)">
+            <Input
+              className="processo-modal-input"
+              value={form.numero || ""}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Contrato (nº ou ID)">
+            <Input
+              className="processo-modal-input"
+              value={(form.contrato_numero || form.contrato_id || "").toString()}
+              readOnly
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Linha 2 - Datas */}
+        <div className="processo-input-row triple">
+          <LinhaInput label="Data de Distribuição">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form.data_distribuicao || ""}
+              readOnly
+            />
+          </LinhaInput>
+          <LinhaInput label="Publicação do Processo">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form.data_publicacao || ""}
+              readOnly
+            />
+          </LinhaInput>
+          <LinhaInput label="Comarca">
+            <Input
+              className="processo-modal-input"
+              value={form.comarca || ""}
+              readOnly
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Etapa */}
+        <h4 className="agenda-modal-section-title">Etapa do Processo</h4>
+        <div className="processo-input-row">
+          <LinhaInput label="Etapa">
+            <select
+              className="processo-modal-input"
+              value={form.processo_evento?.tipo?.id || ""}
+              onChange={(e) => {
+                const selected = tiposEvento.find(te => te.id === Number(e.target.value));
+                setForm({
+                  ...form,
+                  processo_evento: {
+                    ...form.processo_evento,
+                    tipo: selected,
+                  },
+                });
+              }}
+            >
+              <option value="">Selecione</option>
+              {tiposEvento.map((te) => (
+                <option key={te.id} value={te.id}>
+                  {te.tipo}
+                </option>
+              ))}
+            </select>
+          </LinhaInput>
+
+          <LinhaInput label="Publicação da Etapa">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form.processo_evento?.data_publicacao || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  processo_evento: {
+                    ...form.processo_evento,
+                    data_publicacao: e.target.value,
+                  },
+                })
+              }
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Prazos */}
+        <div className="processo-input-row triple">
+          <LinhaInput label="Prazo Jurídico (dias)">
+            <Input
+              type="number"
+              className="processo-modal-input"
+              value={form.processo_evento?.prazo_juridico?.toString() || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  processo_evento: {
+                    ...form.processo_evento,
+                    prazo_juridico: e.target.value,
+                  },
+                })
+              }
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Prazo Interno">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form.processo_evento?.prazo_interno || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  processo_evento: {
+                    ...form.processo_evento,
+                    prazo_interno: e.target.value,
+                  },
+                })
+              }
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Prazo Fatal">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form.processo_evento?.prazo_fatal || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  processo_evento: {
+                    ...form.processo_evento,
+                    prazo_fatal: e.target.value,
+                  },
+                })
+              }
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Observação */}
+        <LinhaInput label="Observação">
+          <textarea
+            className="processo-textarea"
+            rows={2}
+            value={form.processo_evento?.observacao || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  observacao: e.target.value,
+                },
+              })
+            }
+          />
+        </LinhaInput>
+      </div>
+      
+
+
+      <div className="agenda-btn-modal-left-footer">
+        <Button 
+          variant="outline"
+          onClick={() => {
+            setEventoSelecionado(null); // volta para lista
+            setForm({});
+          }}
+        >
+          Voltar para Lista
+        </Button>
+
+        <Button onClick={salvar}>
+          Salvar
+        </Button>
+      </div>
+
+    </div>
+  );
+}
+
+function ModalLeftContrato({ 
+  form, 
+  setForm, 
+  salvar, 
+  visualizando, 
+  editando, 
+  salvarRef,
+  setEventoSelecionado, 
+}) {
+  return (
+    <div className="agenda-modal-left">
+      <div className="agenda-modal-left-content">
+        <h4 className="agenda-modal-section-title">Contrato</h4>
+        <LinhaInput label="Número">
           <Input
             className="processo-modal-input"
             value={form.numero || ""}
-            readOnly
+            onChange={(e) => setForm({ ...form, numero: e.target.value })}
+            readOnly={visualizando}
           />
         </LinhaInput>
 
-        <LinhaInput label="Contrato (nº ou ID)">
+        <LinhaInput label="Valor">
           <Input
             className="processo-modal-input"
-            value={(form.contrato_numero || form.contrato_id || "").toString()}
-            readOnly
-          />
-        </LinhaInput>
-      </div>
-
-      {/* Linha 2 - Datas */}
-      <div className="processo-input-row triple">
-        <LinhaInput label="Data de Distribuição">
-          <Input
-            type="date"
-            className="processo-modal-input"
-            value={form.data_distribuicao || ""}
-            readOnly
-          />
-        </LinhaInput>
-        <LinhaInput label="Publicação do Processo">
-          <Input
-            type="date"
-            className="processo-modal-input"
-            value={form.data_publicacao || ""}
-            readOnly
-          />
-        </LinhaInput>
-        <LinhaInput label="Comarca">
-          <Input
-            className="processo-modal-input"
-            value={form.comarca || ""}
-            readOnly
-          />
-        </LinhaInput>
-      </div>
-
-      {/* Etapa */}
-      <h4 className="agenda-modal-section-title">Etapa do Processo</h4>
-      <div className="processo-input-row">
-        <LinhaInput label="Etapa">
-          <select
-            className="processo-modal-input"
-            value={form.processo_evento?.tipo?.id || ""}
+            value={
+              form.valor !== undefined && form.valor !== null
+                ? Number(form.valor).toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })
+                : ""
+            }
             onChange={(e) => {
-              const selected = tiposEvento.find(te => te.id === Number(e.target.value));
-              setForm({
-                ...form,
-                processo_evento: {
-                  ...form.processo_evento,
-                  tipo: selected,
-                },
-              });
+              // Remove tudo que não for número
+              const raw = e.target.value.replace(/\D/g, "");
+              // Converte para número
+              const numericValue = raw ? parseFloat(raw) / 100 : "";
+              setForm({ ...form, valor: numericValue });
             }}
-          >
-            <option value="">Selecione</option>
-            {tiposEvento.map((te) => (
-              <option key={te.id} value={te.id}>
-                {te.tipo}
-              </option>
-            ))}
-          </select>
-        </LinhaInput>
-
-        <LinhaInput label="Publicação da Etapa">
-          <Input
-            type="date"
-            className="processo-modal-input"
-            value={form.processo_evento?.data_publicacao || ""}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                processo_evento: {
-                  ...form.processo_evento,
-                  data_publicacao: e.target.value,
-                },
-              })
-            }
+            readOnly={visualizando}
           />
         </LinhaInput>
+
+        <LinhaInput label="Lote">
+          <Input
+            className="processo-modal-input"
+            value={form.lote || ""}
+            onChange={(e) => setForm({ ...form, lote: e.target.value })}
+            readOnly={visualizando}
+          />
+        </LinhaInput>
+
+        <LinhaInput label="Observação">
+          <Input
+            className="processo-textarea"
+            value={form.observacao || ""}
+            onChange={(e) => setForm({ ...form, observacao: e.target.value })}
+            readOnly={visualizando}
+          />
+        </LinhaInput>
+
       </div>
-
-      {/* Prazos */}
-      <div className="processo-input-row triple">
-        <LinhaInput label="Prazo Jurídico (dias)">
-          <Input
-            type="number"
-            className="processo-modal-input"
-            value={form.processo_evento?.prazo_juridico?.toString() || ""}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                processo_evento: {
-                  ...form.processo_evento,
-                  prazo_juridico: e.target.value,
-                },
-              })
-            }
-          />
-        </LinhaInput>
-
-        <LinhaInput label="Prazo Interno">
-          <Input
-            type="date"
-            className="processo-modal-input"
-            value={form.processo_evento?.prazo_interno || ""}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                processo_evento: {
-                  ...form.processo_evento,
-                  prazo_interno: e.target.value,
-                },
-              })
-            }
-          />
-        </LinhaInput>
-
-        <LinhaInput label="Prazo Fatal">
-          <Input
-            type="date"
-            className="processo-modal-input"
-            value={form.processo_evento?.prazo_fatal || ""}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                processo_evento: {
-                  ...form.processo_evento,
-                  prazo_fatal: e.target.value,
-                },
-              })
-            }
-          />
-        </LinhaInput>
-      </div>
-
-      {/* Observação */}
-      <LinhaInput label="Observação">
-        <textarea
-          className="processo-textarea"
-          rows={2}
-          value={form.processo_evento?.observacao || ""}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              processo_evento: {
-                ...form.processo_evento,
-                observacao: e.target.value,
-              },
-            })
-          }
-        />
-      </LinhaInput>
+      
 
 
       <div className="agenda-btn-modal-left-footer">
@@ -250,50 +361,54 @@ function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, s
 }
 
 
+
 function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
   return (
     <div className="agenda-modal-left-scroll">
-      <div className="agenda-modal-colunas">
-        {Array.from({ length: 3 }).map((_, colIdx) => (
-          <div className="agenda-modal-coluna" key={colIdx}>
-            {eventos
-              .slice(colIdx * 8, colIdx * 8 + 8)
-              .map((evento, idx) => {
-                const isAudiencia =
-                  evento.entity_type === "processo" &&
-                  evento.descricao?.toLowerCase().includes("audiencia");
+      <div className="agenda-modal-left-content">
+        <div className="agenda-modal-colunas">
+          {Array.from({ length: 3 }).map((_, colIdx) => (
+            <div className="agenda-modal-coluna" key={colIdx}>
+              {eventos
+                .slice(colIdx * 8, colIdx * 8 + 8)
+                .map((evento, idx) => {
+                  const isAudiencia =
+                    evento.entity_type === "processo" &&
+                    evento.descricao?.toLowerCase().includes("audiencia");
 
-                const horario =
-                  isAudiencia && evento.horario
-                    ? new Date(evento.horario).toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : null;
+                  const horario =
+                    isAudiencia && evento.horario
+                      ? new Date(evento.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : null;
 
-                return (
-                  <div
-                    key={idx}
-                    className={`agenda-modal-item cursor-pointer ${
-                      evento.status === "resolvido"
-                        ? "agenda-modal-item-verde"
-                        : evento.status === "com_hora"
-                        ? "agenda-modal-item-vermelho"
-                        : "agenda-modal-item-azul"
-                    }`}
-                    onClick={() => handleSelecionarEvento(evento)}
-                  >
-                    <span className="agenda-modal-item-texto">
-                      {evento.entity_type} → {evento.descricao}
-                      {horario ? ` → ${horario}` : ""}
-                    </span>
-                    <div>{evento.responsavel?.nome || "—"}</div>
-                  </div>
-                );
-              })}
-          </div>
-        ))}
+                  return (
+                    <div
+                      key={idx}
+                      className={`agenda-modal-item cursor-pointer ${
+                        evento.status === "resolvido"
+                          ? "agenda-modal-item-verde"
+                          : evento.status === "com_hora"
+                          ? "agenda-modal-item-vermelho"
+                          : "agenda-modal-item-azul"
+                      }`}
+                      onClick={() => handleSelecionarEvento(evento)}
+                    >
+                      <span className="agenda-modal-item-texto">
+                        {evento.entity_type} → {evento.descricao}
+                        {horario ? ` → ${horario}` : ""}
+                      </span>
+                      <div>{evento.responsavel?.nome || "—"}</div>
+                    </div>
+                  );
+                })}
+            </div>
+          ))}
+        </div>
       </div>
+      
     </div>
   );
 }
@@ -304,6 +419,8 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
   const [form, setForm] = useState({});
   const [visualizando, setVisualizando] = useState(true);
+  const [editando, setEditando] = useState(false);
+  const salvarRef = useRef(null);
 
   // ✅ Estados para tipos e atribuições
   const [tiposEvento, setTiposEvento] = useState([]);
@@ -336,19 +453,42 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
   async function handleSelecionarEvento(evento) {
     setEventoSelecionado(evento);
   
-    if (evento.entity_type === "processo") {
-      try {
+    try {
+      if (evento.entity_type === "processo") {
         const dados = await fetchProcessoById(evento.entity_id);
         setForm(dados);
-        setVisualizando(false); // ou true, dependendo se abre já editável
-      } catch (err) {
-        console.error("Erro ao carregar processo:", err);
+        setVisualizando(false); // Abre em modo edição
+        setEditando(true);
       }
-    } else {
+  
+      else if (evento.entity_type === "contrato") {
+        const dados = await fetchContratoById(evento.entity_id);
+        setForm(dados);
+        setVisualizando(true); // Abre somente leitura
+        setEditando(false);
+      }
+  
+      else if (evento.entity_type === "acordo") {
+        const dados = await fetchAcordoById(evento.entity_id);
+        setForm(dados);
+        setVisualizando(true); // Abre somente leitura
+        setEditando(false);
+      }
+  
+      else {
+        // Caso o tipo não seja reconhecido
+        setForm({});
+        setVisualizando(true);
+        setEditando(false);
+      }
+    } catch (err) {
+      console.error(`Erro ao carregar dados de ${evento.entity_type}:`, err);
       setForm({});
       setVisualizando(true);
+      setEditando(false);
     }
   }
+  
 
   async function salvar() {
     try {
@@ -395,15 +535,30 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
               Lista de atribuições adicionais deste dia
             </DialogDescription>
 
-              {eventoSelecionado?.entity_type === "processo" ? (
+              {eventoSelecionado?.entity_type === "processo" && (
                 <ModalLeftProcesso
                   form={form}
                   setForm={setForm}
                   salvar={salvar}
-                  tiposEvento={tiposEvento}                    
+                  tiposEvento={tiposEvento}
+                  setEventoSelecionado={setEventoSelecionado}
+                />
+              )}
+
+              {eventoSelecionado?.entity_type === "contrato" && (
+                <ModalLeftContrato
+                  form={form}
+                  setForm={setForm}
+                  salvar={salvar}
+                  visualizando={visualizando}
+                  editando={editando}
+                  salvarRef={salvarRef}
                   setEventoSelecionado={setEventoSelecionado} 
                 />
-              ) : (
+              )}
+
+              {/* Fallback para quando não é processo nem contrato (ex: lista de eventos do dia) */}
+              {!eventoSelecionado?.entity_type && (
                 <ModalLeftAgendaLista
                   eventos={eventos}
                   handleSelecionarEvento={handleSelecionarEvento}
