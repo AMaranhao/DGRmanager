@@ -31,7 +31,7 @@ import {
 } from "@/services/ENDPOINTS_ServiceContratos";
 
 import { 
-  fetchAcordoById 
+  fetchAcordoUnificadoById 
 } from "@/services/ENDPOINTS_ServiceAcordos";
 
 import { 
@@ -361,6 +361,149 @@ function ModalLeftContrato({
 }
 
 
+function ModalLeftAcordo({ 
+  form, 
+  setForm, 
+  salvar, 
+  visualizando, 
+  editando, 
+  salvarRef, 
+  setEventoSelecionado 
+}) {
+  return (
+    <div className="agenda-modal-left">
+      <div className="agenda-modal-left-content">
+        <h4 className="agenda-modal-section-title">Acordo</h4>
+
+        {/* Linha 1 - Contrato + Parte Adversa */}
+        <div className="processo-input-row">
+          <LinhaInput label="Contrato">
+            <Input
+              className="processo-modal-input"
+              value={form?.contrato?.numero || ""}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Parte Adversa">
+            <Input
+              className="processo-modal-input"
+              value={form?.parte_adversa?.nome || ""}
+              readOnly
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Linha 2 - Valores + Número de Parcelas */}
+        <div className="processo-input-row triple">
+          <LinhaInput label="Valor do Acordo">
+            <Input
+              className="processo-modal-input"
+              value={
+                form?.proposta?.valor_acordo
+                  ? Number(form.proposta.valor_acordo).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : ""
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Valor da Parcela">
+            <Input
+              className="processo-modal-input"
+              value={
+                form?.proposta?.valor_parcela
+                  ? Number(form.proposta.valor_parcela).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : ""
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Número de Parcelas">
+            <Input
+              className="processo-modal-input"
+              value={form?.proposta?.numero_parcelas || ""}
+              readOnly
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Linha 3 - Status + Data de Início */}
+        <div className="processo-input-row">
+          <LinhaInput label="Status">
+            <Input
+              className="processo-modal-input"
+              value={form?.status || ""}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Data de Início">
+            <Input
+              type="date"
+              className="processo-modal-input"
+              value={form?.data_vencimento || ""}
+              readOnly
+            />
+          </LinhaInput>
+        </div>
+
+        {/* Observações */}
+        <LinhaInput label="Observações">
+          <textarea
+            className="processo-textarea"
+            rows={2}
+            value={form?.observacao || ""}
+            onChange={(e) => {
+              if (!visualizando) {
+                setForm({ ...form, observacao: e.target.value });
+              }
+            }}
+            readOnly={visualizando}
+          />
+        </LinhaInput>
+      </div>
+
+      {/* Rodapé */}
+      <div className="agenda-btn-modal-left-footer">
+        <Button 
+          variant="outline"
+          onClick={() => {
+            setEventoSelecionado(null);
+            setForm({});
+          }}
+        >
+          Voltar para Lista
+        </Button>
+        <Button onClick={salvar}>
+          Salvar
+        </Button>
+
+        {!visualizando && (
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setForm({ ...form, status: "Cancelado" })}
+            >
+              Cancelar Acordo
+            </Button>
+            <Button onClick={salvar}>Salvar</Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
 
 function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
   return (
@@ -469,7 +612,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
       }
   
       else if (evento.entity_type === "acordo") {
-        const dados = await fetchAcordoById(evento.entity_id);
+        const dados = await fetchAcordoUnificadoById(evento.entity_id);
         setForm(dados);
         setVisualizando(true); // Abre somente leitura
         setEditando(false);
@@ -554,6 +697,18 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
                   editando={editando}
                   salvarRef={salvarRef}
                   setEventoSelecionado={setEventoSelecionado} 
+                />
+              )}
+
+              {eventoSelecionado?.entity_type === "acordo" && (
+                <ModalLeftAcordo
+                  form={form}
+                  setForm={setForm}
+                  salvar={salvar}
+                  visualizando={visualizando}
+                  editando={editando}
+                  salvarRef={salvarRef}
+                  setEventoSelecionado={setEventoSelecionado}
                 />
               )}
 
