@@ -56,6 +56,39 @@ const LinhaInput = React.memo(({ label, children }) => (
   </div>
 ));
 
+// 🔽 Função utilitária para ordenar eventos da agenda
+function ordenarEventosAgenda(eventos) {
+  return [...eventos].sort((a, b) => {
+    // 1. Vermelhos de audiência (processo + audiencia)
+    const isAudA = a.entity_type === "processo" && a.descricao?.toLowerCase().includes("audiencia");
+    const isAudB = b.entity_type === "processo" && b.descricao?.toLowerCase().includes("audiencia");
+
+    if (isAudA && !isAudB) return -1;
+    if (!isAudA && isAudB) return 1;
+
+    // Se ambos forem audiência, ordena pelo horário crescente
+    if (isAudA && isAudB) {
+      const hA = a.horario ? new Date(a.horario).getTime() : 0;
+      const hB = b.horario ? new Date(b.horario).getTime() : 0;
+      return hA - hB;
+    }
+
+    // 2. Ordem de status + tipo
+    const prioridadeStatus = { com_hora: 1, pendente: 2, resolvido: 3 }; // vermelho → azul → verde
+    const prioridadeTipo = { acordo: 1, contrato: 2, processo: 3 };
+
+    const statusA = prioridadeStatus[a.status] || 99;
+    const statusB = prioridadeStatus[b.status] || 99;
+
+    if (statusA !== statusB) return statusA - statusB;
+
+    const tipoA = prioridadeTipo[a.entity_type] || 99;
+    const tipoB = prioridadeTipo[b.entity_type] || 99;
+
+    return tipoA - tipoB;
+  });
+}
+
 
 // Função utilitária para calcular os dias úteis da semana atual
 function getDiasSemana(offset = 0) {
@@ -258,8 +291,7 @@ function ModalLeftProcesso({
         <Button 
           variant="outline"
           onClick={() => {
-            setEventoSelecionado(null); // volta para lista
-            setForm({});
+            setEventoSelecionado(null); // volta para lista visível do dia (já está em eventosExtras)
           }}
         >
           Voltar para Lista
@@ -506,14 +538,17 @@ function ModalLeftAcordo({
 
 
 function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
+  const eventosOrdenados = ordenarEventosAgenda(eventos);
+
+  
   return (
     <div className="agenda-modal-left-scroll">
       <div className="agenda-modal-left-content">
         <div className="agenda-modal-colunas">
           {Array.from({ length: 3 }).map((_, colIdx) => (
             <div className="agenda-modal-coluna" key={colIdx}>
-              {eventos
-                .slice(colIdx * 8, colIdx * 8 + 8)
+              {eventosOrdenados
+                .slice(colIdx * 8, colIdx * 8 + 8) // ✅ agora usa os ordenados
                 .map((evento, idx) => {
                   const isAudiencia =
                     evento.entity_type === "processo" &&
@@ -551,14 +586,14 @@ function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
           ))}
         </div>
       </div>
-      
     </div>
   );
 }
 
 
 
-function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
+
+function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, eventoInicial }) {
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
   const [form, setForm] = useState({});
   const [visualizando, setVisualizando] = useState(true);
@@ -570,6 +605,17 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
   const [atribuicoesAcordo, setAtribuicoesAcordo] = useState([]);
   const [atribuicoesProcesso, setAtribuicoesProcesso] = useState([]);
   const [atribuicoesContratos, setAtribuicoesContratos] = useState([]);
+
+  useEffect(() => {
+    if (eventoInicial) {
+      handleSelecionarEvento(eventoInicial);  // abre direto no evento clicado
+    } else if (eventos.length === 1) {
+      handleSelecionarEvento(eventos[0]);
+    } else {
+      setEventoSelecionado(null);
+    }
+  }, [eventos, eventoInicial]);
+  
 
   useEffect(() => {
     async function carregarDadosIniciais() {
@@ -667,11 +713,11 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
           <DialogTitle className="agenda-modal-title">
             Atribuições Dia - {" "}
             {dataSelecionada
-              ? new Date(dataSelecionada).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                })
-              : "—"}
+            ? new Date(`${dataSelecionada}T00:00:00`).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+              })
+            : "—"}
           </DialogTitle>
 
             <DialogDescription className="agenda-modal-description">
@@ -915,6 +961,8 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [eventosExtras, setEventosExtras] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState(null);
+  const [eventoInicial, setEventoInicial] = useState(null);
+
 
 
   const { user } = useAuth();
@@ -936,21 +984,20 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const compromissosPorDia = useMemo(() => {
     const mapa = {};
     diasSemana.forEach((dia) => {
-      // força local YYYY-MM-DD sem UTC
-      const chave = dia.toLocaleDateString("sv-SE");  // ✅ 2025-09-17
+      const chave = dia.toLocaleDateString("sv-SE"); // formato YYYY-MM-DD
       mapa[chave] = [];
     });
-  
+
     compromissos.forEach((evento) => {
-      // garante que o campo já vem como string pura
-      const data = evento.data_definida;  // ✅ já está em "2025-09-17"
+      const data = evento.data_definida;
       if (mapa[data]) {
         mapa[data].push(evento);
       }
     });
-  
+
     return mapa;
   }, [diasSemana, compromissos]);
+  
   
   
 
@@ -988,31 +1035,7 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
                     }
 
                     // ---- ORDENAR EVENTOS ----
-                    eventos = [...eventos].sort((a, b) => {
-                      const isAudA =
-                        a.entity_type === "processo" &&
-                        a.descricao?.toLowerCase().includes("audiencia");
-                      const isAudB =
-                        b.entity_type === "processo" &&
-                        b.descricao?.toLowerCase().includes("audiencia");
-
-                      if (isAudA && !isAudB) return -1;
-                      if (!isAudA && isAudB) return 1;
-
-                      if (isAudA && isAudB) {
-                        const hA = a.horario ? new Date(a.horario).getTime() : 0;
-                        const hB = b.horario ? new Date(b.horario).getTime() : 0;
-                        return hA - hB;
-                      }
-
-                      if (a.status === "pendente" && b.status !== "pendente") return -1;
-                      if (b.status === "pendente" && a.status !== "pendente") return 1;
-
-                      if (a.status === "resolvido" && b.status !== "resolvido") return 1;
-                      if (b.status === "resolvido" && a.status !== "resolvido") return -1;
-
-                      return 0;
-                    });
+                    eventos = ordenarEventosAgenda(eventos);
 
                     // ---- LIMITAR EXIBIÇÃO ----
                     const temMais = eventos.length > 8;
@@ -1047,7 +1070,21 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
                               : null;
 
                           return (
-                            <li key={i} className={`agenda-item ${corClasse}`}>
+                            <li
+                              key={i}
+                              className={`agenda-item ${corClasse} cursor-pointer`}
+                              onClick={() => {
+                                const chave = evento.data_definida.split("T")[0];
+                                const listaVisivel = compromissosPorDia[chave] || [];
+                              
+                                setEventosExtras(listaVisivel);
+                                setDataSelecionada(chave);
+                                setEventoInicial(evento);   // ✅ passa o evento clicado para o modal
+                                setMostrarModal(true);
+                              }}
+                              
+                              
+                            >
                               <span className="agenda-item-texto">
                                 {evento.entity_type} → {evento.descricao}
                                 {horario ? ` ${horario}` : ""}
@@ -1095,6 +1132,7 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
         onClose={() => setMostrarModal(false)}
         eventos={eventosExtras}
         dataSelecionada={dataSelecionada}
+        eventoInicial={eventoInicial}
       />
 
 
@@ -1114,6 +1152,8 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [eventosExtras, setEventosExtras] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState(null);
+  const [eventoInicial, setEventoInicial] = useState(null);
+
 
 
   useEffect(() => {
@@ -1143,19 +1183,22 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
   const compromissosPorDia = useMemo(() => {
     const mapa = {};
     diasSemana.forEach((dia) => {
-      // força local YYYY-MM-DD sem UTC
-      const chave = dia.toLocaleDateString("sv-SE");  // ✅ 2025-09-17
+      const chave = dia.toLocaleDateString("sv-SE");
       mapa[chave] = [];
     });
-  
-    compromissos.forEach((evento) => {
-      // garante que o campo já vem como string pura
-      const data = evento.data_definida;  // ✅ já está em "2025-09-17"
-      if (mapa[data]) {
-        mapa[data].push(evento);
-      }
-    });
-  
+
+    compromissos
+      .filter((evento) => {
+        if (!responsavelFiltro) return true; // sem filtro → todos
+        return String(evento.responsavel?.id) === String(responsavelFiltro);
+      })
+      .forEach((evento) => {
+        const data = evento.data_definida;
+        if (mapa[data]) {
+          mapa[data].push(evento);
+        }
+      });
+
     return mapa;
   }, [diasSemana, compromissos, responsavelFiltro]);
 
@@ -1192,31 +1235,8 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
                     }
 
                     // ---- ORDENAR EVENTOS ----
-                    eventos = [...eventos].sort((a, b) => {
-                      const isAudA =
-                        a.entity_type === "processo" &&
-                        a.descricao?.toLowerCase().includes("audiencia");
-                      const isAudB =
-                        b.entity_type === "processo" &&
-                        b.descricao?.toLowerCase().includes("audiencia");
-
-                      if (isAudA && !isAudB) return -1;
-                      if (!isAudA && isAudB) return 1;
-
-                      if (isAudA && isAudB) {
-                        const hA = a.horario ? new Date(a.horario).getTime() : 0;
-                        const hB = b.horario ? new Date(b.horario).getTime() : 0;
-                        return hA - hB;
-                      }
-
-                      if (a.status === "pendente" && b.status !== "pendente") return -1;
-                      if (b.status === "pendente" && a.status !== "pendente") return 1;
-
-                      if (a.status === "resolvido" && b.status !== "resolvido") return 1;
-                      if (b.status === "resolvido" && a.status !== "resolvido") return -1;
-
-                      return 0;
-                    });
+                    eventos = ordenarEventosAgenda(eventos);
+                    
 
                     // ---- LIMITAR EXIBIÇÃO ----
                     const temMais = eventos.length > 8;
@@ -1251,13 +1271,27 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
                               : null;
 
                           return (
-                            <li key={i} className={`agenda-item ${corClasse}`}>
+                            <li
+                              key={i}
+                              className={`agenda-item ${corClasse} cursor-pointer`}
+                              onClick={() => {
+                                const chave = evento.data_definida.split("T")[0];
+                                const listaVisivel = compromissosPorDia[chave] || [];
+                              
+                                setEventosExtras(listaVisivel);
+                                setDataSelecionada(chave);
+                                setEventoInicial(evento);   // ✅ passa o evento clicado para o modal
+                                setMostrarModal(true);
+                              }}
+                              
+                            >
                               <span className="agenda-item-texto">
                                 {evento.entity_type} → {evento.descricao}
                                 {horario ? ` ${horario}` : ""}
                               </span>
                               <div>{evento.responsavel?.nome || "—"}</div>
                             </li>
+
                           );
                         })}
 
@@ -1323,6 +1357,7 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
         onClose={() => setMostrarModal(false)}
         eventos={eventosExtras}
         dataSelecionada={dataSelecionada}
+        eventoInicial={eventoInicial}
       />
     </div>
   );
