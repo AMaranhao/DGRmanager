@@ -236,7 +236,7 @@ function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, s
             setForm({});
           }}
         >
-          Lista
+          Voltar para Lista
         </Button>
 
         <Button onClick={salvar}>

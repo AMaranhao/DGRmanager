@@ -2426,12 +2426,21 @@ input[type="date"].acordo-modal-input {
   color: #555;
 }
 
-.acordo-right-content {
+/* Para o painel de pagamentos */
+.acordo-right-content.centered {
   display: flex;
-  justify-content: center;     /* Centraliza horizontalmente (opcional) */
-  align-items: center;         /* Centraliza verticalmente */
-  height: 100%;                /* Garante que ocupe todo o espaço disponível */
-  padding: 16px;               /* Mantém o padding existente */
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  padding: 16px;
+}
+
+/* Para os painéis de atribuições (edit/nova) */
+.acordo-right-content.form {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  height: auto;
 }
 
 .acordo-pag-detalhe {

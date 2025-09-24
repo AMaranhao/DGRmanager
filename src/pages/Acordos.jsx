@@ -263,7 +263,7 @@ const norm = (s) =>
           {/* Modo: editar atribuição */}
           {rightMode === "editarAtrib" && (
             <div className="acordo-right-wrapper">
-              <div className="acordo-right-content">
+              <div className="acordo-right-content form">
                 <div className="acordo-atr-section">
                   <p className="acordo-atr-section-title">Atribuição Atual</p>
                   <div className="acordo-atr-linha">
@@ -336,7 +336,7 @@ const norm = (s) =>
           {rightMode === "novaAtrib" && (
             <div className="acordo-right-wrapper">
               <div className="acordo-right-scroll">
-                <div className="acordo-right-content">
+                <div className="acordo-right-content form">
                   <div className="acordo-atr-section-title">Atribuição Atual</div>
                   <div className="acordo-input-wrapper">
                     <label className="acordo-label">Solucionador</label>
@@ -520,7 +520,7 @@ const norm = (s) =>
     
           {/* Conteúdo scrollável */}
           <div className="acordo-right-scroll">
-            <div className="acordo-right-content">
+            <div className="acordo-right-content centered">
               {parcelaSelecionada ? (
                 <>
                   <div className="acordo-pag-detalhe">
@@ -621,7 +621,7 @@ const norm = (s) =>
     
           {/* Rodapé com botão */}
             {parcelaSelecionada && (
-              <div className="acordo-modal-right-footer">
+              <div className="acordo-btn-modal-right-footer">
                 {!editandoPagamento ? (
                   <Button onClick={() => setEditandoPagamento(true)}>
                     Realizar Pagamento
