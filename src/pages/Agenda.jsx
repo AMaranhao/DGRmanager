@@ -1,8 +1,21 @@
 // src/pages/Agenda.jsx
+import React from "react";
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import {
+  Dialog, DialogContent, DialogOverlay, DialogTitle, DialogDescription
+} from "@/components/ui/dialog";
 
 import { useAuth } from "@/contexts/AuthContext";
+
+import {
+  fetchAtribuicoesAcordo,
+  fetchAtribuicoesProcesso,
+  fetchAtribuicoesContratos,
+  } from "@/services/ENDPOINTS_ServiceAtribuicoes";
+  import { fetchTiposEventoProcesso } from "@/services/ENDPOINTS_ServiceProcessos";
 
 import { 
   getAgenda, 
@@ -13,9 +26,20 @@ import {
 import { 
   fetchColaboradores 
 } from "@/services/ENDPOINTS_ServiceColaboradores";
+import { 
+  fetchProcessoById 
+} from "@/services/ENDPOINTS_ServiceProcessos";
 
 
 import "@/styles/unified_refactored_styles.css";
+
+
+const LinhaInput = React.memo(({ label, children }) => (
+  <div className="processo-input-wrapper">
+    <label className="processo-label">{label}</label>
+    {children}
+  </div>
+));
 
 
 // Função utilitária para calcular os dias úteis da semana atual
@@ -35,6 +59,391 @@ function getDiasSemana(offset = 0) {
   });
 }
 
+// src/pages/Agenda.jsx
+
+function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, setEventoSelecionado }) {
+  return (
+    <div className="processo-form-wrapper">
+      {/* Linha 1 - CNJ e Contrato */}
+      <div className="processo-input-row">
+        <LinhaInput label="Número (CNJ)">
+          <Input
+            className="processo-modal-input"
+            value={form.numero || ""}
+            readOnly
+          />
+        </LinhaInput>
+
+        <LinhaInput label="Contrato (nº ou ID)">
+          <Input
+            className="processo-modal-input"
+            value={(form.contrato_numero || form.contrato_id || "").toString()}
+            readOnly
+          />
+        </LinhaInput>
+      </div>
+
+      {/* Linha 2 - Datas */}
+      <div className="processo-input-row triple">
+        <LinhaInput label="Data de Distribuição">
+          <Input
+            type="date"
+            className="processo-modal-input"
+            value={form.data_distribuicao || ""}
+            readOnly
+          />
+        </LinhaInput>
+        <LinhaInput label="Publicação do Processo">
+          <Input
+            type="date"
+            className="processo-modal-input"
+            value={form.data_publicacao || ""}
+            readOnly
+          />
+        </LinhaInput>
+        <LinhaInput label="Comarca">
+          <Input
+            className="processo-modal-input"
+            value={form.comarca || ""}
+            readOnly
+          />
+        </LinhaInput>
+      </div>
+
+      {/* Etapa */}
+      <h4 className="processo-section-title">Etapa do Processo</h4>
+      <div className="processo-input-row">
+        <LinhaInput label="Etapa">
+          <select
+            className="processo-modal-input"
+            value={form.processo_evento?.tipo?.id || ""}
+            onChange={(e) => {
+              const selected = tiposEvento.find(te => te.id === Number(e.target.value));
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  tipo: selected,
+                },
+              });
+            }}
+          >
+            <option value="">Selecione</option>
+            {tiposEvento.map((te) => (
+              <option key={te.id} value={te.id}>
+                {te.tipo}
+              </option>
+            ))}
+          </select>
+        </LinhaInput>
+
+        <LinhaInput label="Publicação da Etapa">
+          <Input
+            type="date"
+            className="processo-modal-input"
+            value={form.processo_evento?.data_publicacao || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  data_publicacao: e.target.value,
+                },
+              })
+            }
+          />
+        </LinhaInput>
+      </div>
+
+      {/* Prazos */}
+      <div className="processo-input-row triple">
+        <LinhaInput label="Prazo Jurídico (dias)">
+          <Input
+            type="number"
+            className="processo-modal-input"
+            value={form.processo_evento?.prazo_juridico?.toString() || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  prazo_juridico: e.target.value,
+                },
+              })
+            }
+          />
+        </LinhaInput>
+
+        <LinhaInput label="Prazo Interno">
+          <Input
+            type="date"
+            className="processo-modal-input"
+            value={form.processo_evento?.prazo_interno || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  prazo_interno: e.target.value,
+                },
+              })
+            }
+          />
+        </LinhaInput>
+
+        <LinhaInput label="Prazo Fatal">
+          <Input
+            type="date"
+            className="processo-modal-input"
+            value={form.processo_evento?.prazo_fatal || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                processo_evento: {
+                  ...form.processo_evento,
+                  prazo_fatal: e.target.value,
+                },
+              })
+            }
+          />
+        </LinhaInput>
+      </div>
+
+      {/* Observação */}
+      <LinhaInput label="Observação">
+        <textarea
+          className="processo-textarea"
+          rows={2}
+          value={form.processo_evento?.observacao || ""}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              processo_evento: {
+                ...form.processo_evento,
+                observacao: e.target.value,
+              },
+            })
+          }
+        />
+      </LinhaInput>
+
+
+      <div className="agenda-btn-modal-left-footer">
+        <Button 
+          variant="outline"
+          onClick={() => {
+            setEventoSelecionado(null); // volta para lista
+            setForm({});
+          }}
+        >
+          Lista
+        </Button>
+
+        <Button onClick={salvar}>
+          Salvar
+        </Button>
+      </div>
+
+    </div>
+  );
+}
+
+
+function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
+  return (
+    <div className="agenda-modal-left-scroll">
+      <div className="agenda-modal-colunas">
+        {Array.from({ length: 3 }).map((_, colIdx) => (
+          <div className="agenda-modal-coluna" key={colIdx}>
+            {eventos
+              .slice(colIdx * 8, colIdx * 8 + 8)
+              .map((evento, idx) => {
+                const isAudiencia =
+                  evento.entity_type === "processo" &&
+                  evento.descricao?.toLowerCase().includes("audiencia");
+
+                const horario =
+                  isAudiencia && evento.horario
+                    ? new Date(evento.horario).toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : null;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`agenda-modal-item cursor-pointer ${
+                      evento.status === "resolvido"
+                        ? "agenda-modal-item-verde"
+                        : evento.status === "com_hora"
+                        ? "agenda-modal-item-vermelho"
+                        : "agenda-modal-item-azul"
+                    }`}
+                    onClick={() => handleSelecionarEvento(evento)}
+                  >
+                    <span className="agenda-modal-item-texto">
+                      {evento.entity_type} → {evento.descricao}
+                      {horario ? ` → ${horario}` : ""}
+                    </span>
+                    <div>{evento.responsavel?.nome || "—"}</div>
+                  </div>
+                );
+              })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+
+function AgendaModalAtribuicoes({ open, onClose, eventos }) {
+  const [eventoSelecionado, setEventoSelecionado] = useState(null);
+  const [form, setForm] = useState({});
+  const [visualizando, setVisualizando] = useState(true);
+
+  // ✅ Estados para tipos e atribuições
+  const [tiposEvento, setTiposEvento] = useState([]);
+  const [atribuicoesAcordo, setAtribuicoesAcordo] = useState([]);
+  const [atribuicoesProcesso, setAtribuicoesProcesso] = useState([]);
+  const [atribuicoesContratos, setAtribuicoesContratos] = useState([]);
+
+  useEffect(() => {
+    async function carregarDadosIniciais() {
+      try {
+        const [tipos, atribAcordo, atribProc, atribContrato] = await Promise.all([
+          fetchTiposEventoProcesso(),
+          fetchAtribuicoesAcordo(),
+          fetchAtribuicoesProcesso(),
+          fetchAtribuicoesContratos(),
+        ]);
+        setTiposEvento(tipos);
+        setAtribuicoesAcordo(atribAcordo);
+        setAtribuicoesProcesso(atribProc);
+        setAtribuicoesContratos(atribContrato);
+      } catch (erro) {
+        console.error("Erro ao carregar dados iniciais:", erro);
+      }
+    }
+  
+    carregarDadosIniciais();
+  }, []);
+
+
+  async function handleSelecionarEvento(evento) {
+    setEventoSelecionado(evento);
+  
+    if (evento.entity_type === "processo") {
+      try {
+        const dados = await fetchProcessoById(evento.entity_id);
+        setForm(dados);
+        setVisualizando(false); // ou true, dependendo se abre já editável
+      } catch (err) {
+        console.error("Erro ao carregar processo:", err);
+      }
+    } else {
+      setForm({});
+      setVisualizando(true);
+    }
+  }
+
+  async function salvar() {
+    try {
+      console.log("Salvando formulário:", form);
+      // aqui você pode chamar um endpoint ex: updateProcesso(form.id, form)
+    } catch (err) {
+      console.error("Erro ao salvar:", err);
+    }
+  }
+  
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          setEventoSelecionado(null); // volta para lista
+          setForm({});
+          setVisualizando(true);
+          onClose(isOpen);
+        }
+
+      }}
+    >
+      <DialogOverlay className="agenda-modal-overlay" />
+      <DialogContent
+        className="agenda-modal-container"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div className="agenda-modal-split">
+          {/* LADO ESQUERDO */}
+          <div className="agenda-modal-split-left">
+            <DialogTitle className="agenda-modal-title">Atribuições Do Dia</DialogTitle>
+            <DialogDescription className="agenda-modal-description">
+              Lista de atribuições adicionais deste dia
+            </DialogDescription>
+
+              {eventoSelecionado?.entity_type === "processo" ? (
+                <ModalLeftProcesso
+                  form={form}
+                  setForm={setForm}
+                  salvar={salvar}
+                  tiposEvento={tiposEvento}                    
+                  setEventoSelecionado={setEventoSelecionado} 
+                />
+              ) : (
+                <ModalLeftAgendaLista
+                  eventos={eventos}
+                  handleSelecionarEvento={handleSelecionarEvento}
+                />
+              )}
+
+
+          </div>
+
+          {/* LADO DIREITO */}
+          <div className="agenda-modal-split-right">
+            <div className="agenda-modal-right-header">
+              <h2 className="agenda-modal-title">Detalhes</h2>
+            </div>
+
+            <div className="agenda-modal-right-content">
+              {eventoSelecionado ? (
+                <div>
+                  <p><b>Tipo:</b> {eventoSelecionado.entity_type}</p>
+                  <p><b>Descrição:</b> {eventoSelecionado.descricao}</p>
+                  <p><b>Responsável:</b> {eventoSelecionado.responsavel?.nome || "—"}</p>
+                  <p><b>Data Definida:</b> {eventoSelecionado.data_definida}</p>
+                  {eventoSelecionado.horario && (
+                    <p><b>Horário:</b> {new Date(eventoSelecionado.horario).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"})}</p>
+                  )}
+                  <p><b>Status:</b> {eventoSelecionado.status}</p>
+                  {eventoSelecionado.entidade?.numero && (
+                    <p><b>Número:</b> {eventoSelecionado.entidade.numero}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="agenda-modal-atr-label">
+                  Clique em uma atribuição à esquerda para detalhar aqui.
+                </p>
+              )}
+            </div>
+
+            <div className="agenda-modal-right-footer">
+
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+
+
 
 
 function AgendaDesignacao() {
@@ -50,12 +459,20 @@ function AgendaDesignacao() {
           getAgendaDefinicao(),
           fetchColaboradores()
         ]);
-        setDefinicoes(resDefinicao);
+  
+        // 🔽 ordena pelo campo prazo (crescente)
+        const definicoesOrdenadas = [...resDefinicao].sort((a, b) => {
+          const dataA = a.prazo ? new Date(a.prazo).getTime() : Infinity;
+          const dataB = b.prazo ? new Date(b.prazo).getTime() : Infinity;
+          return dataA - dataB;
+        });
+  
+        setDefinicoes(definicoesOrdenadas);
         setColaboradores(resColabs);
-
+  
         // inicializa edições com valores atuais
         const inicial = {};
-        resDefinicao.forEach((item) => {
+        definicoesOrdenadas.forEach((item) => {
           inicial[item.id] = {
             responsavel_id: item.responsavel?.id || "",
             data_definida_atribuicao_evento: item.data_definida_atribuicao_evento || "",
@@ -66,9 +483,10 @@ function AgendaDesignacao() {
         console.error("Erro ao carregar dados da designação:", err);
       }
     }
-
+  
     carregarDados();
   }, []);
+  
 
   const handleChange = (id, campo, valor) => {
     setEdicoes((prev) => ({
@@ -96,6 +514,7 @@ function AgendaDesignacao() {
             <tr>
               <th className="agenda-col-tipo">Tipo</th>
               <th className="agenda-col-descricao">Descrição</th>
+              <th className="agenda-col-prazo">Prazo</th>
               <th className="agenda-col-responsavel">Responsável</th>
               <th className="agenda-col-numero">Número</th>
               <th className="agenda-col-acoes">Ações</th>
@@ -104,7 +523,7 @@ function AgendaDesignacao() {
           <tbody>
             {definicoes.length === 0 ? (
               <tr>
-                <td colSpan="5" className="agenda-col-vazio">
+                <td colSpan="6" className="agenda-col-vazio">
                   Nenhuma definição encontrada
                 </td>
               </tr>
@@ -113,6 +532,7 @@ function AgendaDesignacao() {
                 <tr key={item.id}>
                   <td>{item.entity_type}</td>
                   <td>{item.descricao}</td>
+                  <td>{item.prazo ? new Date(item.prazo).toLocaleDateString("pt-BR") : "—"}</td>
                   <td>{item.responsavel?.nome || "—"}</td>
                   <td>{item.entidade?.numero}</td>
                   <td>
@@ -172,6 +592,9 @@ function AgendaDesignacao() {
 function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const diasSemana = getDiasSemana(semanaOffset);
   const [compromissos, setCompromissos] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [eventosExtras, setEventosExtras] = useState([]);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -191,19 +614,23 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const compromissosPorDia = useMemo(() => {
     const mapa = {};
     diasSemana.forEach((dia) => {
-      const chave = dia.toISOString().split("T")[0];
+      // força local YYYY-MM-DD sem UTC
+      const chave = dia.toLocaleDateString("sv-SE");  // ✅ 2025-09-17
       mapa[chave] = [];
     });
-
+  
     compromissos.forEach((evento) => {
-      const data = evento.data_definida?.split("T")[0];
+      // garante que o campo já vem como string pura
+      const data = evento.data_definida;  // ✅ já está em "2025-09-17"
       if (mapa[data]) {
         mapa[data].push(evento);
       }
     });
-
+  
     return mapa;
   }, [diasSemana, compromissos]);
+  
+  
 
   return (
     <div className="agenda-section">
@@ -227,7 +654,8 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
               </h3>
                 <ul className="agenda-lista">
                   {(() => {
-                    const chave = dia.toISOString().split("T")[0];
+                    const chave = dia.toLocaleDateString("sv-SE");
+
                     let eventos = compromissosPorDia[chave] || [];
 
                     if (eventos.length === 0) {
@@ -310,14 +738,15 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
 
                         {temMais && (
                           <li
-                            className="agenda-item agenda-item-azul cursor-pointer"
-                            onClick={() => {
-                              setEventosExtras(eventos);
-                              setMostrarModal(true);
-                            }}
-                          >
-                            <span className="agenda-item-texto">+ Mais Atribuições</span>
-                          </li>
+                          className="agenda-item agenda-item-azul cursor-pointer"
+                          onClick={() => {
+                            setEventosExtras(eventos);
+                            setMostrarModal(true);
+                          }}
+                        >
+                          <span className="agenda-item-texto">+ Mais Atribuições</span>
+                        </li>
+                        
                         )}
                       </>
                     );
@@ -336,6 +765,12 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
           ➡️
         </button>
       </div>
+      <AgendaModalAtribuicoes
+        open={mostrarModal}
+        onClose={() => setMostrarModal(false)}
+        eventos={eventosExtras}
+      />
+
     </div>
   );
 }
@@ -379,19 +814,19 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
   const compromissosPorDia = useMemo(() => {
     const mapa = {};
     diasSemana.forEach((dia) => {
-      const chave = dia.toISOString().split("T")[0];
+      // força local YYYY-MM-DD sem UTC
+      const chave = dia.toLocaleDateString("sv-SE");  // ✅ 2025-09-17
       mapa[chave] = [];
     });
-
+  
     compromissos.forEach((evento) => {
-      const data = evento.data_definida?.split("T")[0];
+      // garante que o campo já vem como string pura
+      const data = evento.data_definida;  // ✅ já está em "2025-09-17"
       if (mapa[data]) {
-        if (!responsavelFiltro || evento.responsavel?.id === Number(responsavelFiltro)) {
-          mapa[data].push(evento);
-        }
+        mapa[data].push(evento);
       }
     });
-
+  
     return mapa;
   }, [diasSemana, compromissos, responsavelFiltro]);
 
@@ -417,7 +852,7 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
               </h3>
                 <ul className="agenda-lista">
                   {(() => {
-                    const chave = dia.toISOString().split("T")[0];
+                    const chave = dia.toLocaleDateString("sv-SE");
                     let eventos = compromissosPorDia[chave] || [];
 
                     if (eventos.length === 0) {
@@ -524,7 +959,7 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
               className="agenda-card agenda-card-extra"
               onClick={() => {
                 const extras = diasSemana.slice(7).map((dia) => {
-                  const chave = dia.toISOString().split("T")[0];
+                  const chave = dia.toLocaleDateString("sv-SE");
                   return compromissosPorDia[chave] || [];
                 }).flat();
                 setEventosExtras(extras);
@@ -544,31 +979,11 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
           ➡️
         </button>
       </div>
-
-      {/* Modal */}
-      {mostrarModal && (
-        <div className="agenda-modal-overlay" onClick={() => setMostrarModal(false)}>
-          <div className="agenda-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="agenda-modal-title">Atribuições Extras</h3>
-            <ul className="agenda-modal-lista">
-              {eventosExtras.map((evento, idx) => (
-                <li key={idx} className="agenda-item agenda-item-azul">
-                  <span className="agenda-item-texto">
-                    {evento.entity_type} → {evento.descricao}
-                  </span>
-                  <div>{evento.responsavel?.nome || "—"}</div>
-                </li>
-              ))}
-            </ul>
-            <button
-              className="agenda-modal-fechar"
-              onClick={() => setMostrarModal(false)}
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
+      <AgendaModalAtribuicoes
+        open={mostrarModal}
+        onClose={() => setMostrarModal(false)}
+        eventos={eventosExtras}
+      />
     </div>
   );
 }

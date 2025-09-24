@@ -2089,7 +2089,7 @@ input[type="date"].processo-modal-input {
   margin-bottom: 1rem;
 }
 
-.acordo-botao-salvar-bottom {
+.acordo-btn-modal-left-footer {
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
@@ -2300,7 +2300,7 @@ input[type="date"].acordo-modal-input {
 
 
 /* Botões fixos no canto inferior direito */
-.acordo-modal-right-footer {
+.acordo-btn-modal-right-footer {
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -2875,4 +2875,187 @@ input[type="date"].acordo-modal-input {
 
 .agenda-tabs-filter {
   align-self: flex-end !important;  
+}
+
+
+/* ========================= */
+/* Agenda – Modal Split */
+/* ========================= */
+
+.agenda-modal-container {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 1300px !important;
+  max-width: 1300px !important;
+  min-width: 1300px !important;
+  height: 590px !important;
+  max-height: 590px !important;
+  min-height: 590px !important;
+  gap: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.agenda-modal-split {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Painéis */
+.agenda-modal-split-left {
+  flex: 0 0 55%;
+  max-width: 55%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0rem 0.5rem 0.5rem 0rem;
+  background: #ffffff;
+}
+
+
+
+.agenda-modal-split-right {
+  flex: 0 0 45%;
+  max-width: 45%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0rem 1rem 0.5rem 0.5rem;
+  background: #f9f9f9;
+}
+
+/* Scroll interno */
+.agenda-modal-left-scroll,
+.agenda-modal-right-scroll {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  padding-right: 4px;
+}
+
+/* Cabeçalhos */
+.agenda-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+
+.agenda-modal-description {
+  font-size: 0.875rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.agenda-modal-right-header {
+  flex-shrink: 0;
+}
+
+.agenda-modal-right-content {
+  padding: 1rem;
+  height: 25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rodapé fixo */
+.agenda-modal-right-footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  gap: 0.75rem;
+}
+
+/* Itens */
+.agenda-modal-atr-label {
+  font-weight: 500;
+}
+
+/* Cada card */
+.agenda-modal-item {
+  padding: 0.3rem 0.4rem;   /* menos padding */
+  border-radius: 6px;
+  font-size: 0.8rem;        /* fonte menor */
+  line-height: 2;         /* altura menor */
+  max-width: 14rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.agenda-modal-item-azul {
+  background: #e0f2fe;
+}
+
+.agenda-modal-item-vermelho {
+  background: #fee2e2;
+}
+
+.agenda-modal-item-verde {
+  background: #dcfce7;
+}
+
+.agenda-modal-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Texto principal do card */
+.agenda-modal-item-texto {
+  font-size: 0.8rem;  /* fonte menor */
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+/* Nome do responsável */
+.agenda-modal-item div {
+  font-size: 0.75rem;
+  color: #374151; /* cinza médio */
+}
+
+.agenda-modal-overlay {
+  background: rgba(0,0,0,0.4);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.agenda-modal-colunas {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem; /* antes era 1rem → reduzido */
+  height: 100%;
+}
+
+.agenda-modal-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem; /* diminui espaço entre cards */
+  flex: 1;
+}
+
+.agenda-btn-modal-left-footer {
+  display: flex;
+  justify-content: flex-end !important;
+  margin-top: 1rem;
+  gap: 0.75rem;
 }

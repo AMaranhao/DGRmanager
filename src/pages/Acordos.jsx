@@ -158,7 +158,7 @@ const norm = (s) =>
     
           {/* Rodapé fixo com botão apenas no modo editar */}
           {!visualizando && (
-            <div className="acordo-botao-salvar-bottom">
+            <div className="acordo-btn-modal-left-footer">
               <Button
                 variant="ghost"
                 onClick={() => setForm({ ...form, status: "Cancelado" })}
@@ -253,7 +253,7 @@ const norm = (s) =>
               </div>
       
               {!visualizando && (
-                <div className="acordo-modal-right-footer">
+                <div className="acordo-btn-modal-right-footer">
                   <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
                 </div>
               )}
@@ -325,7 +325,7 @@ const norm = (s) =>
                 </div>
               </div>
       
-                <div className="acordo-modal-right-footer">
+                <div className="acordo-btn-modal-right-footer">
                   <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
                   <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
                 </div>
@@ -396,7 +396,7 @@ const norm = (s) =>
                 </div>
               </div>
       
-              <div className="acordo-modal-right-footer">
+              <div className="acordo-btn-modal-right-footer">
                 <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
                 <Button onClick={handleCriarAtribuicao}>Salvar</Button>
               </div>
