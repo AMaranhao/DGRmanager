@@ -65,6 +65,7 @@ function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, s
   return (
     <div className="processo-form-wrapper">
       {/* Linha 1 - CNJ e Contrato */}
+      <h4 className="agenda-modal-section-title">Processo</h4>
       <div className="processo-input-row">
         <LinhaInput label="Número (CNJ)">
           <Input
@@ -111,7 +112,7 @@ function ModalLeftProcesso({ form, setForm, visualizando, salvar, tiposEvento, s
       </div>
 
       {/* Etapa */}
-      <h4 className="processo-section-title">Etapa do Processo</h4>
+      <h4 className="agenda-modal-section-title">Etapa do Processo</h4>
       <div className="processo-input-row">
         <LinhaInput label="Etapa">
           <select
@@ -299,7 +300,7 @@ function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
 
 
 
-function AgendaModalAtribuicoes({ open, onClose, eventos }) {
+function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada }) {
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
   const [form, setForm] = useState({});
   const [visualizando, setVisualizando] = useState(true);
@@ -380,7 +381,16 @@ function AgendaModalAtribuicoes({ open, onClose, eventos }) {
         <div className="agenda-modal-split">
           {/* LADO ESQUERDO */}
           <div className="agenda-modal-split-left">
-            <DialogTitle className="agenda-modal-title">Atribuições Do Dia</DialogTitle>
+          <DialogTitle className="agenda-modal-title">
+            Atribuições Dia - {" "}
+            {dataSelecionada
+              ? new Date(dataSelecionada).toLocaleDateString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                })
+              : "—"}
+          </DialogTitle>
+
             <DialogDescription className="agenda-modal-description">
               Lista de atribuições adicionais deste dia
             </DialogDescription>
@@ -594,6 +604,8 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
   const [compromissos, setCompromissos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [eventosExtras, setEventosExtras] = useState([]);
+  const [dataSelecionada, setDataSelecionada] = useState(null);
+
 
   const { user } = useAuth();
 
@@ -647,7 +659,6 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
             <div key={idx} className="agenda-card">
               <h3 className="agenda-card-title">
                 {dia.toLocaleDateString("pt-BR", {
-                  weekday: "long",
                   day: "2-digit",
                   month: "2-digit",
                 })}
@@ -741,8 +752,12 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
                           className="agenda-item agenda-item-azul cursor-pointer"
                           onClick={() => {
                             setEventosExtras(eventos);
+                            if (eventos.length > 0) {
+                              setDataSelecionada(eventos[0].data_definida); // usa a data do primeiro evento
+                            }
                             setMostrarModal(true);
                           }}
+                          
                         >
                           <span className="agenda-item-texto">+ Mais Atribuições</span>
                         </li>
@@ -769,7 +784,9 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
         open={mostrarModal}
         onClose={() => setMostrarModal(false)}
         eventos={eventosExtras}
+        dataSelecionada={dataSelecionada}
       />
+
 
     </div>
   );
@@ -786,6 +803,8 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
   const [colaboradores, setColaboradores] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [eventosExtras, setEventosExtras] = useState([]);
+  const [dataSelecionada, setDataSelecionada] = useState(null);
+
 
   useEffect(() => {
     async function carregarColaboradores() {
@@ -845,7 +864,6 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
             <div key={idx} className="agenda-card">
               <h3 className="agenda-card-title">
                 {dia.toLocaleDateString("pt-BR", {
-                  weekday: "long",
                   day: "2-digit",
                   month: "2-digit",
                 })}
@@ -938,8 +956,12 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
                             className="agenda-item agenda-item-azul cursor-pointer"
                             onClick={() => {
                               setEventosExtras(eventos);
+                              if (eventos.length > 0) {
+                                setDataSelecionada(eventos[0].data_definida); // usa a data do primeiro evento
+                              }
                               setMostrarModal(true);
                             }}
+                            
                           >
                             <span className="agenda-item-texto">+ Mais Atribuições</span>
                           </li>
@@ -962,9 +984,16 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
                   const chave = dia.toLocaleDateString("sv-SE");
                   return compromissosPorDia[chave] || [];
                 }).flat();
+              
                 setEventosExtras(extras);
+              
+                if (extras.length > 0) {
+                  setDataSelecionada(extras[0].data_definida);
+                }
+              
                 setMostrarModal(true);
               }}
+              
             >
               <h3 className="agenda-card-title">+ Mais</h3>
               <p className="agenda-item-texto">Clique para ver atribuições extras</p>
@@ -983,6 +1012,7 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
         open={mostrarModal}
         onClose={() => setMostrarModal(false)}
         eventos={eventosExtras}
+        dataSelecionada={dataSelecionada}
       />
     </div>
   );
