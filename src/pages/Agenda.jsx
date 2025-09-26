@@ -619,8 +619,9 @@ function ModalRightAtribuicoesAgenda({
                 return (
                   <li
                     key={a.id}
-                    className={`agenda-modal-right-item agenda-atr-item ${ultima ? "atual" : ""}`}
+                    className={`agenda-modal-right-item agenda-atr-item cursor-pointer ${ultima ? "atual" : ""}`}
                     onClick={() => {
+                      console.log("Cliquei em atribuição:", a);
                       setFormAtrib({
                         atribuicao_id: a.atribuicao_id,
                         atribuicao_descricao: a.atribuicao_descricao,
@@ -633,6 +634,7 @@ function ModalRightAtribuicoesAgenda({
                       setRightMode("editarAtrib");
                     }}
                   >
+
                     <div className="agenda-modal-right-texto">
                       <div className="atr-desc">{a.atribuicao_descricao}</div>
                       <div className="atr-lista">
@@ -670,13 +672,11 @@ function ModalRightAtribuicoesAgenda({
         </div>
       )}
 
-      {/* Modo: editar atribuição */}
       {rightMode === "editarAtrib" && (
         <div className="agenda-modal-right-wrapper">
           <div className="agenda-modal-right-content form">
-            <h4 className="agenda-atr-section-title">Atribuição Atual</h4>
 
-            <LinhaInput label="Status Atual">
+            <LinhaInput label="Status">
               <Input
                 className="agenda-modal-right-input"
                 value={formAtrib.atribuicao_descricao || ""}
@@ -693,12 +693,29 @@ function ModalRightAtribuicoesAgenda({
               />
             </LinhaInput>
 
+            <LinhaInput label="Tempo no Status">
+              <Input
+                className="agenda-modal-right-input"
+                value={
+                  formAtrib.data_inicial
+                    ? `${Math.floor(
+                        (new Date() - new Date(formAtrib.data_inicial)) /
+                        (1000 * 60 * 60 * 24)
+                      )} dias`
+                    : "—"
+                }
+                readOnly
+              />
+            </LinhaInput>
+
             <LinhaInput label="Prazo">
               <Input
                 type="date"
                 className="agenda-modal-right-input"
                 value={formAtrib.prazo || ""}
-                onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+                onChange={(e) =>
+                  setFormAtrib({ ...formAtrib, prazo: e.target.value })
+                }
               />
             </LinhaInput>
 
@@ -739,6 +756,7 @@ function ModalRightAtribuicoesAgenda({
           </div>
         </div>
       )}
+
 
       {/* Modo: nova atribuição */}
       {rightMode === "novaAtrib" && (
@@ -829,12 +847,29 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   const [visualizando, setVisualizando] = useState(true);
   const [editando, setEditando] = useState(false);
   const salvarRef = useRef(null);
+  const [formAtrib, setFormAtrib] = useState({});
+  const [rightMode, setRightMode] = useState("visualizarAtrib"); // 👈 estado do modo
+  const [historicoAtribs, setHistoricoAtribs] = useState([]);
 
   // ✅ Estados para tipos e atribuições
   const [tiposEvento, setTiposEvento] = useState([]);
   const [atribuicoesAcordo, setAtribuicoesAcordo] = useState([]);
   const [atribuicoesProcesso, setAtribuicoesProcesso] = useState([]);
   const [atribuicoesContratos, setAtribuicoesContratos] = useState([]);
+  const [colaboradores, setColaboradores] = useState([]);
+
+  useEffect(() => {
+    async function carregarColaboradores() {
+      try {
+        const res = await fetchColaboradores();
+        setColaboradores(res);
+      } catch (err) {
+        console.error("Erro ao carregar colaboradores:", err);
+      }
+    }
+    carregarColaboradores();
+  }, []);
+
 
   useEffect(() => {
     if (eventoInicial) {
@@ -876,37 +911,42 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
       if (evento.entity_type === "processo") {
         const dados = await fetchProcessoById(evento.entity_id);
         setForm(dados);
-        setVisualizando(false); // Abre em modo edição
+        setHistoricoAtribs(dados.atribuicoes_evento || []); // 👈 pega do backend
+        setVisualizando(false);
         setEditando(true);
       }
   
       else if (evento.entity_type === "contrato") {
         const dados = await fetchContratoById(evento.entity_id);
         setForm(dados);
-        setVisualizando(true); // Abre somente leitura
+        setHistoricoAtribs(dados.atribuicoes_evento || []); // 👈 idem
+        setVisualizando(true);
         setEditando(false);
       }
   
       else if (evento.entity_type === "acordo") {
         const dados = await fetchAcordoUnificadoById(evento.entity_id);
         setForm(dados);
-        setVisualizando(true); // Abre somente leitura
+        setHistoricoAtribs(dados.atribuicoes_evento || []); // 👈 idem
+        setVisualizando(true);
         setEditando(false);
       }
   
       else {
-        // Caso o tipo não seja reconhecido
         setForm({});
+        setHistoricoAtribs([]); // 👈 limpa
         setVisualizando(true);
         setEditando(false);
       }
     } catch (err) {
       console.error(`Erro ao carregar dados de ${evento.entity_type}:`, err);
       setForm({});
+      setHistoricoAtribs([]);
       setVisualizando(true);
       setEditando(false);
     }
   }
+  
   
 
   async function salvar() {
@@ -1003,20 +1043,21 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           <div className="agenda-modal-split-right">
             {eventoSelecionado?.entity_type ? (
               <ModalRightAtribuicoesAgenda
-                rightMode="visualizarAtrib"
-                setRightMode={() => {}} // depois você pode ligar ao state
-                atribs={[
-                  ...atribuicoesProcesso,
-                  ...atribuicoesContratos,
-                  ...atribuicoesAcordo,
-                ]}
-                colabs={[]} // pode carregar com fetchColaboradores se quiser
-                historicoAtribs={form.atribuicoes_evento || []} // ✅ pega do JSON do form
-                formAtrib={{}}
-                setFormAtrib={() => {}}
-                handleCriarAtribuicao={() => {}}
-                handleEditarAtribuicao={() => {}}
-              />
+              rightMode={rightMode}
+              setRightMode={setRightMode}
+              atribs={[
+                ...atribuicoesProcesso,
+                ...atribuicoesContratos,
+                ...atribuicoesAcordo,
+              ]}
+              colabs={colaboradores} // 👈 já tem fetchColaboradores no seu código
+              historicoAtribs={historicoAtribs} // 👈 agora vem do estado
+              formAtrib={formAtrib}
+              setFormAtrib={setFormAtrib}
+              handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
+              handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
+            />
+            
             ) : (
               <div className="agenda-modal-right-content">
                 <p className="agenda-modal-atr-label">
