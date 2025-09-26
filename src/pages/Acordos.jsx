@@ -174,240 +174,240 @@ const norm = (s) =>
     
     
 
-    function ModalRightAtribuicoesAcordo({
-      rightMode,
-      setRightMode,
-      atribs,
-      colabs,
-      historicoAtribs,
-      formAtrib,
-      setFormAtrib,
-      handleCriarAtribuicao,
-      handleEditarAtribuicao,
-      visualizando,
-    }) {
-      return (
-        <div className="acordo-modal-split-right">
-          {/* Cabeçalho fixo (sempre visível) */}
-          <div className="acordo-right-header">
-            <h2 className="acordo-modal-title">
-              {rightMode === "editarAtrib"
-                ? "Atribuições do Acordo"
-                : rightMode === "novaAtrib"
-                ? "Atribuições do Acordo"
-                : "Atribuições do Acordo"}
-            </h2>
-          </div>
+function ModalRightAtribuicoesAcordo({
+  rightMode,
+  setRightMode,
+  atribs,
+  colabs,
+  historicoAtribs,
+  formAtrib,
+  setFormAtrib,
+  handleCriarAtribuicao,
+  handleEditarAtribuicao,
+  visualizando,
+}) {
+  return (
+    <div className="acordo-modal-split-right">
+      {/* Cabeçalho fixo (sempre visível) */}
+      <div className="acordo-right-header">
+        <h2 className="acordo-modal-title">
+          {rightMode === "editarAtrib"
+            ? "Atribuições do Acordo"
+            : rightMode === "novaAtrib"
+            ? "Atribuições do Acordo"
+            : "Atribuições do Acordo"}
+        </h2>
+      </div>
 
-      
-          {/* Modo: visualizar atribuições */}
-          {rightMode === "visualizarAtrib" && (
-            <div className="acordo-right-wrapper">
-              <div className="acordo-right-scroll">
-                <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
-                  {(historicoAtribs || []).map((a, idx, arr) => {
+  
+      {/* Modo: visualizar atribuições */}
+      {rightMode === "visualizarAtrib" && (
+        <div className="acordo-right-wrapper">
+          <div className="acordo-right-scroll">
+            <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
+              {(historicoAtribs || []).map((a, idx, arr) => {
 
-                    const ultima = idx === arr.length - 1;
-                    return (
-                      <li
-                        key={a.id}
-                        className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
-                        onClick={() => {
-                          setFormAtrib({
-                            atribuicao_id: a.atribuicao_id,
-                            atribuicao_descricao: a.atribuicao_descricao,
-                            status_atual: a.atribuicao_descricao,
-                            data_inicial: a.data_inicial,
-                            prazo: a.prazo ?? "",
-                            responsavel_id: a?.responsavel?.id ?? "",  // ⬅️ Corrigido aqui
-                            observacao: a?.observacao ?? "",
-                          });
-                          setRightMode("editarAtrib");
-                        }}
-                      >
-                        <div className="processo-modal-right-texto">
-                          <div className="atr-desc">{a.atribuicao_descricao}</div>
-                          <div className="atr-lista">
-                            <div className="atr-linha">
-                              <span className="atr-label">Definida em</span>
-                              <span className="atr-valor">
-                                {a.data_inicial ? new Date(a.data_inicial).toLocaleDateString("pt-BR") : "—"}
-                              </span>
-                            </div>
-                            <div className="atr-linha">
-                              <span className="atr-label">Prazo</span>
-                              <span className="atr-valor">
-                                {a.prazo ? new Date(a.prazo).toLocaleDateString("pt-BR") : "—"}
-                              </span>
-                            </div>
-                            <div className="atr-linha">
-                              <span className="atr-label">Responsável</span>
-                              <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-      
-              {!visualizando && (
-                <div className="acordo-btn-modal-right-footer">
-                  <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
-                </div>
-              )}
-            </div>
-          )}
-      
-          {/* Modo: editar atribuição */}
-          {rightMode === "editarAtrib" && (
-            <div className="acordo-right-wrapper">
-              <div className="acordo-right-content form">
-                <div className="acordo-atr-section">
-                  <p className="acordo-atr-section-title">Atribuição Atual</p>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Status Atual</span>
-                    <span className="acordo-atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Definida em</span>
-                    <span className="acordo-atr-valor">
-                      {formAtrib.data_inicial
-                        ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
-                        : "—"}
-                    </span>
-                  </div>
-                  <div className="acordo-atr-linha">
-                    <span className="acordo-atr-label">Tempo no Status</span>
-                    <span className="acordo-atr-valor">
-                      {formAtrib.data_inicial
-                        ? `${Math.floor(
-                            (new Date() - new Date(formAtrib.data_inicial)) / (1000 * 60 * 60 * 24)
-                          )} dias`
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-      
-                <div className="acordo-input-wrapper">
-                  <label className="acordo-label">Prazo</label>
-                  <input
-                    type="date"
-                    className="acordo-modal-input"
-                    value={formAtrib.prazo}
-                    onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
-                  />
-                </div>
-      
-                <div className="acordo-input-wrapper">
-                  <label className="acordo-label">Responsável</label>
-                  <select
-                    className="acordo-modal-input"
-                    value={formAtrib.responsavel_id}
-                    onChange={(e) => setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })}
+                const ultima = idx === arr.length - 1;
+                return (
+                  <li
+                    key={a.id}
+                    className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
+                    onClick={() => {
+                      setFormAtrib({
+                        atribuicao_id: a.atribuicao_id,
+                        atribuicao_descricao: a.atribuicao_descricao,
+                        status_atual: a.atribuicao_descricao,
+                        data_inicial: a.data_inicial,
+                        prazo: a.prazo ?? "",
+                        responsavel_id: a?.responsavel?.id ?? "",  // ⬅️ Corrigido aqui
+                        observacao: a?.observacao ?? "",
+                      });
+                      setRightMode("editarAtrib");
+                    }}
                   >
-                    <option value="">Selecione…</option>
-                    {colabs.map((c) => (
-                      <option key={c.id} value={c.id}>{c.nome}</option>
-                    ))}
-                  </select>
-                </div>
-      
-                <div className="acordo-input-wrapper">
-                  <label className="acordo-label">Observação</label>
-                  <textarea
-                    className="acordo-textarea"
-                    rows={2}
-                    value={formAtrib.observacao || ""}
-                    onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
-                  />
-                </div>
-              </div>
-      
-                <div className="acordo-btn-modal-right-footer">
-                  <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-                  <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
-                </div>
-            </div>
-          )}
-      
-          {/* Modo: nova atribuição */}
-          {rightMode === "novaAtrib" && (
-            <div className="acordo-right-wrapper">
-              <div className="acordo-right-scroll">
-                <div className="acordo-right-content form">
-                  <div className="acordo-atr-section-title">Atribuição Atual</div>
-                  <div className="acordo-input-wrapper">
-                    <label className="acordo-label">Solucionador</label>
-                    <select
-                      className="acordo-modal-input"
-                      value={formAtrib.solucionador_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {colabs.map((c) => (
-                        <option key={c.id} value={c.id}>{c.nome}</option>
-                      ))}
-                    </select>
-                  </div>
-      
-                  <div className="acordo-atr-section-title" style={{ marginTop: "2rem" }}>Próxima Atribuição</div>
-      
-                  <div className="acordo-input-wrapper">
-                    <label className="acordo-label">Status</label>
-                    <select
-                      className="acordo-modal-input"
-                      value={formAtrib.proxima_atr_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {atribs.map((a) => (
-                        <option key={a.id} value={a.id}>{a.descricao}</option>
-                      ))}
-                    </select>
-                  </div>
-      
-                  <div className="acordo-input-wrapper">
-                    <label className="acordo-label">Responsável</label>
-                    <select
-                      className="acordo-modal-input"
-                      value={formAtrib.proximo_resp_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {colabs.map((c) => (
-                        <option key={c.id} value={c.id}>{c.nome}</option>
-                      ))}
-                    </select>
-                  </div>
-      
-                  <div className="acordo-input-wrapper">
-                    <label className="acordo-label">Prazo</label>
-                    <input
-                      type="date"
-                      className="acordo-modal-input"
-                      value={formAtrib.prazo}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
-                    />
-                  </div>
-      
-
-                </div>
-              </div>
-      
-              <div className="acordo-btn-modal-right-footer">
-                <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-                <Button onClick={handleCriarAtribuicao}>Salvar</Button>
-              </div>
+                    <div className="processo-modal-right-texto">
+                      <div className="atr-desc">{a.atribuicao_descricao}</div>
+                      <div className="atr-lista">
+                        <div className="atr-linha">
+                          <span className="atr-label">Definida em</span>
+                          <span className="atr-valor">
+                            {a.data_inicial ? new Date(a.data_inicial).toLocaleDateString("pt-BR") : "—"}
+                          </span>
+                        </div>
+                        <div className="atr-linha">
+                          <span className="atr-label">Prazo</span>
+                          <span className="atr-valor">
+                            {a.prazo ? new Date(a.prazo).toLocaleDateString("pt-BR") : "—"}
+                          </span>
+                        </div>
+                        <div className="atr-linha">
+                          <span className="atr-label">Responsável</span>
+                          <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+  
+          {!visualizando && (
+            <div className="acordo-btn-modal-right-footer">
+              <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
             </div>
           )}
         </div>
-      );
-      
-      
-      
-    }
+      )}
+  
+      {/* Modo: editar atribuição */}
+      {rightMode === "editarAtrib" && (
+        <div className="acordo-right-wrapper">
+          <div className="acordo-right-content form">
+            <div className="acordo-atr-section">
+              <p className="acordo-atr-section-title">Atribuição Atual</p>
+              <div className="acordo-atr-linha">
+                <span className="acordo-atr-label">Status Atual</span>
+                <span className="acordo-atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
+              </div>
+              <div className="acordo-atr-linha">
+                <span className="acordo-atr-label">Definida em</span>
+                <span className="acordo-atr-valor">
+                  {formAtrib.data_inicial
+                    ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
+                    : "—"}
+                </span>
+              </div>
+              <div className="acordo-atr-linha">
+                <span className="acordo-atr-label">Tempo no Status</span>
+                <span className="acordo-atr-valor">
+                  {formAtrib.data_inicial
+                    ? `${Math.floor(
+                        (new Date() - new Date(formAtrib.data_inicial)) / (1000 * 60 * 60 * 24)
+                      )} dias`
+                    : "—"}
+                </span>
+              </div>
+            </div>
+  
+            <div className="acordo-input-wrapper">
+              <label className="acordo-label">Prazo</label>
+              <input
+                type="date"
+                className="acordo-modal-input"
+                value={formAtrib.prazo}
+                onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+              />
+            </div>
+  
+            <div className="acordo-input-wrapper">
+              <label className="acordo-label">Responsável</label>
+              <select
+                className="acordo-modal-input"
+                value={formAtrib.responsavel_id}
+                onChange={(e) => setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })}
+              >
+                <option value="">Selecione…</option>
+                {colabs.map((c) => (
+                  <option key={c.id} value={c.id}>{c.nome}</option>
+                ))}
+              </select>
+            </div>
+  
+            <div className="acordo-input-wrapper">
+              <label className="acordo-label">Observação</label>
+              <textarea
+                className="acordo-textarea"
+                rows={2}
+                value={formAtrib.observacao || ""}
+                onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
+              />
+            </div>
+          </div>
+  
+            <div className="acordo-btn-modal-right-footer">
+              <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
+              <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
+            </div>
+        </div>
+      )}
+  
+      {/* Modo: nova atribuição */}
+      {rightMode === "novaAtrib" && (
+        <div className="acordo-right-wrapper">
+          <div className="acordo-right-scroll">
+            <div className="acordo-right-content form">
+              <div className="acordo-atr-section-title">Atribuição Atual</div>
+              <div className="acordo-input-wrapper">
+                <label className="acordo-label">Solucionador</label>
+                <select
+                  className="acordo-modal-input"
+                  value={formAtrib.solucionador_id}
+                  onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
+                >
+                  <option value="">Selecione…</option>
+                  {colabs.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
+              </div>
+  
+              <div className="acordo-atr-section-title" style={{ marginTop: "2rem" }}>Próxima Atribuição</div>
+  
+              <div className="acordo-input-wrapper">
+                <label className="acordo-label">Status</label>
+                <select
+                  className="acordo-modal-input"
+                  value={formAtrib.proxima_atr_id}
+                  onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
+                >
+                  <option value="">Selecione…</option>
+                  {atribs.map((a) => (
+                    <option key={a.id} value={a.id}>{a.descricao}</option>
+                  ))}
+                </select>
+              </div>
+  
+              <div className="acordo-input-wrapper">
+                <label className="acordo-label">Responsável</label>
+                <select
+                  className="acordo-modal-input"
+                  value={formAtrib.proximo_resp_id}
+                  onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
+                >
+                  <option value="">Selecione…</option>
+                  {colabs.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
+              </div>
+  
+              <div className="acordo-input-wrapper">
+                <label className="acordo-label">Prazo</label>
+                <input
+                  type="date"
+                  className="acordo-modal-input"
+                  value={formAtrib.prazo}
+                  onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+                />
+              </div>
+  
+
+            </div>
+          </div>
+  
+          <div className="acordo-btn-modal-right-footer">
+            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
+            <Button onClick={handleCriarAtribuicao}>Salvar</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+  
+  
+  
+}
     
     
     function ModalLeftParcelas({ parcelas, parcelaSelecionada, setParcelaSelecionada }) {

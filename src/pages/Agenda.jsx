@@ -591,6 +591,236 @@ function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
 }
 
 
+function ModalRightAtribuicoesAgenda({
+  rightMode,
+  setRightMode,
+  atribs,
+  colabs,
+  historicoAtribs,
+  formAtrib,
+  setFormAtrib,
+  handleCriarAtribuicao,
+  handleEditarAtribuicao,
+}) {
+  return (
+    <div className="agenda-modal-right">
+      {/* Cabeçalho fixo */}
+      <div className="agenda-modal-right-header">
+        <h3 className="agenda-modal-right-title">Atribuições</h3>
+      </div>
+
+      {/* Modo: visualizar atribuições */}
+      {rightMode === "visualizarAtrib" && (
+        <div className="agenda-modal-right-wrapper">
+          <div className="agenda-modal-right-scroll">
+            <ul className="agenda-modal-right-lista">
+              {(historicoAtribs || []).map((a, idx, arr) => {
+                const ultima = idx === arr.length - 1;
+                return (
+                  <li
+                    key={a.id}
+                    className={`agenda-modal-right-item agenda-atr-item ${ultima ? "atual" : ""}`}
+                    onClick={() => {
+                      setFormAtrib({
+                        atribuicao_id: a.atribuicao_id,
+                        atribuicao_descricao: a.atribuicao_descricao,
+                        status_atual: a.atribuicao_descricao,
+                        data_inicial: a.data_inicial,
+                        prazo: a.prazo ?? "",
+                        responsavel_id: a?.responsavel?.id ?? "",
+                        observacao: a?.observacao ?? "",
+                      });
+                      setRightMode("editarAtrib");
+                    }}
+                  >
+                    <div className="agenda-modal-right-texto">
+                      <div className="atr-desc">{a.atribuicao_descricao}</div>
+                      <div className="atr-lista">
+                        <div className="atr-linha">
+                          <span className="atr-label">Definida em</span>
+                          <span className="atr-valor">
+                            {a.data_inicial
+                              ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
+                              : "—"}
+                          </span>
+                        </div>
+                        <div className="atr-linha">
+                          <span className="atr-label">Prazo</span>
+                          <span className="atr-valor">
+                            {a.prazo
+                              ? new Date(a.prazo).toLocaleDateString("pt-BR")
+                              : "—"}
+                          </span>
+                        </div>
+                        <div className="atr-linha">
+                          <span className="atr-label">Responsável</span>
+                          <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="agenda-btn-modal-right-footer">
+            <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
+          </div>
+        </div>
+      )}
+
+      {/* Modo: editar atribuição */}
+      {rightMode === "editarAtrib" && (
+        <div className="agenda-modal-right-wrapper">
+          <div className="agenda-modal-right-content form">
+            <h4 className="agenda-atr-section-title">Atribuição Atual</h4>
+
+            <LinhaInput label="Status Atual">
+              <Input
+                className="agenda-modal-right-input"
+                value={formAtrib.atribuicao_descricao || ""}
+                readOnly
+              />
+            </LinhaInput>
+
+            <LinhaInput label="Definida em">
+              <Input
+                type="date"
+                className="agenda-modal-right-input"
+                value={formAtrib.data_inicial || ""}
+                readOnly
+              />
+            </LinhaInput>
+
+            <LinhaInput label="Prazo">
+              <Input
+                type="date"
+                className="agenda-modal-right-input"
+                value={formAtrib.prazo || ""}
+                onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+              />
+            </LinhaInput>
+
+            <LinhaInput label="Responsável">
+              <select
+                className="agenda-modal-right-input"
+                value={formAtrib.responsavel_id}
+                onChange={(e) =>
+                  setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })
+                }
+              >
+                <option value="">Selecione…</option>
+                {colabs.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
+                ))}
+              </select>
+            </LinhaInput>
+
+            <LinhaInput label="Observação">
+              <textarea
+                className="agenda-textarea"
+                rows={2}
+                value={formAtrib.observacao || ""}
+                onChange={(e) =>
+                  setFormAtrib({ ...formAtrib, observacao: e.target.value })
+                }
+              />
+            </LinhaInput>
+          </div>
+
+          <div className="agenda-btn-modal-right-footer">
+            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
+              Cancelar
+            </Button>
+            <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
+          </div>
+        </div>
+      )}
+
+      {/* Modo: nova atribuição */}
+      {rightMode === "novaAtrib" && (
+        <div className="agenda-modal-right-wrapper">
+          <div className="agenda-modal-right-scroll">
+            <div className="agenda-modal-right-content form">
+              <h4 className="agenda-atr-section-title">Nova Atribuição</h4>
+
+              <LinhaInput label="Solucionador">
+                <select
+                  className="agenda-modal-right-input"
+                  value={formAtrib.solucionador_id}
+                  onChange={(e) =>
+                    setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })
+                  }
+                >
+                  <option value="">Selecione…</option>
+                  {colabs.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
+                  ))}
+                </select>
+              </LinhaInput>
+
+              <LinhaInput label="Status">
+                <select
+                  className="agenda-modal-right-input"
+                  value={formAtrib.proxima_atr_id}
+                  onChange={(e) =>
+                    setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })
+                  }
+                >
+                  <option value="">Selecione…</option>
+                  {atribs.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.descricao}
+                    </option>
+                  ))}
+                </select>
+              </LinhaInput>
+
+              <LinhaInput label="Responsável">
+                <select
+                  className="agenda-modal-right-input"
+                  value={formAtrib.proximo_resp_id}
+                  onChange={(e) =>
+                    setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })
+                  }
+                >
+                  <option value="">Selecione…</option>
+                  {colabs.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
+                  ))}
+                </select>
+              </LinhaInput>
+
+              <LinhaInput label="Prazo">
+                <Input
+                  type="date"
+                  className="agenda-modal-right-input"
+                  value={formAtrib.prazo || ""}
+                  onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
+                />
+              </LinhaInput>
+            </div>
+          </div>
+
+          <div className="agenda-btn-modal-right-footer">
+            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCriarAtribuicao}>Salvar</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 
 function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, eventoInicial }) {
@@ -771,36 +1001,32 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
           {/* LADO DIREITO */}
           <div className="agenda-modal-split-right">
-            <div className="agenda-modal-right-header">
-              <h2 className="agenda-modal-title">Detalhes</h2>
-            </div>
-
-            <div className="agenda-modal-right-content">
-              {eventoSelecionado ? (
-                <div>
-                  <p><b>Tipo:</b> {eventoSelecionado.entity_type}</p>
-                  <p><b>Descrição:</b> {eventoSelecionado.descricao}</p>
-                  <p><b>Responsável:</b> {eventoSelecionado.responsavel?.nome || "—"}</p>
-                  <p><b>Data Definida:</b> {eventoSelecionado.data_definida}</p>
-                  {eventoSelecionado.horario && (
-                    <p><b>Horário:</b> {new Date(eventoSelecionado.horario).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"})}</p>
-                  )}
-                  <p><b>Status:</b> {eventoSelecionado.status}</p>
-                  {eventoSelecionado.entidade?.numero && (
-                    <p><b>Número:</b> {eventoSelecionado.entidade.numero}</p>
-                  )}
-                </div>
-              ) : (
+            {eventoSelecionado?.entity_type ? (
+              <ModalRightAtribuicoesAgenda
+                rightMode="visualizarAtrib"
+                setRightMode={() => {}} // depois você pode ligar ao state
+                atribs={[
+                  ...atribuicoesProcesso,
+                  ...atribuicoesContratos,
+                  ...atribuicoesAcordo,
+                ]}
+                colabs={[]} // pode carregar com fetchColaboradores se quiser
+                historicoAtribs={form.atribuicoes_evento || []} // ✅ pega do JSON do form
+                formAtrib={{}}
+                setFormAtrib={() => {}}
+                handleCriarAtribuicao={() => {}}
+                handleEditarAtribuicao={() => {}}
+              />
+            ) : (
+              <div className="agenda-modal-right-content">
                 <p className="agenda-modal-atr-label">
                   Clique em uma atribuição à esquerda para detalhar aqui.
                 </p>
-              )}
-            </div>
-
-            <div className="agenda-modal-right-footer">
-
-            </div>
+              </div>
+            )}
           </div>
+
+
         </div>
       </DialogContent>
     </Dialog>
