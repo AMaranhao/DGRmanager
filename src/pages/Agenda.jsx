@@ -676,37 +676,36 @@ function ModalRightAtribuicoesAgenda({
         <div className="agenda-modal-right-wrapper">
           <div className="agenda-modal-right-content form">
 
-            <LinhaInput label="Status">
-              <Input
-                className="agenda-modal-right-input"
-                value={formAtrib.atribuicao_descricao || ""}
-                readOnly
-              />
-            </LinhaInput>
+            <div className="agenda-atr-section">
+              <h4 className="agenda-atr-section-title">Atribuição atual</h4>
 
-            <LinhaInput label="Definida em">
-              <Input
-                type="date"
-                className="agenda-modal-right-input"
-                value={formAtrib.data_inicial || ""}
-                readOnly
-              />
-            </LinhaInput>
+              <div className="atr-linha">
+                <span className="atr-label">Status Atual</span>
+                <span className="atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
+              </div>
 
-            <LinhaInput label="Tempo no Status">
-              <Input
-                className="agenda-modal-right-input"
-                value={
-                  formAtrib.data_inicial
+              <div className="atr-linha">
+                <span className="atr-label">Definida em</span>
+                <span className="atr-valor">
+                  {formAtrib.data_inicial
+                    ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
+                    : "—"}
+                </span>
+              </div>
+
+              <div className="atr-linha">
+                <span className="atr-label">Tempo no Status</span>
+                <span className="atr-valor">
+                  {formAtrib.data_inicial
                     ? `${Math.floor(
                         (new Date() - new Date(formAtrib.data_inicial)) /
                         (1000 * 60 * 60 * 24)
                       )} dias`
-                    : "—"
-                }
-                readOnly
-              />
-            </LinhaInput>
+                    : "—"}
+                </span>
+              </div>
+            </div>
+
 
             <LinhaInput label="Prazo">
               <Input
@@ -761,9 +760,8 @@ function ModalRightAtribuicoesAgenda({
       {/* Modo: nova atribuição */}
       {rightMode === "novaAtrib" && (
         <div className="agenda-modal-right-wrapper">
-          <div className="agenda-modal-right-scroll">
             <div className="agenda-modal-right-content form">
-              <h4 className="agenda-atr-section-title">Nova Atribuição</h4>
+              <h4 className="agenda-atr-section-title">Atribuição Atual</h4>
 
               <LinhaInput label="Solucionador">
                 <select
@@ -781,6 +779,8 @@ function ModalRightAtribuicoesAgenda({
                   ))}
                 </select>
               </LinhaInput>
+
+              <h4 className="agenda-atr-section-title">Próxima Atribuição</h4>
 
               <LinhaInput label="Status">
                 <select
@@ -825,7 +825,6 @@ function ModalRightAtribuicoesAgenda({
                 />
               </LinhaInput>
             </div>
-          </div>
 
           <div className="agenda-btn-modal-right-footer">
             <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>

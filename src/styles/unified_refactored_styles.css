@@ -3142,3 +3142,75 @@ input[type="date"].agenda-modal-left-input {
   height: 455px !important;
 }
 
+
+/* ============================= */
+/* Agenda – Inputs no Modal Right */
+/* ============================= */
+
+.agenda-modal-right-input {
+  border-radius: 9999px !important;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  max-width: 21rem !important;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+input[type="date"].agenda-modal-right-input,
+input[type="time"].agenda-modal-right-input {
+  background-color: white !important;
+  color: #111827;
+}
+
+select.agenda-modal-right-input {
+  background-color: white !important;
+  color: #111827;
+}
+
+.dark .agenda-modal-right-input {
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* ============================= */
+/* Agenda – Textarea no Modal Right */
+/* ============================= */
+
+.agenda-textarea {
+  width: 100%;
+  min-height: 3.5rem;       /* ~2 linhas */
+  resize: vertical;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.25rem;
+  max-width: 30rem;
+  background-color: white;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  box-sizing: border-box;
+}
+
+.agenda-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59,130,246,.3);
+  border-color: #93c5fd;
+}
+
+.dark .agenda-textarea {
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+.agenda-atr-section-title {
+  font-size: 1.2rem;           /* ~13px, pequeno como no print */
+  font-weight: 600;
+  color: #111827;                 /* gray-900 */
+  margin-bottom: 0.25rem;
+  margin-top: 0rem;
+}
