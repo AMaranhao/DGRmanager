@@ -692,7 +692,7 @@ function ModalRightAtribuicoesAgenda({
             {entityType === "contrato" && (
               <Button
                 variant="outline"
-                onClick={() => console.log("Abrir modal de Partes do contrato")}
+                onClick={() => setRightMode("partes")}
               >
                 Partes
               </Button>
@@ -871,6 +871,168 @@ function ModalRightAtribuicoesAgenda({
   );
 }
 
+function ModalRightAgendaContratoPartes({
+  contratoSelecionado,
+  partesVinculadas,
+  setPartesVinculadas,
+  visualizando,
+  showFormParte,
+  setShowFormParte,
+  fetchParte,
+  setFetchParte,
+  foundParte,
+  setFoundParte,
+  parteAviso,
+  setParteAviso,
+  parteParaRemover,
+  setParteParaRemover,
+  handleBuscarParte,
+  handleAdicionarParte,
+  handleRemoverParte,
+  setRightMode,
+  parteEditando,          // 👈 ADICIONE
+  setParteEditando,       // 👈 ADICIONE
+  parteEncontrada,        // 👈 ADICIONE
+  setParteEncontrada,     // 👈 ADICIONE
+}) {
+
+  return (
+    <div className="agenda-modal-right-wrapper">
+      <h3 className="agenda-modal-right-title">Partes Vinculadas</h3>
+      <div className="agenda-modal-right-scroll form">
+        {showFormParte ? (
+          <div className="parte-contrato-modal">
+            {/* Caso esteja editando uma parte existente */}
+            {parteEditando ? (
+              <>
+                <div className="non-editable-input-wrapper">
+                  <label className="usuarios-label">Nome</label>
+                  <Input className="usuarios-modal-input" value={parteEditando.nome} readOnly />
+                </div>
+                <div className="non-editable-input-wrapper">
+                  <label className="usuarios-label">CPF</label>
+                  <Input className="usuarios-modal-input" value={parteEditando.cpf} readOnly />
+                </div>
+              </>
+            ) : (
+              /* Caso seja + Parte */
+              <>
+                <div className="editable-input-wrapper">
+                  <label className="usuarios-label">CPF</label>
+                  <Input
+                    className="usuarios-modal-input"
+                    value={fetchParte}
+                    onChange={(e) => setFetchParte(e.target.value)}
+                    placeholder="Digite o CPF"
+                  />
+                </div>
+
+                <div className="non-editable-input-wrapper">
+                  <label className="usuarios-label">Nome</label>
+                  <Input
+                    className="usuarios-modal-input"
+                    value={parteEncontrada?.nome || ""}
+                    readOnly
+                    placeholder="—"
+                  />
+                </div>
+              </>
+            )}
+
+            {parteAviso && (
+              <div className="dashboard-modal-error" style={{ margin: "0.5rem 0" }}>
+                {parteAviso}
+              </div>
+            )}
+          </div>
+        ) : (
+          <ul>
+            {partesVinculadas?.length ? (
+              partesVinculadas.map((p) => (
+                <li
+                  key={p.id ?? p.cpf}
+                  onClick={() => {
+                    setParteEditando(p);   // 👈 entra no modo edição
+                    setShowFormParte(true);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="contratos-modal-right-texto">
+                    <div className={p.principal ? "font-bold" : ""}>{p.nome}</div>
+                    <div className="text-xs text-gray-500">
+                      {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
+                    </div>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p>Nenhuma parte vinculada ainda.</p>
+            )}
+          </ul>
+
+        )}
+
+      </div>
+      <div className="agenda-btn-modal-right-footer">
+        {parteEditando ? (
+          <>
+            <Button variant="destructive" onClick={handleRemoverParte}>Remover</Button>
+            <Button onClick={() => {
+              setPartesVinculadas(prev =>
+                prev.map(parte => parte.id === parteEditando.id ? parteEditando : parte)
+              );
+              setShowFormParte(false);
+              setParteEditando(null);
+            }}>Atualizar</Button>
+            <Button variant="outline" onClick={() => {
+              setShowFormParte(false);
+              setParteEditando(null);
+            }}>Cancelar</Button>
+          </>
+        ) : parteEncontrada ? (
+          <>
+            <Button onClick={handleAdicionarParte}>Salvar</Button>
+            <Button onClick={handleBuscarParte}>Buscar</Button>
+            <Button variant="outline" onClick={() => {
+              setShowFormParte(false);
+              setFetchParte("");
+              setParteEncontrada(null);
+              setParteEditando(null);
+              setParteAviso("");
+            }}>Cancelar</Button>
+          </>
+        ) : showFormParte ? (
+          <>
+            <Button onClick={handleBuscarParte}>Buscar</Button>
+            <Button variant="outline" onClick={() => {
+              setShowFormParte(false);
+              setFetchParte("");
+              setParteEncontrada(null);
+            }}>Cancelar</Button>
+          </>
+        ) : (
+          <>
+            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
+              Atribuições
+            </Button>
+            <Button onClick={() => {
+              setShowFormParte(true);
+              setParteAviso("");
+              setParteEditando(null);
+              setParteEncontrada(null);
+            }}>
+              + Parte
+            </Button>
+          </>
+        )}
+      </div>
+
+
+
+    </div>
+  );
+}
+
 
 
 function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, eventoInicial }) {
@@ -882,6 +1044,55 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   const [formAtrib, setFormAtrib] = useState({});
   const [rightMode, setRightMode] = useState("visualizarAtrib"); // 👈 estado do modo
   const [historicoAtribs, setHistoricoAtribs] = useState([]);
+
+    // 🔽 Estados específicos para manipular Partes no Contrato
+  const [showFormParte, setShowFormParte] = useState(false);
+  const [fetchParte, setFetchParte] = useState("");
+  const [foundParte, setFoundParte] = useState(null);
+  const [parteAviso, setParteAviso] = useState("");
+  const [parteParaRemover, setParteParaRemover] = useState(null);
+  const [parteEditando, setParteEditando] = useState(null);
+  const [parteEncontrada, setParteEncontrada] = useState(null);
+
+  // 🔽 Handlers de Partes
+  function handleBuscarParte() {
+    if (!fetchParte) {
+      setParteAviso("Digite um CPF para buscar.");
+      return;
+    }
+    const resultadoFake = { id: Date.now(), nome: "Parte Exemplo", cpf: fetchParte };
+    setParteEncontrada(resultadoFake);  // 👈 vai cair no fluxo de "Salvar"
+    setParteAviso("");
+  }
+  
+  
+
+  function handleAdicionarParte() {
+    if (!foundParte) {
+      setParteAviso("Nenhuma parte encontrada.");
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      partes_adversas: [...(prev.partes_adversas || []), foundParte],
+    }));
+    setShowFormParte(false);
+    setFetchParte(""); 
+    setFoundParte(null);
+  }
+
+  function handleRemoverParte() {
+    if (!parteParaRemover) return;
+    setForm((prev) => ({
+      ...prev,
+      partes_adversas: (prev.partes_adversas || []).filter(
+        (p) => p.id !== parteParaRemover.id
+      ),
+    }));
+    setParteParaRemover(null);
+    setShowFormParte(false);
+  }
+
 
   // ✅ Estados para tipos e atribuições
   const [tiposEvento, setTiposEvento] = useState([]);
@@ -1082,28 +1293,56 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           {/* LADO DIREITO */}
           <div className="agenda-modal-split-right">
             {eventoSelecionado?.entity_type ? (
-              <ModalRightAtribuicoesAgenda
-                rightMode={rightMode}
-                setRightMode={setRightMode}
-                atribs={
-                  eventoSelecionado?.entity_type === "processo"
-                    ? atribuicoesProcesso
-                    : eventoSelecionado?.entity_type === "acordo"
-                    ? atribuicoesAcordo
-                    : eventoSelecionado?.entity_type === "contrato"
-                    ? atribuicoesContratos
-                    : []
-                }
-                colabs={colaboradores}
-                historicoAtribs={historicoAtribs}
-                formAtrib={formAtrib}
-                setFormAtrib={setFormAtrib}
-                handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
-                handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
-                entityType={eventoSelecionado?.entity_type} 
-              />
-            
-            
+              rightMode === "partes" ? (
+                <ModalRightAgendaContratoPartes
+                  contratoSelecionado={form}
+                  partesVinculadas={form.partes_adversas || []}
+                  setPartesVinculadas={(novas) =>
+                    setForm((prev) => ({ ...prev, partes_adversas: novas }))
+                  }
+                  visualizando={visualizando}
+                  showFormParte={showFormParte}
+                  setShowFormParte={setShowFormParte}
+                  fetchParte={fetchParte}
+                  foundParte={foundParte}
+                  setFetchParte={setFetchParte} 
+                  setFoundParte={setFoundParte}
+                  parteAviso={parteAviso}
+                  setParteAviso={setParteAviso}
+                  parteParaRemover={parteParaRemover}
+                  setParteParaRemover={setParteParaRemover}
+                  parteEditando={parteEditando}              // 👈 ADICIONE
+                  setParteEditando={setParteEditando}        // 👈 ADICIONE
+                  parteEncontrada={parteEncontrada}          // 👈 ADICIONE
+                  setParteEncontrada={setParteEncontrada}    // 👈 ADICIONE
+                  handleBuscarParte={handleBuscarParte}
+                  handleAdicionarParte={handleAdicionarParte}
+                  handleRemoverParte={handleRemoverParte}
+                  setRightMode={setRightMode}
+                />
+
+              ) : (
+                <ModalRightAtribuicoesAgenda
+                  rightMode={rightMode}
+                  setRightMode={setRightMode}
+                  atribs={
+                    eventoSelecionado?.entity_type === "processo"
+                      ? atribuicoesProcesso
+                      : eventoSelecionado?.entity_type === "acordo"
+                      ? atribuicoesAcordo
+                      : eventoSelecionado?.entity_type === "contrato"
+                      ? atribuicoesContratos
+                      : []
+                  }
+                  colabs={colaboradores}
+                  historicoAtribs={historicoAtribs}
+                  formAtrib={formAtrib}
+                  setFormAtrib={setFormAtrib}
+                  handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
+                  handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
+                  entityType={eventoSelecionado?.entity_type}
+                />
+              )
             ) : (
               <div className="agenda-modal-right-content">
                 <p className="agenda-modal-atr-label">
@@ -1112,6 +1351,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               </div>
             )}
           </div>
+
 
 
         </div>

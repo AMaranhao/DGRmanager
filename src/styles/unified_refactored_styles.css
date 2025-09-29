@@ -3252,3 +3252,17 @@ select.agenda-modal-right-input {
   font-size: 14px;
   font-weight: bold;
 }
+
+
+.agenda-modal-right-contratos-item h4 {
+  font-size: 1.5rem; /* mesmo tamanho de .dashboard-modal-title */
+  font-weight: 600;
+  margin-top: 0rem;
+  margin-bottom: 1rem;
+}
+
+.agenda-modal-right-contratos-item {
+  padding-left: 1.5rem; /* espaço para o ícone */
+  list-style: none;
+  height: 380px !important;
+}
