@@ -3214,3 +3214,41 @@ select.agenda-modal-right-input {
   margin-bottom: 0.25rem;
   margin-top: 0rem;
 }
+
+.agenda-modal-right-lista {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* 👈 espaçamento entre os itens */
+}
+
+/* Espaçamento e alinhamento dos itens */
+.agenda-modal-right-item {
+  position: relative;
+  padding-left: 24px; /* espaço para o marcador */
+  min-height: 24px;   /* garante altura mínima */
+  display: flex;
+  align-items: center; /* 👈 centraliza conteúdo junto do marcador */
+}
+
+/* Bolinha padrão para todos os itens */
+.agenda-modal-right-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 50%;                /* coloca no meio */
+  transform: translateY(-50%); /* centraliza verticalmente */
+  color: #333;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Substitui a bolinha por check no item atual */
+.agenda-modal-right-item.atual::before {
+  content: "✔";
+  color: #2563eb; /* azul, pode trocar */
+  font-size: 14px;
+  font-weight: bold;
+}

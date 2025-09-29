@@ -89,6 +89,20 @@ function ordenarEventosAgenda(eventos) {
   });
 }
 
+// 🔽 Ordena atribuições por data_inicial (decrescente) e retorna também a mais recente
+function ordenarAtribuicoes(historico) {
+  if (!historico || historico.length === 0) return { listaOrdenada: [], atual: null };
+
+  const listaOrdenada = [...historico].sort((a, b) => {
+    const dA = a.data_inicial ? new Date(a.data_inicial).getTime() : 0;
+    const dB = b.data_inicial ? new Date(b.data_inicial).getTime() : 0;
+    return dB - dA; // 🔽 mais recente primeiro
+  });
+
+  return { listaOrdenada, atual: listaOrdenada[0] }; // primeira é a mais atual
+}
+
+
 
 // Função utilitária para calcular os dias úteis da semana atual
 function getDiasSemana(offset = 0) {
@@ -601,6 +615,7 @@ function ModalRightAtribuicoesAgenda({
   setFormAtrib,
   handleCriarAtribuicao,
   handleEditarAtribuicao,
+  entityType,
 }) {
   return (
     <div className="agenda-modal-right">
@@ -614,60 +629,78 @@ function ModalRightAtribuicoesAgenda({
         <div className="agenda-modal-right-wrapper">
           <div className="agenda-modal-right-scroll">
             <ul className="agenda-modal-right-lista">
-              {(historicoAtribs || []).map((a, idx, arr) => {
-                const ultima = idx === arr.length - 1;
-                return (
-                  <li
-                    key={a.id}
-                    className={`agenda-modal-right-item agenda-atr-item cursor-pointer ${ultima ? "atual" : ""}`}
-                    onClick={() => {
-                      console.log("Cliquei em atribuição:", a);
-                      setFormAtrib({
-                        atribuicao_id: a.atribuicao_id,
-                        atribuicao_descricao: a.atribuicao_descricao,
-                        status_atual: a.atribuicao_descricao,
-                        data_inicial: a.data_inicial,
-                        prazo: a.prazo ?? "",
-                        responsavel_id: a?.responsavel?.id ?? "",
-                        observacao: a?.observacao ?? "",
-                      });
-                      setRightMode("editarAtrib");
-                    }}
-                  >
+              {(() => {
+                const { listaOrdenada, atual } = ordenarAtribuicoes(historicoAtribs);
 
-                    <div className="agenda-modal-right-texto">
-                      <div className="atr-desc">{a.atribuicao_descricao}</div>
-                      <div className="atr-lista">
-                        <div className="atr-linha">
-                          <span className="atr-label">Definida em</span>
-                          <span className="atr-valor">
-                            {a.data_inicial
-                              ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
-                              : "—"}
-                          </span>
-                        </div>
-                        <div className="atr-linha">
-                          <span className="atr-label">Prazo</span>
-                          <span className="atr-valor">
-                            {a.prazo
-                              ? new Date(a.prazo).toLocaleDateString("pt-BR")
-                              : "—"}
-                          </span>
-                        </div>
-                        <div className="atr-linha">
-                          <span className="atr-label">Responsável</span>
-                          <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                return listaOrdenada.map((a) => {
+                  const isAtual = atual && atual.id === a.id;
+
+                  return (
+                    <li
+                      key={a.id}
+                      className={`agenda-modal-right-item agenda-atr-item cursor-pointer ${
+                        isAtual ? "atual" : ""
+                      }`}
+                      onClick={() => {
+                        console.log("Cliquei em atribuição:", a);
+                        setFormAtrib({
+                          atribuicao_id: a.atribuicao_id,
+                          atribuicao_descricao: a.atribuicao_descricao,
+                          status_atual: a.atribuicao_descricao,
+                          data_inicial: a.data_inicial,
+                          prazo: a.prazo ?? "",
+                          responsavel_id: a?.responsavel?.id ?? "",
+                          observacao: a?.observacao ?? "",
+                        });
+                        setRightMode("editarAtrib");
+                      }}
+                    >
+                      <div className="agenda-modal-right-texto">
+                        <div className="atr-desc">{a.atribuicao_descricao}</div>
+                        <div className="atr-lista">
+                          <div className="atr-linha">
+                            <span className="atr-label">Definida em</span>
+                            <span className="atr-valor">
+                              {a.data_inicial
+                                ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
+                                : "—"}
+                            </span>
+                          </div>
+                          <div className="atr-linha">
+                            <span className="atr-label">Prazo</span>
+                            <span className="atr-valor">
+                              {a.prazo
+                                ? new Date(a.prazo).toLocaleDateString("pt-BR")
+                                : "—"}
+                            </span>
+                          </div>
+                          <div className="atr-linha">
+                            <span className="atr-label">Responsável</span>
+                            <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
+                    </li>
+                  );
+                });
+              })()}
+
             </ul>
           </div>
 
           <div className="agenda-btn-modal-right-footer">
-            <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
+            {entityType === "contrato" && (
+              <Button
+                variant="outline"
+                onClick={() => console.log("Abrir modal de Partes do contrato")}
+              >
+                Partes
+              </Button>
+            )}
+
+            <Button onClick={() => setRightMode("novaAtrib")}>
+              Próxima Atribuição
+            </Button>
           </div>
         </div>
       )}
@@ -905,7 +938,8 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
   async function handleSelecionarEvento(evento) {
     setEventoSelecionado(evento);
-  
+    setRightMode("visualizarAtrib");
+ 
     try {
       if (evento.entity_type === "processo") {
         const dados = await fetchProcessoById(evento.entity_id);
@@ -963,14 +997,21 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          setEventoSelecionado(null); // volta para lista
+          // 🔽 Reseta apenas os estados internos
+          setEventoSelecionado(null);
           setForm({});
           setVisualizando(true);
+          setEditando(false);
+          setRightMode("visualizarAtrib");
+          setHistoricoAtribs([]);
+          setFormAtrib({});
+          
+          // 🔽 O pai (AgendaPessoal/AgendaEquipe) cuida dos externos
           onClose(isOpen);
         }
-
       }}
     >
+
       <DialogOverlay className="agenda-modal-overlay" />
       <DialogContent
         className="agenda-modal-container"
@@ -1042,20 +1083,26 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           <div className="agenda-modal-split-right">
             {eventoSelecionado?.entity_type ? (
               <ModalRightAtribuicoesAgenda
-              rightMode={rightMode}
-              setRightMode={setRightMode}
-              atribs={[
-                ...atribuicoesProcesso,
-                ...atribuicoesContratos,
-                ...atribuicoesAcordo,
-              ]}
-              colabs={colaboradores} // 👈 já tem fetchColaboradores no seu código
-              historicoAtribs={historicoAtribs} // 👈 agora vem do estado
-              formAtrib={formAtrib}
-              setFormAtrib={setFormAtrib}
-              handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
-              handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
-            />
+                rightMode={rightMode}
+                setRightMode={setRightMode}
+                atribs={
+                  eventoSelecionado?.entity_type === "processo"
+                    ? atribuicoesProcesso
+                    : eventoSelecionado?.entity_type === "acordo"
+                    ? atribuicoesAcordo
+                    : eventoSelecionado?.entity_type === "contrato"
+                    ? atribuicoesContratos
+                    : []
+                }
+                colabs={colaboradores}
+                historicoAtribs={historicoAtribs}
+                formAtrib={formAtrib}
+                setFormAtrib={setFormAtrib}
+                handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
+                handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
+                entityType={eventoSelecionado?.entity_type} 
+              />
+            
             
             ) : (
               <div className="agenda-modal-right-content">
@@ -1395,11 +1442,19 @@ function AgendaPessoal({ semanaOffset, setSemanaOffset }) {
       </div>
       <AgendaModalAtribuicoes
         open={mostrarModal}
-        onClose={() => setMostrarModal(false)}
+        onClose={(isOpen) => {
+          setMostrarModal(isOpen);
+          if (!isOpen) {
+            setEventosExtras([]);
+            setDataSelecionada(null);
+            setEventoInicial(null);
+          }
+        }}
         eventos={eventosExtras}
         dataSelecionada={dataSelecionada}
         eventoInicial={eventoInicial}
       />
+
 
 
     </div>
@@ -1620,11 +1675,19 @@ function AgendaEquipe({ semanaOffset, setSemanaOffset, responsavelFiltro }) {
       </div>
       <AgendaModalAtribuicoes
         open={mostrarModal}
-        onClose={() => setMostrarModal(false)}
+        onClose={(isOpen) => {
+          setMostrarModal(isOpen);
+          if (!isOpen) {
+            setEventosExtras([]);
+            setDataSelecionada(null);
+            setEventoInicial(null);
+          }
+        }}
         eventos={eventosExtras}
         dataSelecionada={dataSelecionada}
         eventoInicial={eventoInicial}
       />
+
     </div>
   );
 }
