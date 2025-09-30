@@ -121,7 +121,49 @@ function getDiasSemana(offset = 0) {
   });
 }
 
-// src/pages/Agenda.jsx
+
+function ModalRightInicialContrato({ form, setForm, setRightMode }) {
+  return (
+    <div className="agenda-modal-right-wrapper">
+      <div className="agenda-modal-right-content form">
+        <h4 className="agenda-atr-section-title">Minuta - Inicial</h4>
+
+        <LinhaInput label="Valor do Contrato Atualizado">
+          <Input
+            className="agenda-modal-right-input"
+            value={
+              form?.valor_atualizado !== undefined && form?.valor_atualizado !== null
+                ? Number(form.valor_atualizado).toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })
+                : ""
+            }
+            onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "");
+              const numericValue = raw ? parseFloat(raw) / 100 : "";
+              setForm({ ...form, valor_atualizado: numericValue });
+            }}
+            placeholder="Digite o valor"
+          />
+        </LinhaInput>
+
+        <div className="flex gap-2 mt-3">
+          <Button variant="outline">📝 Word</Button>
+          <Button variant="outline">📄 PDF</Button>
+        </div>
+      </div>
+
+      <div className="agenda-btn-modal-right-footer">
+        <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
+          Atribuições
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+
 
 function ModalLeftProcesso({ 
   form, 
@@ -310,6 +352,12 @@ function ModalLeftProcesso({
         >
           Voltar para Lista
         </Button>
+        <Button 
+          variant="secondary"
+        >
+          Proposta
+        </Button>
+
 
         <Button onClick={salvar}>
           Salvar
@@ -327,7 +375,8 @@ function ModalLeftContrato({
   visualizando, 
   editando, 
   salvarRef,
-  setEventoSelecionado, 
+  setEventoSelecionado,
+  setRightMode,
 }) {
   return (
     <div className="agenda-modal-left">
@@ -405,6 +454,10 @@ function ModalLeftContrato({
     </div>
   );
 }
+
+
+
+
 
 
 function ModalLeftAcordo({ 
@@ -528,9 +581,17 @@ function ModalLeftAcordo({
         >
           Voltar para Lista
         </Button>
+        <Button 
+          variant="secondary"
+        >
+          Parcelas
+        </Button>
         <Button onClick={salvar}>
           Salvar
         </Button>
+
+
+
 
         {!visualizando && (
           <>
@@ -616,6 +677,8 @@ function ModalRightAtribuicoesAgenda({
   handleCriarAtribuicao,
   handleEditarAtribuicao,
   entityType,
+  form,
+  setForm, 
 }) {
   return (
     <div className="agenda-modal-right">
@@ -690,12 +753,20 @@ function ModalRightAtribuicoesAgenda({
 
           <div className="agenda-btn-modal-right-footer">
             {entityType === "contrato" && (
-              <Button
-                variant="outline"
-                onClick={() => setRightMode("partes")}
-              >
-                Partes
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setRightMode("partes")}
+                >
+                  Partes
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setRightMode("inicialContrato")}
+                >
+                  Inicial
+                </Button>
+              </>
             )}
 
             <Button onClick={() => setRightMode("novaAtrib")}>
@@ -790,6 +861,8 @@ function ModalRightAtribuicoesAgenda({
       )}
 
 
+
+
       {/* Modo: nova atribuição */}
       {rightMode === "novaAtrib" && (
         <div className="agenda-modal-right-wrapper">
@@ -867,6 +940,14 @@ function ModalRightAtribuicoesAgenda({
           </div>
         </div>
       )}
+      {rightMode === "inicialContrato" && (
+        <ModalRightInicialContrato 
+          form={form} 
+          setForm={setForm} 
+          setRightMode={setRightMode} 
+        />
+      )}
+
     </div>
   );
 }
@@ -912,7 +993,25 @@ function ModalRightAgendaContratoPartes({
                 <div className="non-editable-input-wrapper">
                   <label className="usuarios-label">CPF</label>
                   <Input className="usuarios-modal-input" value={parteEditando.cpf} readOnly />
+                    <div className="checkbox-wrapper">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={parteEditando?.principal || parteEncontrada?.principal || false}
+                          onChange={(e) => {
+                            if (parteEditando) {
+                              setParteEditando({ ...parteEditando, principal: e.target.checked });
+                            } else if (parteEncontrada) {
+                              setParteEncontrada({ ...parteEncontrada, principal: e.target.checked });
+                            }
+                          }}
+                        />
+                        Parte Principal
+                      </label>
+                    </div>
+
                 </div>
+
               </>
             ) : (
               /* Caso seja + Parte */
@@ -936,6 +1035,23 @@ function ModalRightAgendaContratoPartes({
                     placeholder="—"
                   />
                 </div>
+                <div className="checkbox-wrapper">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={parteEditando?.principal || parteEncontrada?.principal || false}
+                      onChange={(e) => {
+                        if (parteEditando) {
+                          setParteEditando({ ...parteEditando, principal: e.target.checked });
+                        } else if (parteEncontrada) {
+                          setParteEncontrada({ ...parteEncontrada, principal: e.target.checked });
+                        }
+                      }}
+                    />
+                    Parte Principal
+                  </label>
+                </div>
+
               </>
             )}
 
@@ -946,29 +1062,32 @@ function ModalRightAgendaContratoPartes({
             )}
           </div>
         ) : (
-          <ul>
-            {partesVinculadas?.length ? (
-              partesVinculadas.map((p) => (
-                <li
-                  key={p.id ?? p.cpf}
-                  onClick={() => {
-                    setParteEditando(p);   // 👈 entra no modo edição
-                    setShowFormParte(true);
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="contratos-modal-right-texto">
-                    <div className={p.principal ? "font-bold" : ""}>{p.nome}</div>
-                    <div className="text-xs text-gray-500">
-                      {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
+            <ul>
+              {partesVinculadas?.length ? (
+                partesVinculadas.map((p) => (
+                  <li
+                    key={p.id ?? p.cpf}
+                    onClick={() => {
+                      setParteEditando(p);
+                      setShowFormParte(true);
+                    }}
+                    className={`agenda-modal-right-item ${p.principal ? "atual" : ""}`}
+                  >
+                    <div className="contratos-modal-right-texto">
+                      <div className={p.principal ? "font-bold" : ""}>{p.nome}</div>
+                      <div className="text-xs text-gray-500">
+                        {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <p>Nenhuma parte vinculada ainda.</p>
-            )}
-          </ul>
+                  </li>
+
+                ))
+              ) : (
+                <p>Nenhuma parte vinculada ainda.</p>
+              )}
+            </ul>
+
+
 
         )}
 
@@ -1232,7 +1351,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           {/* LADO ESQUERDO */}
           <div className="agenda-modal-split-left">
           <DialogTitle className="agenda-modal-title">
-            Atribuições Dia - {" "}
+            Agenda do Dia - {" "}
             {dataSelecionada
             ? new Date(`${dataSelecionada}T00:00:00`).toLocaleDateString("pt-BR", {
                 day: "2-digit",
@@ -1242,7 +1361,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           </DialogTitle>
 
             <DialogDescription className="agenda-modal-description">
-              Lista de atribuições adicionais deste dia
+              Atribuições deste dia
             </DialogDescription>
 
               {eventoSelecionado?.entity_type === "processo" && (
@@ -1263,7 +1382,8 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   visualizando={visualizando}
                   editando={editando}
                   salvarRef={salvarRef}
-                  setEventoSelecionado={setEventoSelecionado} 
+                  setEventoSelecionado={setEventoSelecionado}
+                  setRightMode={setRightMode}  
                 />
               )}
 
@@ -1341,6 +1461,8 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
                   handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
                   entityType={eventoSelecionado?.entity_type}
+                  form={form}
+                  setForm={setForm} 
                 />
               )
             ) : (

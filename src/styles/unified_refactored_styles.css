@@ -3266,3 +3266,17 @@ select.agenda-modal-right-input {
   list-style: none;
   height: 380px !important;
 }
+
+
+.partes-lista {
+  list-style: disc inside;
+  padding-left: 0; /* remove espaço extra */
+}
+
+.parte-item {
+  display: flex;
+  align-items: center; /* ✅ centraliza o bullet no meio do conteúdo */
+  gap: 0.5rem; /* espaço entre o bullet e o texto */
+  cursor: pointer;
+  margin: 0.25rem 0;
+}
