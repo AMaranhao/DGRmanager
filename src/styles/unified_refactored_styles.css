@@ -2987,6 +2987,9 @@ input[type="date"].acordo-modal-input {
   overflow-y: auto;            /* ativa scroll interno se precisar */
 }
 
+.agenda-modal-right-content {
+  min-height: 475px !important;
+}
 
 /* Rodapé fixo */
 .agenda-modal-right-footer {
@@ -3131,9 +3134,9 @@ input[type="date"].agenda-modal-left-input {
 
 
 .agenda-modal-right-scroll {
-  min-height: 470px !important;
-  max-height: 470px !important;
-  height: 470px !important;
+  min-height: 480px !important;
+  max-height: 480px !important;
+  height: 480px !important;
 }
 
 .agenda-modal-right-wrapper {
@@ -3279,4 +3282,53 @@ select.agenda-modal-right-input {
   gap: 0.5rem; /* espaço entre o bullet e o texto */
   cursor: pointer;
   margin: 0.25rem 0;
+}
+
+.agenda-modal-tabs {
+  display: flex;
+  justify-content: center;   /* centraliza horizontalmente */
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+}
+
+.agenda-modal-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  min-width: 130px;
+  padding: 0.75rem 1.25rem !important;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+
+  border-radius: 9999px !important;
+  background: white;
+  border: 1px solid #d1d5db;
+  color: #2f4674;
+
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover */
+.agenda-modal-tab-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Ativo → azul igual ao da sidebar */
+.agenda-modal-tab-btn.active {
+  background-color: #2f4674 !important;
+  color: white !important;
+  border-color: #2f4674 !important;
+}
+
+.agenda-modal-tab-btn.active svg {
+  color: white !important;
+  fill: white !important;
 }

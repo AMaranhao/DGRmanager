@@ -126,8 +126,7 @@ function ModalRightInicialContrato({ form, setForm, setRightMode }) {
   return (
     <div className="agenda-modal-right-wrapper">
       <div className="agenda-modal-right-content form">
-        <h4 className="agenda-atr-section-title">Minuta - Inicial</h4>
-
+ 
         <LinhaInput label="Valor do Contrato Atualizado">
           <Input
             className="agenda-modal-right-input"
@@ -154,11 +153,7 @@ function ModalRightInicialContrato({ form, setForm, setRightMode }) {
         </div>
       </div>
 
-      <div className="agenda-btn-modal-right-footer">
-        <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
-          Atribuições
-        </Button>
-      </div>
+
     </div>
   );
 }
@@ -684,8 +679,36 @@ function ModalRightAtribuicoesAgenda({
     <div className="agenda-modal-right">
       {/* Cabeçalho fixo */}
       <div className="agenda-modal-right-header">
-        <h3 className="agenda-modal-right-title">Atribuições</h3>
+        <div className="agenda-modal-tabs">
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={
+              ["visualizarAtrib", "editarAtrib", "novaAtrib"].includes(rightMode)
+                ? "default"
+                : "outline"
+            }
+            onClick={() => setRightMode("visualizarAtrib")}
+          >
+            Atribuições
+          </Button>
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={rightMode === "inicialContrato" ? "default" : "outline"}
+            onClick={() => setRightMode("inicialContrato")}
+          >
+            Inicial
+          </Button>
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={rightMode === "partes" ? "default" : "outline"}
+            onClick={() => setRightMode("partes")}
+          >
+            Partes
+          </Button>
+        </div>
+
       </div>
+
 
       {/* Modo: visualizar atribuições */}
       {rightMode === "visualizarAtrib" && (
@@ -752,27 +775,20 @@ function ModalRightAtribuicoesAgenda({
           </div>
 
           <div className="agenda-btn-modal-right-footer">
-            {entityType === "contrato" && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setRightMode("partes")}
-                >
-                  Partes
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => setRightMode("inicialContrato")}
-                >
-                  Inicial
-                </Button>
-              </>
+            {rightMode === "visualizarAtrib" && (
+              <Button onClick={() => setRightMode("novaAtrib")}>
+                Próxima Atribuição
+              </Button>
             )}
 
-            <Button onClick={() => setRightMode("novaAtrib")}>
-              Próxima Atribuição
-            </Button>
+            {rightMode === "partes" && (
+              <Button onClick={() => setShowFormParte(true)}>
+                + Parte
+              </Button>
+            )}
           </div>
+
+
         </div>
       )}
 
@@ -971,15 +987,42 @@ function ModalRightAgendaContratoPartes({
   handleAdicionarParte,
   handleRemoverParte,
   setRightMode,
-  parteEditando,          // 👈 ADICIONE
-  setParteEditando,       // 👈 ADICIONE
-  parteEncontrada,        // 👈 ADICIONE
-  setParteEncontrada,     // 👈 ADICIONE
+  parteEditando,
+  setParteEditando,
+  parteEncontrada,
+  setParteEncontrada,
+  rightMode,
 }) {
 
   return (
     <div className="agenda-modal-right-wrapper">
-      <h3 className="agenda-modal-right-title">Partes Vinculadas</h3>
+      <div className="agenda-modal-right-header">
+        <div className="agenda-modal-tabs">
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={rightMode === "visualizarAtrib" ? "default" : "outline"}
+            onClick={() => setRightMode("visualizarAtrib")}
+          >
+            Atribuições
+          </Button>
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={rightMode === "inicialContrato" ? "default" : "outline"}
+            onClick={() => setRightMode("inicialContrato")}
+          >
+            Inicial
+          </Button>
+          <Button
+            className="agenda-modal-tab-btn"
+            variant={rightMode === "partes" ? "default" : "outline"}
+            onClick={() => setRightMode("partes")}
+          >
+            Partes
+          </Button>
+        </div>
+      </div>
+
+
       <div className="agenda-modal-right-scroll form">
         {showFormParte ? (
           <div className="parte-contrato-modal">
@@ -1096,55 +1139,76 @@ function ModalRightAgendaContratoPartes({
         {parteEditando ? (
           <>
             <Button variant="destructive" onClick={handleRemoverParte}>Remover</Button>
-            <Button onClick={() => {
-              setPartesVinculadas(prev =>
-                prev.map(parte => parte.id === parteEditando.id ? parteEditando : parte)
-              );
-              setShowFormParte(false);
-              setParteEditando(null);
-            }}>Atualizar</Button>
-            <Button variant="outline" onClick={() => {
-              setShowFormParte(false);
-              setParteEditando(null);
-            }}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setPartesVinculadas(prev =>
+                  prev.map(parte =>
+                    parte.id === parteEditando.id ? parteEditando : parte
+                  )
+                );
+                setShowFormParte(false);
+                setParteEditando(null);
+              }}
+            >
+              Atualizar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowFormParte(false);
+                setParteEditando(null);
+              }}
+            >
+              Cancelar
+            </Button>
           </>
         ) : parteEncontrada ? (
           <>
             <Button onClick={handleAdicionarParte}>Salvar</Button>
             <Button onClick={handleBuscarParte}>Buscar</Button>
-            <Button variant="outline" onClick={() => {
-              setShowFormParte(false);
-              setFetchParte("");
-              setParteEncontrada(null);
-              setParteEditando(null);
-              setParteAviso("");
-            }}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowFormParte(false);
+                setFetchParte("");
+                setParteEncontrada(null);
+                setParteEditando(null);
+                setParteAviso("");
+              }}
+            >
+              Cancelar
+            </Button>
           </>
         ) : showFormParte ? (
           <>
             <Button onClick={handleBuscarParte}>Buscar</Button>
-            <Button variant="outline" onClick={() => {
-              setShowFormParte(false);
-              setFetchParte("");
-              setParteEncontrada(null);
-            }}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowFormParte(false);
+                setFetchParte("");
+                setParteEncontrada(null);
+              }}
+            >
+              Cancelar
+            </Button>
           </>
         ) : (
           <>
-            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>
-              Atribuições
-            </Button>
-            <Button onClick={() => {
-              setShowFormParte(true);
-              setParteAviso("");
-              setParteEditando(null);
-              setParteEncontrada(null);
-            }}>
+            <Button
+              onClick={() => {
+                setShowFormParte(true);
+                setParteAviso("");
+                setParteEditando(null);
+                setParteEncontrada(null);
+              }}
+            >
               + Parte
             </Button>
           </>
         )}
       </div>
+
 
 
 
@@ -1431,14 +1495,15 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setParteAviso={setParteAviso}
                   parteParaRemover={parteParaRemover}
                   setParteParaRemover={setParteParaRemover}
-                  parteEditando={parteEditando}              // 👈 ADICIONE
-                  setParteEditando={setParteEditando}        // 👈 ADICIONE
-                  parteEncontrada={parteEncontrada}          // 👈 ADICIONE
-                  setParteEncontrada={setParteEncontrada}    // 👈 ADICIONE
+                  parteEditando={parteEditando}            
+                  setParteEditando={setParteEditando}       
+                  parteEncontrada={parteEncontrada}         
+                  setParteEncontrada={setParteEncontrada}  
                   handleBuscarParte={handleBuscarParte}
                   handleAdicionarParte={handleAdicionarParte}
                   handleRemoverParte={handleRemoverParte}
                   setRightMode={setRightMode}
+                  rightMode={rightMode}
                 />
 
               ) : (
