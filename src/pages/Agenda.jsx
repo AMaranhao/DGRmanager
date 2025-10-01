@@ -691,21 +691,27 @@ function ModalRightAtribuicoesAgenda({
           >
             Atribuições
           </Button>
-          <Button
-            className="agenda-modal-tab-btn"
-            variant={rightMode === "inicialContrato" ? "default" : "outline"}
-            onClick={() => setRightMode("inicialContrato")}
-          >
-            Inicial
-          </Button>
-          <Button
-            className="agenda-modal-tab-btn"
-            variant={rightMode === "partes" ? "default" : "outline"}
-            onClick={() => setRightMode("partes")}
-          >
-            Partes
-          </Button>
+
+          {entityType === "contrato" && (
+            <>
+              <Button
+                className="agenda-modal-tab-btn"
+                variant={rightMode === "inicialContrato" ? "default" : "outline"}
+                onClick={() => setRightMode("inicialContrato")}
+              >
+                Inicial
+              </Button>
+              <Button
+                className="agenda-modal-tab-btn"
+                variant={rightMode === "partes" ? "default" : "outline"}
+                onClick={() => setRightMode("partes")}
+              >
+                Partes
+              </Button>
+            </>
+          )}
         </div>
+
 
       </div>
 
@@ -992,6 +998,7 @@ function ModalRightAgendaContratoPartes({
   parteEncontrada,
   setParteEncontrada,
   rightMode,
+  entityType,
 }) {
 
   return (
@@ -1000,26 +1007,36 @@ function ModalRightAgendaContratoPartes({
         <div className="agenda-modal-tabs">
           <Button
             className="agenda-modal-tab-btn"
-            variant={rightMode === "visualizarAtrib" ? "default" : "outline"}
+            variant={
+              ["visualizarAtrib", "editarAtrib", "novaAtrib"].includes(rightMode)
+                ? "default"
+                : "outline"
+            }
             onClick={() => setRightMode("visualizarAtrib")}
           >
             Atribuições
           </Button>
-          <Button
-            className="agenda-modal-tab-btn"
-            variant={rightMode === "inicialContrato" ? "default" : "outline"}
-            onClick={() => setRightMode("inicialContrato")}
-          >
-            Inicial
-          </Button>
-          <Button
-            className="agenda-modal-tab-btn"
-            variant={rightMode === "partes" ? "default" : "outline"}
-            onClick={() => setRightMode("partes")}
-          >
-            Partes
-          </Button>
+
+          {entityType === "contrato" && (
+            <>
+              <Button
+                className="agenda-modal-tab-btn"
+                variant={rightMode === "inicialContrato" ? "default" : "outline"}
+                onClick={() => setRightMode("inicialContrato")}
+              >
+                Inicial
+              </Button>
+              <Button
+                className="agenda-modal-tab-btn"
+                variant={rightMode === "partes" ? "default" : "outline"}
+                onClick={() => setRightMode("partes")}
+              >
+                Partes
+              </Button>
+            </>
+          )}
         </div>
+
       </div>
 
 
@@ -1479,6 +1496,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
             {eventoSelecionado?.entity_type ? (
               rightMode === "partes" ? (
                 <ModalRightAgendaContratoPartes
+                  entityType={eventoSelecionado?.entity_type} 
                   contratoSelecionado={form}
                   partesVinculadas={form.partes_adversas || []}
                   setPartesVinculadas={(novas) =>
