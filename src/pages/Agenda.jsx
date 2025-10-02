@@ -102,6 +102,57 @@ function ordenarAtribuicoes(historico) {
   return { listaOrdenada, atual: listaOrdenada[0] }; // primeira é a mais atual
 }
 
+function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva) {
+  let tabs = [];
+
+  if (entityType === "contrato") {
+    tabs = [
+      { id: "contrato", label: "Contrato" },
+    ];
+  } 
+  else if (entityType === "processo") {
+    tabs = [
+      { id: "processo", label: "Processo" },
+      { id: "propostas", label: "Propostas" },
+    ];
+  } 
+  else if (entityType === "acordo") {
+    tabs = [
+      { id: "acordo", label: "Acordo" },
+      { id: "parcelas", label: "Parcelas" },
+    ];
+  } 
+  else {
+    // fallback → agenda lista
+    tabs = [
+      { 
+        id: "agenda", 
+        label: `Agenda Dia - ${
+          dataSelecionada 
+            ? new Date(`${dataSelecionada}T00:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) 
+            : "—"
+        }` 
+      },
+    ];
+  }
+
+  return (
+    <div className="agenda-modal-tabs">
+      {tabs.map((tab) => (
+        <Button
+          key={tab.id}
+          className="agenda-modal-tab-btn"
+          variant={abaAtiva === tab.id ? "default" : "outline"}
+          onClick={() => setAbaAtiva(tab.id)}
+        >
+          {tab.label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+
 
 
 // Função utilitária para calcular os dias úteis da semana atual
@@ -172,7 +223,6 @@ function ModalLeftProcesso({
     <div className="processo-form-wrapper">
       <div className="agenda-modal-left-content">
         {/* Linha 1 - CNJ e Contrato */}
-        <h4 className="agenda-modal-section-title">Processo</h4>
         <div className="processo-input-row">
           <LinhaInput label="Número (CNJ)">
             <Input
@@ -347,11 +397,7 @@ function ModalLeftProcesso({
         >
           Voltar para Lista
         </Button>
-        <Button 
-          variant="secondary"
-        >
-          Proposta
-        </Button>
+ 
 
 
         <Button onClick={salvar}>
@@ -376,7 +422,6 @@ function ModalLeftContrato({
   return (
     <div className="agenda-modal-left">
       <div className="agenda-modal-left-content">
-        <h4 className="agenda-modal-section-title">Contrato</h4>
         <LinhaInput label="Número">
           <Input
             className="processo-modal-input"
@@ -467,7 +512,6 @@ function ModalLeftAcordo({
   return (
     <div className="agenda-modal-left">
       <div className="agenda-modal-left-content">
-        <h4 className="agenda-modal-section-title">Acordo</h4>
 
         {/* Linha 1 - Contrato + Parte Adversa */}
         <div className="processo-input-row">
@@ -576,11 +620,7 @@ function ModalLeftAcordo({
         >
           Voltar para Lista
         </Button>
-        <Button 
-          variant="secondary"
-        >
-          Parcelas
-        </Button>
+
         <Button onClick={salvar}>
           Salvar
         </Button>
@@ -844,6 +884,20 @@ function ModalRightAtribuicoesAgenda({
               />
             </LinhaInput>
 
+            {entityType === "processo" && (
+              <LinhaInput label="Horário Agendado">
+                <Input
+                  type="datetime-local"
+                  className="agenda-modal-right-input"
+                  value={formAtrib.horario || ""}
+                  onChange={(e) =>
+                    setFormAtrib({ ...formAtrib, horario: e.target.value })
+                  }
+                />
+              </LinhaInput>
+            )}
+
+
             <LinhaInput label="Responsável">
               <select
                 className="agenda-modal-right-input"
@@ -952,6 +1006,20 @@ function ModalRightAtribuicoesAgenda({
                   onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
                 />
               </LinhaInput>
+
+              {entityType === "processo" && (
+                <LinhaInput label="Horário Agendado">
+                  <Input
+                    type="datetime-local"
+                    className="agenda-modal-right-input"
+                    value={formAtrib.horario || ""}
+                    onChange={(e) =>
+                      setFormAtrib({ ...formAtrib, horario: e.target.value })
+                    }
+                  />
+                </LinhaInput>
+              )}
+
             </div>
 
           <div className="agenda-btn-modal-right-footer">
@@ -1253,6 +1321,20 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   const [parteParaRemover, setParteParaRemover] = useState(null);
   const [parteEditando, setParteEditando] = useState(null);
   const [parteEncontrada, setParteEncontrada] = useState(null);
+  const [abaAtiva, setAbaAtiva] = useState(null);
+
+
+  useEffect(() => {
+    if (eventoSelecionado?.entity_type === "contrato") {
+      setAbaAtiva("contrato");
+    } else if (eventoSelecionado?.entity_type === "processo") {
+      setAbaAtiva("processo");
+    } else if (eventoSelecionado?.entity_type === "acordo") {
+      setAbaAtiva("acordo");
+    } else {
+      setAbaAtiva("agenda");
+    }
+  }, [eventoSelecionado]);
 
   // 🔽 Handlers de Partes
   function handleBuscarParte() {
@@ -1431,21 +1513,16 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
         <div className="agenda-modal-split">
           {/* LADO ESQUERDO */}
           <div className="agenda-modal-split-left">
-          <DialogTitle className="agenda-modal-title">
-            Agenda do Dia - {" "}
-            {dataSelecionada
-            ? new Date(`${dataSelecionada}T00:00:00`).toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-              })
-            : "—"}
-          </DialogTitle>
+            <DialogTitle className="agenda-modal-title">
+              {renderModalLeftTabs(eventoSelecionado?.entity_type, dataSelecionada, abaAtiva, setAbaAtiva)}
+            </DialogTitle>
+
 
             <DialogDescription className="agenda-modal-description">
-              Atribuições deste dia
+              {abaAtiva === "agenda" ? "Atribuições deste dia" : ""}
             </DialogDescription>
 
-              {eventoSelecionado?.entity_type === "processo" && (
+              {abaAtiva === "processo" && (
                 <ModalLeftProcesso
                   form={form}
                   setForm={setForm}
@@ -1455,7 +1532,14 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                 />
               )}
 
-              {eventoSelecionado?.entity_type === "contrato" && (
+              {abaAtiva === "propostas" && (
+                <div className="agenda-modal-left-content">
+                  <h4>Lista de Propostas</h4>
+                  {/* lógica futura */}
+                </div>
+              )}
+
+              {abaAtiva === "contrato" && (
                 <ModalLeftContrato
                   form={form}
                   setForm={setForm}
@@ -1464,11 +1548,11 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   editando={editando}
                   salvarRef={salvarRef}
                   setEventoSelecionado={setEventoSelecionado}
-                  setRightMode={setRightMode}  
+                  setRightMode={setRightMode}
                 />
               )}
 
-              {eventoSelecionado?.entity_type === "acordo" && (
+              {abaAtiva === "acordo" && (
                 <ModalLeftAcordo
                   form={form}
                   setForm={setForm}
@@ -1480,13 +1564,20 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                 />
               )}
 
-              {/* Fallback para quando não é processo nem contrato (ex: lista de eventos do dia) */}
-              {!eventoSelecionado?.entity_type && (
+              {abaAtiva === "parcelas" && (
+                <div className="agenda-modal-left-content">
+                  <h4>Parcelas do Acordo</h4>
+                  {/* lógica futura */}
+                </div>
+              )}
+
+              {abaAtiva === "agenda" && (
                 <ModalLeftAgendaLista
                   eventos={eventos}
                   handleSelecionarEvento={handleSelecionarEvento}
                 />
               )}
+
 
 
           </div>

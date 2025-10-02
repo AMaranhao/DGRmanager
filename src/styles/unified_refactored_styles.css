@@ -2920,7 +2920,7 @@ input[type="date"].acordo-modal-input {
 /* Painéis */
 .agenda-modal-split-left {
   flex: 0 0 55%;
-  max-width: 55%;
+  max-width: 54.5%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -2928,14 +2928,14 @@ input[type="date"].acordo-modal-input {
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
-  padding: 0rem 0.5rem 0.5rem 0rem;
-  background: #ffffff;
+  padding: 0rem 1rem 0.5rem 0.5rem;
+  background: #f9f9f9;
 }
 
 
 
 .agenda-modal-split-right {
-  flex: 0 0 45%;
+  flex: 0 0 44.5%;
   max-width: 45%;
   height: 100%;
   display: flex;
@@ -2954,7 +2954,7 @@ input[type="date"].acordo-modal-input {
   flex: 1;
   overflow-y: auto;
   margin-top: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
   padding-right: 4px;
 }
 
@@ -2983,7 +2983,7 @@ input[type="date"].acordo-modal-input {
   flex-direction: column;      /* organiza em coluna */
   align-items: stretch;        /* inputs ocupam largura total */
   justify-content: flex-start; /* começa do topo */
-  gap: 1rem;                   /* espaçamento entre campos */
+  gap: 0.5rem;                   /* espaçamento entre campos */
   overflow-y: auto;            /* ativa scroll interno se precisar */
 }
 
@@ -3290,6 +3290,7 @@ select.agenda-modal-right-input {
   align-items: center;
   gap: 0.5rem;
   min-height: 2.5rem;
+  margin-top: 0.25rem;
 }
 
 .agenda-modal-tab-btn {
@@ -3331,4 +3332,9 @@ select.agenda-modal-right-input {
 .agenda-modal-tab-btn.active svg {
   color: white !important;
   fill: white !important;
+}
+
+.agenda-modal-title {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
