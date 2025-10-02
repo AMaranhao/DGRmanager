@@ -111,7 +111,7 @@ function ordenarAtribuicoes(historico) {
   return { listaOrdenada, atual: listaOrdenada[0] }; // primeira é a mais atual
 }
 
-function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva) {
+function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva, setRightMode) {
   let tabs = [];
 
   if (entityType === "contrato") {
@@ -152,13 +152,23 @@ function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva)
           key={tab.id}
           className="agenda-modal-tab-btn"
           variant={abaAtiva === tab.id ? "default" : "outline"}
-          onClick={() => setAbaAtiva(tab.id)}
+          onClick={() => {
+            setAbaAtiva(tab.id);
+        
+            if (tab.id === "propostas") {
+              setRightMode("visualizarPropostas"); // sempre abre no default de propostas
+            } else if (tab.id === "processo") {
+              setRightMode("visualizarAtrib"); // sempre abre no default de atribuições
+            }
+          }}
         >
           {tab.label}
         </Button>
+      
       ))}
     </div>
   );
+  
 }
 
 
@@ -214,6 +224,7 @@ function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode })
               </div>
             ))
           ) : (
+            
             <p className="agenda-modal-propostas-empty">Nenhuma proposta encontrada.</p>
           )}
         </div>
@@ -237,33 +248,48 @@ function ModalRightPropostas({
 }) {
   if (rightMode === "visualizarPropostas") {
     return (
-      <div className="agenda-modal-right-content">
+      <div className="agenda-modal-right-wrapper">
+        {/* Aba única */}
+        <div className="agenda-modal-tabs">
+          <Button
+            className="agenda-modal-tab-btn"
+            variant="default"   // sempre ativo
+          >
+            Proposta
+          </Button>
+        </div>
+  
+        {/* Conteúdo scroll */}
         <div className="agenda-modal-right-scroll">
           <p className="agenda-modal-atr-label">
             Clique em uma proposta à esquerda para detalhar aqui.
           </p>
-
-      
         </div>
-        <div className="agenda-btn-modal-left-footer">
-            <Button
-              onClick={() => {
-                setRightMode("novaProposta");
-              }}
-            >
-              + Proposta
-            </Button>
-          </div>
-        
+  
+        {/* Footer */}
+        <div className="agenda-btn-modal-right-footer">
+          <Button
+            onClick={() => {
+              setRightMode("novaProposta");
+            }}
+          >
+            + Proposta
+          </Button>
+        </div>
       </div>
     );
   }
+  
+  
 
   if (rightMode === "novaProposta") {
     return (
-      <div className="agenda-modal-right-content form">
+      <div className="agenda-modal-right-wrapper">
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">Proposta</Button>
+        </div>
+  
         <div className="agenda-modal-right-scroll">
-        <h4 className="agenda-atr-section-title">Nova Proposta</h4>
           <LinhaInput label="Parcelas">
             <Input
               type="number"
@@ -276,23 +302,37 @@ function ModalRightPropostas({
               }
             />
           </LinhaInput>
-
+  
           <LinhaInput label="Valor">
             <Input
-              type="number"
+              type="text"
               className="agenda-modal-right-input"
-              onChange={(e) =>
+              value={
+                propostaSelecionada?.valor !== undefined && propostaSelecionada?.valor !== null
+                  ? Number(propostaSelecionada.valor).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : ""
+              }
+              onChange={(e) => {
+                // Remove tudo que não for número
+                const numericValue = e.target.value.replace(/\D/g, "");
+                // Converte para número decimal (centavos)
+                const floatValue = numericValue ? parseFloat(numericValue) / 100 : 0;
+
                 setPropostaSelecionada((prev) => ({
                   ...prev,
-                  valor: e.target.value,
-                }))
-              }
+                  valor: floatValue,
+                }));
+              }}
             />
           </LinhaInput>
 
-        </div>
-        
 
+
+        </div>
+  
         <div className="agenda-btn-modal-right-footer">
           <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
             Cancelar
@@ -304,13 +344,16 @@ function ModalRightPropostas({
       </div>
     );
   }
+  
 
   if (rightMode === "propostaSelecionada" && propostaSelecionada) {
     return (
-      <div className="agenda-modal-right-content form">
+      <div className="agenda-modal-right-wrapper">
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">Proposta</Button>
+        </div>
+  
         <div className="agenda-modal-right-scroll">
-        <h4 className="agenda-atr-section-title">Proposta Selecionada</h4>
-
           <LinhaInput label="Parcelas">
             <Input
               type="number"
@@ -319,7 +362,7 @@ function ModalRightPropostas({
               readOnly
             />
           </LinhaInput>
-
+  
           <LinhaInput label="Valor">
             <Input
               type="text"
@@ -335,7 +378,7 @@ function ModalRightPropostas({
               readOnly
             />
           </LinhaInput>
-
+  
           <LinhaInput label="Vencimento do 1º Pagamento">
             <Input
               type="date"
@@ -349,10 +392,8 @@ function ModalRightPropostas({
               }
             />
           </LinhaInput>
-
         </div>
-        
-
+  
         <div className="agenda-btn-modal-right-footer">
           <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
             Cancelar
@@ -363,40 +404,45 @@ function ModalRightPropostas({
       </div>
     );
   }
+  
 
   if (rightMode === "editarProposta" && propostaSelecionada) {
     return (
-      <div className="agenda-modal-right-content form">
-        <h4 className="agenda-atr-section-title">Editar Proposta</h4>
-
-        <LinhaInput label="Parcelas">
-          <Input
-            type="number"
-            className="agenda-modal-right-input"
-            value={propostaSelecionada.numero_parcelas || ""}
-            onChange={(e) =>
-              setPropostaSelecionada({
-                ...propostaSelecionada,
-                numero_parcelas: e.target.value,
-              })
-            }
-          />
-        </LinhaInput>
-
-        <LinhaInput label="Valor">
-          <Input
-            type="number"
-            className="agenda-modal-right-input"
-            value={propostaSelecionada.valor || ""}
-            onChange={(e) =>
-              setPropostaSelecionada({
-                ...propostaSelecionada,
-                valor: e.target.value,
-              })
-            }
-          />
-        </LinhaInput>
-
+      <div className="agenda-modal-right-wrapper">
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">Proposta</Button>
+        </div>
+  
+        <div className="agenda-modal-right-scroll">
+          <LinhaInput label="Parcelas">
+            <Input
+              type="number"
+              className="agenda-modal-right-input"
+              value={propostaSelecionada.numero_parcelas || ""}
+              onChange={(e) =>
+                setPropostaSelecionada({
+                  ...propostaSelecionada,
+                  numero_parcelas: e.target.value,
+                })
+              }
+            />
+          </LinhaInput>
+  
+          <LinhaInput label="Valor">
+            <Input
+              type="number"
+              className="agenda-modal-right-input"
+              value={propostaSelecionada.valor || ""}
+              onChange={(e) =>
+                setPropostaSelecionada({
+                  ...propostaSelecionada,
+                  valor: e.target.value,
+                })
+              }
+            />
+          </LinhaInput>
+        </div>
+  
         <div className="agenda-btn-modal-right-footer">
           <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
             Cancelar
@@ -406,6 +452,7 @@ function ModalRightPropostas({
       </div>
     );
   }
+  
 
   return null;
 }
@@ -1820,15 +1867,23 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
       <DialogOverlay className="agenda-modal-overlay" />
       <DialogContent
+        aria-describedby={undefined}
         className="agenda-modal-container"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
+        
         <div className="agenda-modal-split">
           {/* LADO ESQUERDO */}
           <div className="agenda-modal-split-left">
-            <DialogTitle className="agenda-modal-title">
-              {renderModalLeftTabs(eventoSelecionado?.entity_type, dataSelecionada, abaAtiva, setAbaAtiva)}
-            </DialogTitle>
+          <DialogTitle className="agenda-modal-title">
+            {renderModalLeftTabs(
+              eventoSelecionado?.entity_type,
+              dataSelecionada,
+              abaAtiva,
+              setAbaAtiva,
+              setRightMode   
+            )}
+          </DialogTitle>
 
 
             {abaAtiva === "agenda" && (
