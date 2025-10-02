@@ -45,6 +45,15 @@ import {
   fetchColaboradores 
 } from "@/services/ENDPOINTS_ServiceColaboradores";
 
+import { 
+  createProposta,              
+  fetchPropostasByProcesso,    
+  updateProposta,             
+} from "@/services/ENDPOINTS_ServicePropostas";
+
+import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js"; // POST /acordos
+
+
 
 import "@/styles/unified_refactored_styles.css";
 
@@ -171,6 +180,237 @@ function getDiasSemana(offset = 0) {
     return d;
   });
 }
+
+function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode }) {
+  return (
+    <div className="agenda-modal-propostas-wrapper">
+      {/* Área com rolagem e grid */}
+      <div className="agenda-modal-propostas-content">
+        <div className="agenda-modal-propostas-grid">
+          {propostas.length > 0 ? (
+            propostas.map((p) => (
+              <div
+                key={p.id}
+                className="agenda-modal-propostas-card cursor-pointer"
+                onClick={() => {
+                  setPropostaSelecionada(p);
+                  setRightMode("propostaSelecionada");
+                }}
+              >
+                <div className="agenda-modal-propostas-linha">
+                  <span className="agenda-modal-propostas-label">Parcelas:</span>
+                  <span className="agenda-modal-propostas-valor">{p.numero_parcelas}</span>
+                </div>
+                <div className="agenda-modal-propostas-linha">
+                  <span className="agenda-modal-propostas-label">Valor:</span>
+                  <span className="agenda-modal-propostas-valor">
+                    {Number(p.valor_parcela).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </span>
+
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="agenda-modal-propostas-empty">Nenhuma proposta encontrada.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Rodapé fixo com botão */}
+
+    </div>
+  );
+}
+
+
+function ModalRightPropostas({
+  rightMode,
+  propostaSelecionada,
+  setPropostaSelecionada,
+  handleAdicionarProposta,
+  handleEditarProposta,
+  handleAceitarProposta,
+  setRightMode,
+}) {
+  if (rightMode === "visualizarPropostas") {
+    return (
+      <div className="agenda-modal-right-content">
+        <div className="agenda-modal-right-scroll">
+          <p className="agenda-modal-atr-label">
+            Clique em uma proposta à esquerda para detalhar aqui.
+          </p>
+
+      
+        </div>
+        <div className="agenda-btn-modal-left-footer">
+            <Button
+              onClick={() => {
+                setRightMode("novaProposta");
+              }}
+            >
+              + Proposta
+            </Button>
+          </div>
+        
+      </div>
+    );
+  }
+
+  if (rightMode === "novaProposta") {
+    return (
+      <div className="agenda-modal-right-content form">
+        <div className="agenda-modal-right-scroll">
+        <h4 className="agenda-atr-section-title">Nova Proposta</h4>
+          <LinhaInput label="Parcelas">
+            <Input
+              type="number"
+              className="agenda-modal-right-input"
+              onChange={(e) =>
+                setPropostaSelecionada((prev) => ({
+                  ...prev,
+                  numero_parcelas: e.target.value,
+                }))
+              }
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Valor">
+            <Input
+              type="number"
+              className="agenda-modal-right-input"
+              onChange={(e) =>
+                setPropostaSelecionada((prev) => ({
+                  ...prev,
+                  valor: e.target.value,
+                }))
+              }
+            />
+          </LinhaInput>
+
+        </div>
+        
+
+        <div className="agenda-btn-modal-right-footer">
+          <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
+            Cancelar
+          </Button>
+          <Button onClick={() => handleAdicionarProposta(propostaSelecionada)}>
+            Adicionar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (rightMode === "propostaSelecionada" && propostaSelecionada) {
+    return (
+      <div className="agenda-modal-right-content form">
+        <div className="agenda-modal-right-scroll">
+        <h4 className="agenda-atr-section-title">Proposta Selecionada</h4>
+
+          <LinhaInput label="Parcelas">
+            <Input
+              type="number"
+              className="agenda-modal-right-input"
+              value={propostaSelecionada.numero_parcelas || ""}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Valor">
+            <Input
+              type="text"
+              className="agenda-modal-right-input"
+              value={
+                propostaSelecionada.valor_parcela
+                  ? Number(propostaSelecionada.valor_parcela).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : ""
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Vencimento do 1º Pagamento">
+            <Input
+              type="date"
+              className="agenda-modal-right-input"
+              value={propostaSelecionada.data_vencimento || ""}
+              onChange={(e) =>
+                setPropostaSelecionada({
+                  ...propostaSelecionada,
+                  data_vencimento: e.target.value,
+                })
+              }
+            />
+          </LinhaInput>
+
+        </div>
+        
+
+        <div className="agenda-btn-modal-right-footer">
+          <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
+            Cancelar
+          </Button>
+          <Button onClick={() => setRightMode("editarProposta")}>Editar</Button>
+          <Button onClick={() => handleAceitarProposta(propostaSelecionada)}>Aceitar</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (rightMode === "editarProposta" && propostaSelecionada) {
+    return (
+      <div className="agenda-modal-right-content form">
+        <h4 className="agenda-atr-section-title">Editar Proposta</h4>
+
+        <LinhaInput label="Parcelas">
+          <Input
+            type="number"
+            className="agenda-modal-right-input"
+            value={propostaSelecionada.numero_parcelas || ""}
+            onChange={(e) =>
+              setPropostaSelecionada({
+                ...propostaSelecionada,
+                numero_parcelas: e.target.value,
+              })
+            }
+          />
+        </LinhaInput>
+
+        <LinhaInput label="Valor">
+          <Input
+            type="number"
+            className="agenda-modal-right-input"
+            value={propostaSelecionada.valor || ""}
+            onChange={(e) =>
+              setPropostaSelecionada({
+                ...propostaSelecionada,
+                valor: e.target.value,
+              })
+            }
+          />
+        </LinhaInput>
+
+        <div className="agenda-btn-modal-right-footer">
+          <Button variant="secondary" onClick={() => setRightMode("visualizarPropostas")}>
+            Cancelar
+          </Button>
+          <Button onClick={() => handleEditarProposta(propostaSelecionada)}>Salvar</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+
 
 
 function ModalRightInicialContrato({ form, setForm, setRightMode }) {
@@ -1322,6 +1562,79 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   const [parteEditando, setParteEditando] = useState(null);
   const [parteEncontrada, setParteEncontrada] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState(null);
+  const [propostas, setPropostas] = useState([]);
+  const [novaProposta, setNovaProposta] = useState({ numero_parcelas: "", valor_parcela: "" });
+  const [propostaSelecionada, setPropostaSelecionada] = useState(null);
+  const [vencimentoAcordo, setVencimentoAcordo] = useState("");
+
+
+
+  useEffect(() => {
+    async function carregarPropostas() {
+      if (abaAtiva === "propostas" && eventoSelecionado?.entity_type === "processo") {
+        try {
+          const res = await fetchPropostasByProcesso(eventoSelecionado.entity_id);
+          setPropostas(res || []);
+        } catch (err) {
+          console.error("Erro ao carregar propostas:", err);
+          setPropostas([]);
+        }
+      }
+    }
+    carregarPropostas();
+  }, [abaAtiva, eventoSelecionado]);
+
+  async function handleAdicionarProposta() {
+    if (!eventoSelecionado?.entity_id) return;
+    try {
+      const payload = {
+        processo_id: eventoSelecionado.entity_id,
+        numero_parcelas: Number(novaProposta.numero_parcelas),
+        valor_parcela: Number(novaProposta.valor_parcela),
+      };
+      await createProposta(payload);
+      const atualizadas = await fetchPropostasByProcesso(eventoSelecionado.entity_id);
+      setPropostas(atualizadas);
+      setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
+    } catch (err) {
+      console.error("Erro ao adicionar proposta:", err);
+    }
+  }
+  
+  async function handleEditarProposta() {
+    if (!propostaSelecionada) return;
+    try {
+      await updateProposta(propostaSelecionada.id, {
+        numero_parcelas: Number(novaProposta.numero_parcelas),
+        valor_parcela: Number(novaProposta.valor_parcela),
+      });
+      const atualizadas = await fetchPropostasByProcesso(eventoSelecionado.entity_id);
+      setPropostas(atualizadas);
+      setPropostaSelecionada(null);
+    } catch (err) {
+      console.error("Erro ao editar proposta:", err);
+    }
+  }
+  
+  async function handleAceitarProposta() {
+    if (!propostaSelecionada || !eventoSelecionado?.entity_id) return;
+    try {
+      const payload = {
+        processo_id: eventoSelecionado.entity_id,
+        proposta_processo_id: propostaSelecionada.id,
+        data_vencimento: vencimentoAcordo,
+      };
+      await createAcordo(payload);
+      const atualizadas = await fetchPropostasByProcesso(eventoSelecionado.entity_id);
+      setPropostas(atualizadas);
+      setPropostaSelecionada(null);
+      setVencimentoAcordo("");
+    } catch (err) {
+      console.error("Erro ao aceitar proposta:", err);
+    }
+  }
+  
+  
 
 
   useEffect(() => {
@@ -1518,9 +1831,12 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
             </DialogTitle>
 
 
-            <DialogDescription className="agenda-modal-description">
-              {abaAtiva === "agenda" ? "Atribuições deste dia" : ""}
-            </DialogDescription>
+            {abaAtiva === "agenda" && (
+              <DialogDescription className="agenda-modal-description">
+                Atribuições deste dia
+              </DialogDescription>
+            )}
+
 
               {abaAtiva === "processo" && (
                 <ModalLeftProcesso
@@ -1533,11 +1849,13 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               )}
 
               {abaAtiva === "propostas" && (
-                <div className="agenda-modal-left-content">
-                  <h4>Lista de Propostas</h4>
-                  {/* lógica futura */}
-                </div>
+                <ModalLeftPropostas
+                  propostas={propostas} 
+                  setPropostaSelecionada={setPropostaSelecionada}
+                  setRightMode={setRightMode}
+                />
               )}
+
 
               {abaAtiva === "contrato" && (
                 <ModalLeftContrato
@@ -1587,7 +1905,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
             {eventoSelecionado?.entity_type ? (
               rightMode === "partes" ? (
                 <ModalRightAgendaContratoPartes
-                  entityType={eventoSelecionado?.entity_type} 
+                  entityType={eventoSelecionado?.entity_type}
                   contratoSelecionado={form}
                   partesVinculadas={form.partes_adversas || []}
                   setPartesVinculadas={(novas) =>
@@ -1598,21 +1916,36 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setShowFormParte={setShowFormParte}
                   fetchParte={fetchParte}
                   foundParte={foundParte}
-                  setFetchParte={setFetchParte} 
+                  setFetchParte={setFetchParte}
                   setFoundParte={setFoundParte}
                   parteAviso={parteAviso}
                   setParteAviso={setParteAviso}
                   parteParaRemover={parteParaRemover}
                   setParteParaRemover={setParteParaRemover}
-                  parteEditando={parteEditando}            
-                  setParteEditando={setParteEditando}       
-                  parteEncontrada={parteEncontrada}         
-                  setParteEncontrada={setParteEncontrada}  
+                  parteEditando={parteEditando}
+                  setParteEditando={setParteEditando}
+                  parteEncontrada={parteEncontrada}
+                  setParteEncontrada={setParteEncontrada}
                   handleBuscarParte={handleBuscarParte}
                   handleAdicionarParte={handleAdicionarParte}
                   handleRemoverParte={handleRemoverParte}
                   setRightMode={setRightMode}
                   rightMode={rightMode}
+                />
+              ) : abaAtiva === "propostas" ? (
+                <ModalRightPropostas
+                  rightMode={rightMode}
+                  propostaSelecionada={propostaSelecionada}
+                  setPropostaSelecionada={setPropostaSelecionada}
+                  propostas={propostas}
+                  novaProposta={novaProposta}
+                  setNovaProposta={setNovaProposta}
+                  vencimentoAcordo={vencimentoAcordo}
+                  setVencimentoAcordo={setVencimentoAcordo}
+                  handleAdicionarProposta={handleAdicionarProposta}
+                  handleEditarProposta={handleEditarProposta}
+                  handleAceitarProposta={handleAceitarProposta}
+                  setRightMode={setRightMode}
                 />
 
               ) : (
@@ -1636,7 +1969,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
                   entityType={eventoSelecionado?.entity_type}
                   form={form}
-                  setForm={setForm} 
+                  setForm={setForm}
                 />
               )
             ) : (
@@ -1647,6 +1980,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               </div>
             )}
           </div>
+
 
 
 
