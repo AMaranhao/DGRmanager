@@ -51,6 +51,11 @@ import {
   updateProposta,             
 } from "@/services/ENDPOINTS_ServicePropostas";
 
+import { 
+  fetchModalParcelasByAcordoId 
+} from "@/services/ENDPOINTS_ServiceParcelasAcordo";
+
+
 import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js"; // POST /acordos
 
 
@@ -190,6 +195,84 @@ function getDiasSemana(offset = 0) {
     return d;
   });
 }
+
+
+
+function ModalLeftParcelasAgenda({ parcelas = [], setParcelaSelecionada }) {
+  // Normaliza "hoje" para comparar só a data (sem hora)
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const getCardClass = (parcela) => {
+    const st = (parcela.status || "").toLowerCase();
+    const estaPaga = !!parcela.data_pagamento || st === "pago" || st === "paga";
+
+    if (estaPaga) {
+      // classe "pago" (ou "paga") para fundo verde claro
+      return "agenda-modal-parcelas-card pago";
+    }
+
+    // Se não está paga, verifica atraso
+    if (parcela.vencimento) {
+      const venc = new Date(parcela.vencimento);
+      venc.setHours(0, 0, 0, 0);
+      if (venc < hoje) {
+        // fundo vermelho claro
+        return "agenda-modal-parcelas-card atrasada";
+      }
+    }
+
+    // padrão
+    return "agenda-modal-parcelas-card";
+  };
+
+  // Garante ordenação por numero_parcela
+  const itens = Array.isArray(parcelas) ? [...parcelas] : [];
+  itens.sort((a, b) => (a.numero_parcela ?? 0) - (b.numero_parcela ?? 0));
+
+  return (
+    <div className="agenda-modal-parcelas-wrapper">
+      <div className="agenda-modal-parcelas-content">
+        <div className="agenda-modal-parcelas-grid">
+          {itens.length > 0 ? (
+            itens.map((parcela) => (
+              <div
+                key={parcela.id}
+                className={getCardClass(parcela)}
+                onClick={() => setParcelaSelecionada?.(parcela)}
+              >
+                <div className="agenda-modal-parcelas-linha">
+                  <span className="agenda-modal-parcelas-data">
+                    {parcela.vencimento
+                      ? new Date(parcela.vencimento).toLocaleDateString("pt-BR")
+                      : "—"}
+                  </span>
+                </div>
+                <div className="agenda-modal-parcelas-linha">
+                  <span className="agenda-modal-parcelas-valor">
+                    {parcela.valor_parcela != null
+                      ? Number(parcela.valor_parcela).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })
+                      : "—"}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="agenda-modal-parcelas-empty">Nenhuma parcela encontrada.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
 
 function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode }) {
   return (
@@ -1812,11 +1895,18 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   
       else if (evento.entity_type === "acordo") {
         const dados = await fetchAcordoUnificadoById(evento.entity_id);
-        setForm(dados);
-        setHistoricoAtribs(dados.atribuicoes_evento || []); // 👈 idem
+        const parcelas = await fetchModalParcelasByAcordoId(evento.entity_id);
+      
+        setForm({
+          ...dados,
+          parcelas, // 👈 adiciona parcelas no form
+        });
+      
+        setHistoricoAtribs(dados.atribuicoes_evento || []);
         setVisualizando(true);
         setEditando(false);
       }
+      
   
       else {
         setForm({});
@@ -1938,11 +2028,16 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               )}
 
               {abaAtiva === "parcelas" && (
-                <div className="agenda-modal-left-content">
-                  <h4>Parcelas do Acordo</h4>
-                  {/* lógica futura */}
-                </div>
+                <ModalLeftParcelasAgenda
+                  parcelas={form?.parcelas || []}
+                  parcelaSelecionada={form?.parcelaSelecionada}
+                  setParcelaSelecionada={(p) =>
+                    setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
+                  }
+                />
               )}
+
+
 
               {abaAtiva === "agenda" && (
                 <ModalLeftAgendaLista

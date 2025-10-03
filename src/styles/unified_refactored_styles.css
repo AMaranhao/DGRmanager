@@ -3427,3 +3427,99 @@ select.agenda-modal-right-input {
   display: flex;
   justify-content: flex-end;
 }
+
+/* ============================
+   Modal Parcelas (Left)
+   ============================ */
+
+/* Wrapper principal */
+.agenda-modal-parcelas-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Área scrollável */
+.agenda-modal-parcelas-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+/* Grid fixo (4 colunas, 8 linhas) com preenchimento por coluna: 01-09-17-25... */
+.agenda-modal-parcelas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(8, auto);
+  grid-auto-flow: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Cartão padrão */
+.agenda-modal-parcelas-card {
+  background: #f9f9f9;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.agenda-modal-parcelas-card:hover {
+  background: #f0f4ff;
+  border-color: #1e3a8a;
+  box-shadow: 0 0 6px rgba(30, 58, 138, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Estado: paga/pago (verde claro) */
+.agenda-modal-parcelas-card.paga,
+.agenda-modal-parcelas-card.pago {
+  background: #e6fbe6;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+/* Estado: atrasada (vermelho claro) */
+.agenda-modal-parcelas-card.atrasada {
+  background: #ffe6e6;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+/* Linhas internas */
+.agenda-modal-parcelas-linha {
+  display: flex;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 2px 0;
+}
+
+.agenda-modal-parcelas-data {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.agenda-modal-parcelas-valor {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #111827;
+}
+
+/* Estado vazio */
+.agenda-modal-parcelas-empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 1rem;
+  font-style: italic;
+}
