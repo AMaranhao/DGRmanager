@@ -103,6 +103,8 @@ function ordenarEventosAgenda(eventos) {
   });
 }
 
+
+
 // 🔽 Ordena atribuições por data_inicial (decrescente) e retorna também a mais recente
 function ordenarAtribuicoes(historico) {
   if (!historico || historico.length === 0) return { listaOrdenada: [], atual: null };
@@ -135,7 +137,7 @@ function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva,
       { id: "acordo", label: "Acordo" },
       { id: "parcelas", label: "Parcelas" },
     ];
-  } 
+  }
   else {
     // fallback → agenda lista
     tabs = [
@@ -161,20 +163,23 @@ function renderModalLeftTabs(entityType, dataSelecionada, abaAtiva, setAbaAtiva,
             setAbaAtiva(tab.id);
         
             if (tab.id === "propostas") {
-              setRightMode("visualizarPropostas"); // sempre abre no default de propostas
+              setRightMode("visualizarPropostas");
             } else if (tab.id === "processo") {
-              setRightMode("visualizarAtrib"); // sempre abre no default de atribuições
+              setRightMode("visualizarAtrib");
+            } else if (tab.id === "acordo") {
+              setRightMode("visualizarAtrib");   // 👈 força atribuições quando volta para acordo
+            } else if (tab.id === "parcelas") {
+              setRightMode("visualizarParcelas"); // 👈 força parcelas quando entra
             }
           }}
         >
           {tab.label}
         </Button>
-      
       ))}
     </div>
   );
-  
 }
+
 
 
 
@@ -198,7 +203,11 @@ function getDiasSemana(offset = 0) {
 
 
 
-function ModalLeftParcelasAgenda({ parcelas = [], setParcelaSelecionada }) {
+function ModalLeftParcelasAgenda({ 
+  parcelas = [], 
+  setParcelaSelecionada,
+  setRightMode,
+}) {
   // Normaliza "hoje" para comparar só a data (sem hora)
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
@@ -239,7 +248,10 @@ function ModalLeftParcelasAgenda({ parcelas = [], setParcelaSelecionada }) {
               <div
                 key={parcela.id}
                 className={getCardClass(parcela)}
-                onClick={() => setParcelaSelecionada?.(parcela)}
+                onClick={() => {
+                  setParcelaSelecionada?.(parcela);
+                  setRightMode("parcelaSelecionada"); // 👈 abre no detalhe da parcela
+                }}
               >
                 <div className="agenda-modal-parcelas-linha">
                   <span className="agenda-modal-parcelas-data">
@@ -259,6 +271,7 @@ function ModalLeftParcelasAgenda({ parcelas = [], setParcelaSelecionada }) {
                   </span>
                 </div>
               </div>
+
             ))
           ) : (
             <p className="agenda-modal-parcelas-empty">Nenhuma parcela encontrada.</p>
@@ -269,6 +282,241 @@ function ModalLeftParcelasAgenda({ parcelas = [], setParcelaSelecionada }) {
   );
 }
 
+
+function ModalRightParcelasAgenda({
+  rightMode,
+  setRightMode,
+  parcelaSelecionada,
+  setParcelaSelecionada,
+  handleSalvarPagamento,
+}) {
+  if (rightMode === "visualizarParcelas") {
+    return (
+      <div className="agenda-modal-right-wrapper">
+        {/* Aba única */}
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">
+            Pagamentos
+          </Button>
+        </div>
+
+        {/* Conteúdo scroll */}
+        <div className="agenda-modal-right-scroll">
+          <p className="agenda-modal-atr-label">
+            Clique em uma parcela à esquerda para detalhar aqui.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (rightMode === "parcelaSelecionada" && parcelaSelecionada) {
+    return (
+      <div className="agenda-modal-right-wrapper">
+        {/* Aba única */}
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">
+            Pagamentos
+          </Button>
+        </div>
+
+        {/* Conteúdo scroll */}
+        <div className="agenda-modal-right-scroll">
+          <LinhaInput label="Parcela">
+            <Input
+              className="agenda-modal-right-input"
+              value={parcelaSelecionada.numero_parcela}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Data do Vencimento">
+            <Input
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.vencimento
+                  ? new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")
+                  : "—"
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Valor da Parcela">
+            <Input
+              className="agenda-modal-right-input"
+              value={Number(parcelaSelecionada.valor_parcela).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Data do Pagamento">
+            <Input
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.data_pagamento
+                  ? new Date(parcelaSelecionada.data_pagamento).toLocaleDateString("pt-BR")
+                  : "—"
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          
+
+          <LinhaInput label="Valor Pago">
+            <Input
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.valor_pago
+                  ? Number(parcelaSelecionada.valor_pago).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : "R$ 0,00"
+              }
+              readOnly
+            />
+          </LinhaInput>
+
+          <LinhaInput label="Status">
+            <span
+              style={{
+                color:
+                  parcelaSelecionada.status === "pago"
+                    ? "green"
+                    : parcelaSelecionada.status === "em_atraso"
+                    ? "red"
+                    : "orange",
+                fontWeight: "bold",
+              }}
+            >
+              {parcelaSelecionada.status}
+            </span>
+          </LinhaInput>
+        </div>
+
+        { /* Footer */}
+        <div className="agenda-btn-modal-right-footer">
+          <Button
+            onClick={() => setRightMode("realizarPagamento")}
+            disabled={parcelaSelecionada.status === "pago"} // 🔒 Desabilita se já pago
+          >
+            Realizar Pagamento
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (rightMode === "realizarPagamento" && parcelaSelecionada) {
+    return (
+      <div className="agenda-modal-right-wrapper">
+        {/* Aba única */}
+        <div className="agenda-modal-tabs">
+          <Button className="agenda-modal-tab-btn" variant="default">
+            Pagamentos
+          </Button>
+        </div>
+  
+        {/* Conteúdo scroll */}
+        <div className="agenda-modal-right-scroll">
+          <LinhaInput label="Parcela">
+            <Input
+              className="agenda-modal-right-input"
+              value={parcelaSelecionada.numero_parcela}
+              readOnly
+            />
+          </LinhaInput>
+  
+          <LinhaInput label="Data do Vencimento">
+            <Input
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.vencimento
+                  ? new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")
+                  : "—"
+              }
+              readOnly
+            />
+          </LinhaInput>
+  
+          <LinhaInput label="Valor da Parcela">
+            <Input
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.valor_parcela
+                  ? Number(parcelaSelecionada.valor_parcela).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : "R$ 0,00"
+              }
+              readOnly
+            />
+          </LinhaInput>
+  
+          <LinhaInput label="Data do Pagamento">
+            <Input
+              type="date"
+              className="agenda-modal-right-input"
+              value={parcelaSelecionada.data_pagamento || ""}
+              onChange={(e) =>
+                setParcelaSelecionada({
+                  ...parcelaSelecionada,
+                  data_pagamento: e.target.value,
+                })
+              }
+            />
+          </LinhaInput>
+  
+          <LinhaInput label="Valor Pago">
+            <Input
+              type="text"
+              className="agenda-modal-right-input"
+              value={
+                parcelaSelecionada.valor_pago !== undefined && parcelaSelecionada.valor_pago !== null
+                  ? Number(parcelaSelecionada.valor_pago).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : ""
+              }
+              onChange={(e) => {
+                const numericValue = e.target.value.replace(/\D/g, "");
+                const floatValue = numericValue ? parseFloat(numericValue) / 100 : 0;
+                setParcelaSelecionada({
+                  ...parcelaSelecionada,
+                  valor_pago: floatValue,
+                });
+              }}
+              placeholder="R$ 0,00"
+            />
+          </LinhaInput>
+        </div>
+  
+        {/* Footer */}
+        <div className="agenda-btn-modal-right-footer">
+          <Button
+            variant="secondary"
+            onClick={() => setRightMode("parcelaSelecionada")}
+          >
+            Cancelar
+          </Button>
+          <Button onClick={() => handleSalvarPagamento(parcelaSelecionada)}>
+            Salvar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+
+  return null;
+}
 
 
 
@@ -2034,8 +2282,10 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setParcelaSelecionada={(p) =>
                     setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
                   }
+                  setRightMode={setRightMode}   // 👈 passa a função para o Left
                 />
               )}
+
 
 
 
@@ -2097,7 +2347,18 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleAceitarProposta={handleAceitarProposta}
                   setRightMode={setRightMode}
                 />
-
+              ) : abaAtiva === "parcelas" ? (
+                <ModalRightParcelasAgenda
+                  rightMode={rightMode}
+                  setRightMode={setRightMode}
+                  parcelaSelecionada={form?.parcelaSelecionada}
+                  setParcelaSelecionada={(p) =>
+                    setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
+                  }
+                  handleSalvarPagamento={(p) =>
+                    console.log("Salvar pagamento", p)
+                  }
+                />
               ) : (
                 <ModalRightAtribuicoesAgenda
                   rightMode={rightMode}
@@ -2115,8 +2376,12 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   historicoAtribs={historicoAtribs}
                   formAtrib={formAtrib}
                   setFormAtrib={setFormAtrib}
-                  handleCriarAtribuicao={() => console.log("Criar atribuição", formAtrib)}
-                  handleEditarAtribuicao={() => console.log("Editar atribuição", formAtrib)}
+                  handleCriarAtribuicao={() =>
+                    console.log("Criar atribuição", formAtrib)
+                  }
+                  handleEditarAtribuicao={() =>
+                    console.log("Editar atribuição", formAtrib)
+                  }
                   entityType={eventoSelecionado?.entity_type}
                   form={form}
                   setForm={setForm}
@@ -2130,6 +2395,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               </div>
             )}
           </div>
+
 
 
 
