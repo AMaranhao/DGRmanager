@@ -3538,3 +3538,17 @@ select.agenda-modal-right-input {
 .agenda-modal-parcelas-card.atrasada {
   background: #fdeaea; /* vermelho bem claro */
 }
+
+/* Inputs editáveis (usuário pode digitar) */
+.input-editable {
+  background-color: #ffffff !important; /* branco */
+  color: #000000 !important;
+  cursor: text;
+}
+
+/* Inputs somente leitura */
+.input-readonly {
+  background-color: #f5f5f5 !important; /* cinza claro */
+  color: #555555 !important;
+  cursor: not-allowed;
+}

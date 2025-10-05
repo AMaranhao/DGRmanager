@@ -324,7 +324,7 @@ function ModalRightParcelasAgenda({
         <div className="agenda-modal-right-scroll">
           <LinhaInput label="Parcela">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={parcelaSelecionada.numero_parcela}
               readOnly
             />
@@ -332,7 +332,7 @@ function ModalRightParcelasAgenda({
 
           <LinhaInput label="Data do Vencimento">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 parcelaSelecionada.vencimento
                   ? new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")
@@ -344,7 +344,7 @@ function ModalRightParcelasAgenda({
 
           <LinhaInput label="Valor da Parcela">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={Number(parcelaSelecionada.valor_parcela).toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
@@ -355,7 +355,7 @@ function ModalRightParcelasAgenda({
 
           <LinhaInput label="Data do Pagamento">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 parcelaSelecionada.data_pagamento
                   ? new Date(parcelaSelecionada.data_pagamento).toLocaleDateString("pt-BR")
@@ -369,7 +369,7 @@ function ModalRightParcelasAgenda({
 
           <LinhaInput label="Valor Pago">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 parcelaSelecionada.valor_pago
                   ? Number(parcelaSelecionada.valor_pago).toLocaleString("pt-BR", {
@@ -426,7 +426,7 @@ function ModalRightParcelasAgenda({
         <div className="agenda-modal-right-scroll">
           <LinhaInput label="Parcela">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={parcelaSelecionada.numero_parcela}
               readOnly
             />
@@ -434,7 +434,7 @@ function ModalRightParcelasAgenda({
   
           <LinhaInput label="Data do Vencimento">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 parcelaSelecionada.vencimento
                   ? new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")
@@ -446,7 +446,7 @@ function ModalRightParcelasAgenda({
   
           <LinhaInput label="Valor da Parcela">
             <Input
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 parcelaSelecionada.valor_parcela
                   ? Number(parcelaSelecionada.valor_parcela).toLocaleString("pt-BR", {
@@ -462,7 +462,7 @@ function ModalRightParcelasAgenda({
           <LinhaInput label="Data do Pagamento">
             <Input
               type="date"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={parcelaSelecionada.data_pagamento || ""}
               onChange={(e) =>
                 setParcelaSelecionada({
@@ -476,7 +476,7 @@ function ModalRightParcelasAgenda({
           <LinhaInput label="Valor Pago">
             <Input
               type="text"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={
                 parcelaSelecionada.valor_pago !== undefined && parcelaSelecionada.valor_pago !== null
                   ? Number(parcelaSelecionada.valor_pago).toLocaleString("pt-BR", {
@@ -624,7 +624,7 @@ function ModalRightPropostas({
           <LinhaInput label="Parcelas">
             <Input
               type="number"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               onChange={(e) =>
                 setPropostaSelecionada((prev) => ({
                   ...prev,
@@ -637,7 +637,7 @@ function ModalRightPropostas({
           <LinhaInput label="Valor">
             <Input
               type="text"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={
                 propostaSelecionada?.valor !== undefined && propostaSelecionada?.valor !== null
                   ? Number(propostaSelecionada.valor).toLocaleString("pt-BR", {
@@ -688,7 +688,7 @@ function ModalRightPropostas({
           <LinhaInput label="Parcelas">
             <Input
               type="number"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={propostaSelecionada.numero_parcelas || ""}
               readOnly
             />
@@ -697,7 +697,7 @@ function ModalRightPropostas({
           <LinhaInput label="Valor">
             <Input
               type="text"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-readonly"
               value={
                 propostaSelecionada.valor_parcela
                   ? Number(propostaSelecionada.valor_parcela).toLocaleString("pt-BR", {
@@ -713,7 +713,7 @@ function ModalRightPropostas({
           <LinhaInput label="Vencimento do 1º Pagamento">
             <Input
               type="date"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={propostaSelecionada.data_vencimento || ""}
               onChange={(e) =>
                 setPropostaSelecionada({
@@ -748,7 +748,7 @@ function ModalRightPropostas({
           <LinhaInput label="Parcelas">
             <Input
               type="number"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={propostaSelecionada.numero_parcelas || ""}
               onChange={(e) =>
                 setPropostaSelecionada({
@@ -762,7 +762,7 @@ function ModalRightPropostas({
           <LinhaInput label="Valor">
             <Input
               type="number"
-              className="agenda-modal-right-input"
+              className="agenda-modal-right-input input-editable"
               value={propostaSelecionada.valor || ""}
               onChange={(e) =>
                 setPropostaSelecionada({
@@ -798,7 +798,7 @@ function ModalRightInicialContrato({ form, setForm, setRightMode }) {
  
         <LinhaInput label="Valor do Contrato Atualizado">
           <Input
-            className="agenda-modal-right-input"
+            className="agenda-modal-right-input input-editable"
             value={
               form?.valor_atualizado !== undefined && form?.valor_atualizado !== null
                 ? Number(form.valor_atualizado).toLocaleString("pt-BR", {
@@ -844,7 +844,7 @@ function ModalLeftProcesso({
         <div className="processo-input-row">
           <LinhaInput label="Número (CNJ)">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form.numero || ""}
               readOnly
             />
@@ -852,7 +852,7 @@ function ModalLeftProcesso({
 
           <LinhaInput label="Contrato (nº ou ID)">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={(form.contrato_numero || form.contrato_id || "").toString()}
               readOnly
             />
@@ -864,7 +864,7 @@ function ModalLeftProcesso({
           <LinhaInput label="Data de Distribuição">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form.data_distribuicao || ""}
               readOnly
             />
@@ -872,14 +872,14 @@ function ModalLeftProcesso({
           <LinhaInput label="Publicação do Processo">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form.data_publicacao || ""}
               readOnly
             />
           </LinhaInput>
           <LinhaInput label="Comarca">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form.comarca || ""}
               readOnly
             />
@@ -891,7 +891,7 @@ function ModalLeftProcesso({
         <div className="processo-input-row">
           <LinhaInput label="Etapa">
             <select
-              className="processo-modal-input"
+              className="processo-modal-input input-editable"
               value={form.processo_evento?.tipo?.id || ""}
               onChange={(e) => {
                 const selected = tiposEvento.find(te => te.id === Number(e.target.value));
@@ -916,7 +916,7 @@ function ModalLeftProcesso({
           <LinhaInput label="Publicação da Etapa">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-editable"
               value={form.processo_evento?.data_publicacao || ""}
               onChange={(e) =>
                 setForm({
@@ -936,7 +936,7 @@ function ModalLeftProcesso({
           <LinhaInput label="Prazo Jurídico (dias)">
             <Input
               type="number"
-              className="processo-modal-input"
+              className="processo-modal-input input-editable"
               value={form.processo_evento?.prazo_juridico?.toString() || ""}
               onChange={(e) =>
                 setForm({
@@ -953,7 +953,7 @@ function ModalLeftProcesso({
           <LinhaInput label="Prazo Interno">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-editable"
               value={form.processo_evento?.prazo_interno || ""}
               onChange={(e) =>
                 setForm({
@@ -970,7 +970,7 @@ function ModalLeftProcesso({
           <LinhaInput label="Prazo Fatal">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-editable"
               value={form.processo_evento?.prazo_fatal || ""}
               onChange={(e) =>
                 setForm({
@@ -988,7 +988,7 @@ function ModalLeftProcesso({
         {/* Observação */}
         <LinhaInput label="Observação">
           <textarea
-            className="processo-textarea"
+            className="processo-textarea input-editable"
             rows={2}
             value={form.processo_evento?.observacao || ""}
             onChange={(e) =>
@@ -1042,7 +1042,7 @@ function ModalLeftContrato({
       <div className="agenda-modal-left-content">
         <LinhaInput label="Número">
           <Input
-            className="processo-modal-input"
+            className={`processo-modal-input ${visualizando ? "input-readonly" : "input-editable"}`}
             value={form.numero || ""}
             onChange={(e) => setForm({ ...form, numero: e.target.value })}
             readOnly={visualizando}
@@ -1051,7 +1051,7 @@ function ModalLeftContrato({
 
         <LinhaInput label="Valor">
           <Input
-            className="processo-modal-input"
+            className={`processo-modal-input ${visualizando ? "input-readonly" : "input-editable"}`}
             value={
               form.valor !== undefined && form.valor !== null
                 ? Number(form.valor).toLocaleString("pt-BR", {
@@ -1073,7 +1073,7 @@ function ModalLeftContrato({
 
         <LinhaInput label="Lote">
           <Input
-            className="processo-modal-input"
+            className={`processo-modal-input ${visualizando ? "input-readonly" : "input-editable"}`}
             value={form.lote || ""}
             onChange={(e) => setForm({ ...form, lote: e.target.value })}
             readOnly={visualizando}
@@ -1082,7 +1082,7 @@ function ModalLeftContrato({
 
         <LinhaInput label="Observação">
           <Input
-            className="processo-textarea"
+            className={`processo-textarea ${visualizando ? "input-readonly" : "input-editable"}`}
             value={form.observacao || ""}
             onChange={(e) => setForm({ ...form, observacao: e.target.value })}
             readOnly={visualizando}
@@ -1135,7 +1135,7 @@ function ModalLeftAcordo({
         <div className="processo-input-row">
           <LinhaInput label="Contrato">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form?.contrato?.numero || ""}
               readOnly
             />
@@ -1143,7 +1143,7 @@ function ModalLeftAcordo({
 
           <LinhaInput label="Parte Adversa">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form?.parte_adversa?.nome || ""}
               readOnly
             />
@@ -1154,7 +1154,7 @@ function ModalLeftAcordo({
         <div className="processo-input-row triple">
           <LinhaInput label="Valor do Acordo">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={
                 form?.proposta?.valor_acordo
                   ? Number(form.proposta.valor_acordo).toLocaleString("pt-BR", {
@@ -1169,7 +1169,7 @@ function ModalLeftAcordo({
 
           <LinhaInput label="Valor da Parcela">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={
                 form?.proposta?.valor_parcela
                   ? Number(form.proposta.valor_parcela).toLocaleString("pt-BR", {
@@ -1184,7 +1184,7 @@ function ModalLeftAcordo({
 
           <LinhaInput label="Número de Parcelas">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form?.proposta?.numero_parcelas || ""}
               readOnly
             />
@@ -1195,7 +1195,7 @@ function ModalLeftAcordo({
         <div className="processo-input-row">
           <LinhaInput label="Status">
             <Input
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form?.status || ""}
               readOnly
             />
@@ -1204,7 +1204,7 @@ function ModalLeftAcordo({
           <LinhaInput label="Data de Início">
             <Input
               type="date"
-              className="processo-modal-input"
+              className="processo-modal-input input-readonly"
               value={form?.data_vencimento || ""}
               readOnly
             />
@@ -1214,7 +1214,7 @@ function ModalLeftAcordo({
         {/* Observações */}
         <LinhaInput label="Observações">
           <textarea
-            className="processo-textarea"
+            className="processo-textarea input-editable"
             rows={2}
             value={form?.observacao || ""}
             onChange={(e) => {
@@ -1494,7 +1494,7 @@ function ModalRightAtribuicoesAgenda({
             <LinhaInput label="Prazo">
               <Input
                 type="date"
-                className="agenda-modal-right-input"
+                className="agenda-modal-right-input input-editable"
                 value={formAtrib.prazo || ""}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, prazo: e.target.value })
@@ -1506,7 +1506,7 @@ function ModalRightAtribuicoesAgenda({
               <LinhaInput label="Horário Agendado">
                 <Input
                   type="datetime-local"
-                  className="agenda-modal-right-input"
+                  className="agenda-modal-right-input input-editable"
                   value={formAtrib.horario || ""}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, horario: e.target.value })
@@ -1518,7 +1518,7 @@ function ModalRightAtribuicoesAgenda({
 
             <LinhaInput label="Responsável">
               <select
-                className="agenda-modal-right-input"
+                className="agenda-modal-right-input input-editable"
                 value={formAtrib.responsavel_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })
@@ -1535,7 +1535,7 @@ function ModalRightAtribuicoesAgenda({
 
             <LinhaInput label="Observação">
               <textarea
-                className="agenda-textarea"
+                className="agenda-textarea input-editable"
                 rows={2}
                 value={formAtrib.observacao || ""}
                 onChange={(e) =>
@@ -1565,7 +1565,7 @@ function ModalRightAtribuicoesAgenda({
 
               <LinhaInput label="Solucionador">
                 <select
-                  className="agenda-modal-right-input"
+                  className="agenda-modal-right-input input-editable"
                   value={formAtrib.solucionador_id}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })
@@ -1584,7 +1584,7 @@ function ModalRightAtribuicoesAgenda({
 
               <LinhaInput label="Status">
                 <select
-                  className="agenda-modal-right-input"
+                  className="agenda-modal-right-input input-editable"
                   value={formAtrib.proxima_atr_id}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })
@@ -1601,7 +1601,7 @@ function ModalRightAtribuicoesAgenda({
 
               <LinhaInput label="Responsável">
                 <select
-                  className="agenda-modal-right-input"
+                  className="agenda-modal-right-input input-editable"
                   value={formAtrib.proximo_resp_id}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })
@@ -1619,7 +1619,7 @@ function ModalRightAtribuicoesAgenda({
               <LinhaInput label="Prazo">
                 <Input
                   type="date"
-                  className="agenda-modal-right-input"
+                  className="agenda-modal-right-input input-editable"
                   value={formAtrib.prazo || ""}
                   onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
                 />
@@ -1629,7 +1629,7 @@ function ModalRightAtribuicoesAgenda({
                 <LinhaInput label="Horário Agendado">
                   <Input
                     type="datetime-local"
-                    className="agenda-modal-right-input"
+                    className="agenda-modal-right-input input-editable"
                     value={formAtrib.horario || ""}
                     onChange={(e) =>
                       setFormAtrib({ ...formAtrib, horario: e.target.value })
@@ -1659,6 +1659,7 @@ function ModalRightAtribuicoesAgenda({
     </div>
   );
 }
+
 
 function ModalRightAgendaContratoPartes({
   contratoSelecionado,
@@ -1734,11 +1735,11 @@ function ModalRightAgendaContratoPartes({
               <>
                 <div className="non-editable-input-wrapper">
                   <label className="usuarios-label">Nome</label>
-                  <Input className="usuarios-modal-input" value={parteEditando.nome} readOnly />
+                  <Input className="usuarios-modal-input input-readonly" value={parteEditando.nome} readOnly />
                 </div>
                 <div className="non-editable-input-wrapper">
                   <label className="usuarios-label">CPF</label>
-                  <Input className="usuarios-modal-input" value={parteEditando.cpf} readOnly />
+                  <Input className="usuarios-modal-input input-readonly" value={parteEditando.cpf} readOnly />
                     <div className="checkbox-wrapper">
                       <label className="flex items-center gap-2">
                         <input
@@ -1765,7 +1766,7 @@ function ModalRightAgendaContratoPartes({
                 <div className="editable-input-wrapper">
                   <label className="usuarios-label">CPF</label>
                   <Input
-                    className="usuarios-modal-input"
+                    className="usuarios-modal-input input-editable"
                     value={fetchParte}
                     onChange={(e) => setFetchParte(e.target.value)}
                     placeholder="Digite o CPF"
@@ -1775,7 +1776,7 @@ function ModalRightAgendaContratoPartes({
                 <div className="non-editable-input-wrapper">
                   <label className="usuarios-label">Nome</label>
                   <Input
-                    className="usuarios-modal-input"
+                    className="usuarios-modal-input input-readonly"
                     value={parteEncontrada?.nome || ""}
                     readOnly
                     placeholder="—"
