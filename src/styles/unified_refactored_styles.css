@@ -2953,8 +2953,9 @@ input[type="date"].acordo-modal-input {
 .agenda-modal-right-scroll {
   flex: 1;
   overflow-y: auto;
-  margin-top: 0.5rem;
-  margin-bottom: 1.75rem;
+  margin-top: 1rem;
+  margin-left: 0.25rem;
+
   padding-right: 4px;
 }
 

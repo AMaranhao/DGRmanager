@@ -1,0 +1,81 @@
+/* ========================= */
+/*   ModalLeftAgendaLista    */
+/* ========================= */
+
+/* Área de rolagem esquerda do modal */
+.modalleft-agenda-lista-scroll {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 1rem;
+    margin-left: 0.25rem;
+    padding-right: 4px;
+  }
+  
+  /* Container do conteúdo */
+  .modalleft-agenda-lista-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  /* Layout de colunas (3 colunas) */
+  .modalleft-agenda-lista-colunas {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    height: 100%;
+  }
+  
+  /* Cada coluna */
+  .modalleft-agenda-lista-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+  }
+  
+  /* Item de evento (card) */
+  .modalleft-agenda-lista-item {
+    padding: 0.3rem 0.4rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    line-height: 1.75;
+    max-width: 14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  
+  /* Efeitos hover */
+  .modalleft-agenda-lista-item:hover {
+    transform: translateY(-1px);
+  }
+  
+  /* Texto principal do card */
+  .modalleft-agenda-lista-item-texto {
+    font-size: 0.8rem;
+    line-height: 1.25;
+    font-weight: 500;
+  }
+  
+  /* Nome do responsável */
+  .modalleft-agenda-lista-item div {
+    font-size: 0.75rem;
+    color: #374151;
+  }
+  
+  /* Cores dos eventos */
+  .modalleft-agenda-lista-item-vermelho {
+    background: #fee2e2;
+  }
+  
+  .modalleft-agenda-lista-item-azul {
+    background: #dbeafe;
+  }
+  
+  .modalleft-agenda-lista-item-verde {
+    background: #dcfce7;
+  }
+  

@@ -56,8 +56,14 @@ import {
 } from "@/services/ENDPOINTS_ServiceParcelasAcordo";
 
 
-import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js"; // POST /acordos
+import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js"; 
 
+// 🧩 Novos modais modularizados
+import ModalLeftAcordo from "@/components/modais/acordos/ModalLeftAcordo";
+import ModalLeftParcelas from "@/components/modais/acordos/ModalLeftParcelas";
+import ModalRightParcelas from "@/components/modais/acordos/ModalRightParcelas";
+
+import ModalLeftAgendaLista from "@/components/modais/agenda/ModalLeftAgendaLista";
 
 
 import "@/styles/unified_refactored_styles.css";
@@ -202,7 +208,7 @@ function getDiasSemana(offset = 0) {
 }
 
 
-
+/*
 function ModalLeftParcelasAgenda({ 
   parcelas = [], 
   setParcelaSelecionada,
@@ -281,8 +287,8 @@ function ModalLeftParcelasAgenda({
     </div>
   );
 }
-
-
+*/
+/*
 function ModalRightParcelasAgenda({
   rightMode,
   setRightMode,
@@ -293,14 +299,14 @@ function ModalRightParcelasAgenda({
   if (rightMode === "visualizarParcelas") {
     return (
       <div className="agenda-modal-right-wrapper">
-        {/* Aba única */}
+    
         <div className="agenda-modal-tabs">
           <Button className="agenda-modal-tab-btn" variant="default">
             Pagamentos
           </Button>
         </div>
 
-        {/* Conteúdo scroll */}
+   
         <div className="agenda-modal-right-scroll">
           <p className="agenda-modal-atr-label">
             Clique em uma parcela à esquerda para detalhar aqui.
@@ -313,14 +319,14 @@ function ModalRightParcelasAgenda({
   if (rightMode === "parcelaSelecionada" && parcelaSelecionada) {
     return (
       <div className="agenda-modal-right-wrapper">
-        {/* Aba única */}
+
         <div className="agenda-modal-tabs">
           <Button className="agenda-modal-tab-btn" variant="default">
             Pagamentos
           </Button>
         </div>
 
-        {/* Conteúdo scroll */}
+
         <div className="agenda-modal-right-scroll">
           <LinhaInput label="Parcela">
             <Input
@@ -399,7 +405,7 @@ function ModalRightParcelasAgenda({
           </LinhaInput>
         </div>
 
-        { /* Footer */}
+
         <div className="agenda-btn-modal-right-footer">
           <Button
             onClick={() => setRightMode("realizarPagamento")}
@@ -415,14 +421,13 @@ function ModalRightParcelasAgenda({
   if (rightMode === "realizarPagamento" && parcelaSelecionada) {
     return (
       <div className="agenda-modal-right-wrapper">
-        {/* Aba única */}
+
         <div className="agenda-modal-tabs">
           <Button className="agenda-modal-tab-btn" variant="default">
             Pagamentos
           </Button>
         </div>
   
-        {/* Conteúdo scroll */}
         <div className="agenda-modal-right-scroll">
           <LinhaInput label="Parcela">
             <Input
@@ -498,7 +503,6 @@ function ModalRightParcelasAgenda({
           </LinhaInput>
         </div>
   
-        {/* Footer */}
         <div className="agenda-btn-modal-right-footer">
           <Button
             variant="secondary"
@@ -519,7 +523,7 @@ function ModalRightParcelasAgenda({
 }
 
 
-
+*/
 
 
 function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode }) {
@@ -1116,7 +1120,7 @@ function ModalLeftContrato({
 
 
 
-
+/*
 
 function ModalLeftAcordo({ 
   form, 
@@ -1131,7 +1135,6 @@ function ModalLeftAcordo({
     <div className="agenda-modal-left">
       <div className="agenda-modal-left-content">
 
-        {/* Linha 1 - Contrato + Parte Adversa */}
         <div className="processo-input-row">
           <LinhaInput label="Contrato">
             <Input
@@ -1150,7 +1153,6 @@ function ModalLeftAcordo({
           </LinhaInput>
         </div>
 
-        {/* Linha 2 - Valores + Número de Parcelas */}
         <div className="processo-input-row triple">
           <LinhaInput label="Valor do Acordo">
             <Input
@@ -1191,7 +1193,6 @@ function ModalLeftAcordo({
           </LinhaInput>
         </div>
 
-        {/* Linha 3 - Status + Data de Início */}
         <div className="processo-input-row">
           <LinhaInput label="Status">
             <Input
@@ -1211,7 +1212,6 @@ function ModalLeftAcordo({
           </LinhaInput>
         </div>
 
-        {/* Observações */}
         <LinhaInput label="Observações">
           <textarea
             className="processo-textarea input-editable"
@@ -1227,7 +1227,6 @@ function ModalLeftAcordo({
         </LinhaInput>
       </div>
 
-      {/* Rodapé */}
       <div className="agenda-btn-modal-left-footer">
         <Button 
           variant="outline"
@@ -1262,8 +1261,8 @@ function ModalLeftAcordo({
   );
 }
 
-
-
+*/
+/*
 
 function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
   const eventosOrdenados = ordenarEventosAgenda(eventos);
@@ -1317,7 +1316,7 @@ function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
     </div>
   );
 }
-
+*/
 
 function ModalRightAtribuicoesAgenda({
   rightMode,
@@ -2266,24 +2265,23 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
               {abaAtiva === "acordo" && (
                 <ModalLeftAcordo
-                  form={form}
-                  setForm={setForm}
-                  salvar={salvar}
-                  visualizando={visualizando}
-                  editando={editando}
-                  salvarRef={salvarRef}
-                  setEventoSelecionado={setEventoSelecionado}
-                />
+                form={form}
+                setForm={setForm}
+                salvar={salvar}
+                salvarRef={salvarRef}
+                setEventoSelecionado={setEventoSelecionado}
+                modo="visualizarAgenda"
+              />
               )}
 
               {abaAtiva === "parcelas" && (
-                <ModalLeftParcelasAgenda
+                <ModalLeftParcelas
                   parcelas={form?.parcelas || []}
                   parcelaSelecionada={form?.parcelaSelecionada}
                   setParcelaSelecionada={(p) =>
                     setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
                   }
-                  setRightMode={setRightMode}   // 👈 passa a função para o Left
+                  setRightMode={setRightMode}
                 />
               )}
 
@@ -2349,7 +2347,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setRightMode={setRightMode}
                 />
               ) : abaAtiva === "parcelas" ? (
-                <ModalRightParcelasAgenda
+                <ModalRightParcelas
                   rightMode={rightMode}
                   setRightMode={setRightMode}
                   parcelaSelecionada={form?.parcelaSelecionada}

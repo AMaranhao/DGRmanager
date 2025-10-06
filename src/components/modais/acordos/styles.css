@@ -1,0 +1,334 @@
+/* ============================
+   Modal Left Parcelas (novo padrão)
+   ============================ */
+
+/* Wrapper principal */
+.modalleft-parcelas-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Área scrollável */
+  .modalleft-parcelas-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  
+  /* Grid fixo (4 colunas, 8 linhas) com preenchimento por coluna */
+  .modalleft-parcelas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(7, auto);
+    grid-auto-flow: column;
+    gap: 0.5rem;
+  }
+  
+  /* Cartão padrão */
+  .modalleft-parcelas-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modalleft-parcelas-card:hover {
+    background: #f0f4ff;
+    border-color: #1e3a8a;
+    box-shadow: 0 0 6px rgba(30, 58, 138, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  /* Estado: paga/pago (verde claro) */
+  .modalleft-parcelas-card.pago,
+  .modalleft-parcelas-card.paga {
+    background: #e6fbe6;
+    border-color: #22c55e;
+    color: #166534;
+  }
+  
+  /* Estado: atrasada (vermelho claro) */
+  .modalleft-parcelas-card.atrasada {
+    background: #fdeaea;
+    border-color: #ef4444;
+    color: #991b1b;
+  }
+  
+  /* Linhas internas */
+  .modalleft-parcelas-linha {
+    display: flex;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin: 2px 0;
+  }
+  
+  .modalleft-parcelas-data {
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #333;
+  }
+  
+  .modalleft-parcelas-valor {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #111827;
+  }
+  
+  /* Estado vazio */
+  .modalleft-parcelas-empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 1rem;
+    font-style: italic;
+  }
+  
+  /* ============================
+     Modal Right Parcelas (novo padrão)
+     ============================ */
+  
+  .modalright-parcelas-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+    min-height: 455px;
+    max-height: 455px;
+  }
+  
+
+  
+
+  
+  .modalright-parcelas-tab-btn:hover {
+    background-color: #1e3a8a !important;
+  }
+  
+  .modalright-parcelas-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 1rem;
+    min-height: 465px;
+  }
+  
+  .modalright-parcelas-input {
+    border-radius: 9999px;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .modalright-parcelas-label {
+    font-weight: 500;
+    text-align: center;
+    margin-top: 2rem;
+    color: #374151;
+  }
+  
+  /* Footer fixo no canto inferior direito */
+  .modalright-parcelas-footer {
+    display: flex;
+    justify-content: flex-end !important;
+    margin-top: 1rem;
+    gap: 0.75rem;
+  }
+  
+  /* ============================
+     Modal Left Acordo (novo padrão)
+     ============================ */
+  
+  .modalleft-acordo-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: transparent !important; /* removido fundo branco */
+    border-radius: 8px;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+  
+  .modalleft-acordo-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+  
+  .modalleft-acordo-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .modalleft-acordo-row.triple {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+  
+  /* Inputs com visual padronizado */
+  .modalleft-acordo-input,
+  .modalright-parcelas-input {
+    border-radius: 9999px !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem !important;
+    width: 100%;
+    background-color: #fff !important;
+    box-sizing: border-box;
+  }
+  
+  input[type="date"].modalleft-acordo-input {
+    background-color: white !important;
+    color: #111827;
+  }
+  
+  .modalleft-acordo-textarea {
+    width: 100%;
+    max-width: 100%;              /* 🔹 impede que ultrapasse o container */
+    resize: none;                 /* 🔹 evita redimensionamento manual */
+    border-radius: 12px;          /* 🔹 igual aos inputs arredondados */
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    color: #111827;
+    background-color: #f9fafb;
+    box-sizing: border-box;
+    overflow-x: hidden;           /* 🔹 remove scroll horizontal */
+  }
+  
+  
+  .modalleft-acordo-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    gap: 0.75rem;
+  }
+  
+  .dark .modalleft-acordo-input {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+  
+  .dark .modalleft-acordo-textarea {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+  
+  /* ============================
+     Utilitários de Input (padrão de todos os modais)
+     ============================ */
+  
+  .input-readonly {
+    background-color: #f9fafb !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+  }
+  
+  .input-editable {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .input-editable:focus {
+    outline: none;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 1px #2563eb;
+  }
+  
+  .modalleft-acordo-input[type="date"].input-readonly {
+    background-color: #f9fafb !important;
+    color: #6b7280 !important;
+  }
+  
+  .modalleft-acordo-input[type="date"].input-editable {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+  
+  
+  /* Linha de 3 colunas */
+  .modalleft-acordo-row.triple {
+    flex-wrap: nowrap;
+  }
+  
+  @media (max-width: 900px) {
+    .modalleft-acordo-row.triple {
+      flex-wrap: wrap;
+    }
+  }
+  
+  /* Dark mode */
+  .dark .modalleft-acordo-input,
+  .dark .modalleft-acordo-textarea,
+  .dark .modalright-parcelas-input {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+  
+  /* ============================
+     Correções visuais gerais
+     ============================ */
+  
+  /* Aba "Pagamentos" igual às abas principais */
+  .modalright-parcelas-tab-btn {
+    background-color: #111827 !important;
+    color: #fff !important;
+    border-radius: 9999px !important;
+    font-weight: 500;
+    transition: background 0.2s ease-in-out;
+  }
+
+  .modalright-parcelas-tabs {
+    display: flex;
+    justify-content: center;   /* centraliza horizontalmente */
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .modalright-parcelas-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    min-width: 130px;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    border-radius: 9999px !important;
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #2f4674;
+  
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .modalright-parcelas-tab-btn:hover {
+    background-color: #1e3a8a !important;
+  }
+  
