@@ -58,12 +58,20 @@ import {
 
 import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js"; 
 
-// 🧩 Novos modais modularizados
+// 🧩  modais modularizados Acordo
 import ModalLeftAcordo from "@/components/modais/acordos/ModalLeftAcordo";
 import ModalLeftParcelas from "@/components/modais/acordos/ModalLeftParcelas";
 import ModalRightParcelas from "@/components/modais/acordos/ModalRightParcelas";
-
+// 🧩  modais modularizados Agenda
 import ModalLeftAgendaLista from "@/components/modais/agenda/ModalLeftAgendaLista";
+// 🧩  modais modularizados de Contratos
+import ModalLeftContratos from "@/components/modais/contratos/ModalLeftContratos";
+import ModalRightInicial from "@/components/modais/contratos/ModalRightInicial";
+import ModalRightPartes from "@/components/modais/contratos/ModalRightPartes";
+// 🧩  modais modularizados de Contratos
+import ModalRightAtribuicoes from "@/components/modais/atribuicoes/ModalRightAtribuicoes";
+
+
 
 
 import "@/styles/unified_refactored_styles.css";
@@ -793,9 +801,14 @@ function ModalRightPropostas({
 }
 
 
+/*
 
-
-function ModalRightInicialContrato({ form, setForm, setRightMode }) {
+function ModalRightInicial
+({ 
+  form, 
+  setForm, 
+  setRightMode 
+}) {
   return (
     <div className="agenda-modal-right-wrapper">
       <div className="agenda-modal-right-content form">
@@ -831,7 +844,7 @@ function ModalRightInicialContrato({ form, setForm, setRightMode }) {
   );
 }
 
-
+*/
 
 function ModalLeftProcesso({ 
   form, 
@@ -1031,7 +1044,9 @@ function ModalLeftProcesso({
   );
 }
 
-function ModalLeftContrato({ 
+/*
+
+function ModalLeftContratos({ 
   form, 
   setForm, 
   salvar, 
@@ -1117,7 +1132,7 @@ function ModalLeftContrato({
   );
 }
 
-
+*/
 
 
 /*
@@ -1318,7 +1333,8 @@ function ModalLeftAgendaLista({ eventos, handleSelecionarEvento }) {
 }
 */
 
-function ModalRightAtribuicoesAgenda({
+/*
+function ModalRightAtribuicoes({
   rightMode,
   setRightMode,
   atribs,
@@ -1334,7 +1350,6 @@ function ModalRightAtribuicoesAgenda({
 }) {
   return (
     <div className="agenda-modal-right">
-      {/* Cabeçalho fixo */}
       <div className="agenda-modal-right-header">
         <div className="agenda-modal-tabs">
           <Button
@@ -1373,7 +1388,6 @@ function ModalRightAtribuicoesAgenda({
       </div>
 
 
-      {/* Modo: visualizar atribuições */}
       {rightMode === "visualizarAtrib" && (
         <div className="agenda-modal-right-wrapper">
           <div className="agenda-modal-right-scroll">
@@ -1556,7 +1570,6 @@ function ModalRightAtribuicoesAgenda({
 
 
 
-      {/* Modo: nova atribuição */}
       {rightMode === "novaAtrib" && (
         <div className="agenda-modal-right-wrapper">
             <div className="agenda-modal-right-content form">
@@ -1647,20 +1660,17 @@ function ModalRightAtribuicoesAgenda({
           </div>
         </div>
       )}
-      {rightMode === "inicialContrato" && (
-        <ModalRightInicialContrato 
-          form={form} 
-          setForm={setForm} 
-          setRightMode={setRightMode} 
-        />
-      )}
+
 
     </div>
   );
 }
 
+*/
 
-function ModalRightAgendaContratoPartes({
+/*
+
+function ModalRightPartes({
   contratoSelecionado,
   partesVinculadas,
   setPartesVinculadas,
@@ -1729,7 +1739,7 @@ function ModalRightAgendaContratoPartes({
       <div className="agenda-modal-right-scroll form">
         {showFormParte ? (
           <div className="parte-contrato-modal">
-            {/* Caso esteja editando uma parte existente */}
+
             {parteEditando ? (
               <>
                 <div className="non-editable-input-wrapper">
@@ -1760,7 +1770,7 @@ function ModalRightAgendaContratoPartes({
 
               </>
             ) : (
-              /* Caso seja + Parte */
+
               <>
                 <div className="editable-input-wrapper">
                   <label className="usuarios-label">CPF</label>
@@ -1918,7 +1928,7 @@ function ModalRightAgendaContratoPartes({
     </div>
   );
 }
-
+*/
 
 
 function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, eventoInicial }) {
@@ -2251,7 +2261,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
 
               {abaAtiva === "contrato" && (
-                <ModalLeftContrato
+                <ModalLeftContratos
                   form={form}
                   setForm={setForm}
                   salvar={salvar}
@@ -2302,8 +2312,18 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
           {/* LADO DIREITO */}
           <div className="agenda-modal-split-right">
             {eventoSelecionado?.entity_type ? (
-              rightMode === "partes" ? (
-                <ModalRightAgendaContratoPartes
+              // 🔹 1. Inicial do Contrato
+              eventoSelecionado.entity_type === "contrato" && rightMode === "inicialContrato" ? (
+                <ModalRightInicial
+                  form={form}
+                  setForm={setForm}
+                  setRightMode={setRightMode}
+                  rightMode={rightMode}
+                />
+              ) 
+              // 🔹 2. Partes do Contrato
+              : rightMode === "partes" ? (
+                <ModalRightPartes
                   entityType={eventoSelecionado?.entity_type}
                   contratoSelecionado={form}
                   partesVinculadas={form.partes_adversas || []}
@@ -2331,7 +2351,9 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setRightMode={setRightMode}
                   rightMode={rightMode}
                 />
-              ) : abaAtiva === "propostas" ? (
+              ) 
+              // 🔹 3. Propostas de Processo
+              : abaAtiva === "propostas" ? (
                 <ModalRightPropostas
                   rightMode={rightMode}
                   propostaSelecionada={propostaSelecionada}
@@ -2346,7 +2368,9 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleAceitarProposta={handleAceitarProposta}
                   setRightMode={setRightMode}
                 />
-              ) : abaAtiva === "parcelas" ? (
+              )
+              // 🔹 4. Parcelas de Acordo
+              : abaAtiva === "parcelas" ? (
                 <ModalRightParcelas
                   rightMode={rightMode}
                   setRightMode={setRightMode}
@@ -2358,8 +2382,10 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                     console.log("Salvar pagamento", p)
                   }
                 />
-              ) : (
-                <ModalRightAtribuicoesAgenda
+              )
+              // 🔹 5. Atribuições padrão (processo/acordo/contrato)
+              : (
+                <ModalRightAtribuicoes
                   rightMode={rightMode}
                   setRightMode={setRightMode}
                   atribs={
@@ -2394,6 +2420,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               </div>
             )}
           </div>
+
 
 
 
