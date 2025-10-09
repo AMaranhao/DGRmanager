@@ -3553,3 +3553,57 @@ select.agenda-modal-right-input {
   color: #555555 !important;
   cursor: not-allowed;
 }
+
+
+.agenda-atribuicao-modal-right-input {
+    border-radius: 9999px !important;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    font-size: 1rem;
+    margin-bottom: 0.25rem !important;
+    max-width: 21rem !important;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  
+  input[type="date"].agenda-atribuicao-modal-right-input,
+  input[type="time"].agenda-atribuicao-modal-right-input {
+    background-color: white !important;
+    color: #111827;
+  }
+  
+  select.agenda-atribuicao-modal-right-input {
+    background-color: white !important;
+    color: #111827;
+  }
+  
+  .dark .agenda-atribuicao-modal-right-input {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+
+  .modalright-atrib .linha-input-wrapper {
+    margin-bottom: 8px !important;
+  }
+  
+.agenda-modal-right-content.form {
+    height: 455px !important;
+    max-height: 455px !important;
+    min-height: 455px !important;
+}
+
+.agenda-atribuicao-modal-right-scroll {
+    height: 487px !important;
+    max-height: 487px !important;
+    min-height: 487px !important;
+}
+
+.agenda-atribuicao-modal-right-scroll {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+    margin-left: 0.25rem;
+    padding-right: 0.25rem;
+  }

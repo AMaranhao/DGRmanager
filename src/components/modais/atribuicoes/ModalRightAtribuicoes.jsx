@@ -22,7 +22,7 @@ export default function ModalRightAtribuicoes({
   setForm,
 }) {
   return (
-    <div className="agenda-modal-right">
+    <div className="agenda-modal-right modalright-atrib">
       <div className="agenda-modal-right-header">
         <div className="agenda-modal-tabs">
           <Button
@@ -60,7 +60,7 @@ export default function ModalRightAtribuicoes({
 
       {rightMode === "visualizarAtrib" && (
         <div className="agenda-modal-right-wrapper">
-          <div className="agenda-modal-right-scroll">
+          <div className="agenda-atribuicao-modal-right-scroll">
             <ul className="agenda-modal-right-lista">
               {(() => {
                 const { listaOrdenada, atual } = ordenarAtribuicoes(historicoAtribs);
@@ -160,7 +160,7 @@ export default function ModalRightAtribuicoes({
             <LinhaInput label="Prazo">
               <Input
                 type="date"
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.prazo || ""}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, prazo: e.target.value })
@@ -172,7 +172,7 @@ export default function ModalRightAtribuicoes({
               <LinhaInput label="Horário Agendado">
                 <Input
                   type="datetime-local"
-                  className="agenda-modal-right-input input-editable"
+                  className="agenda-atribuicao-modal-right-input input-editable"
                   value={formAtrib.horario || ""}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, horario: e.target.value })
@@ -183,7 +183,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Responsável">
               <select
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.responsavel_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })
@@ -224,7 +224,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Solucionador">
               <select
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.solucionador_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })
@@ -243,7 +243,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Status">
               <select
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.proxima_atr_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })
@@ -260,7 +260,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Responsável">
               <select
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.proximo_resp_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })
@@ -278,7 +278,7 @@ export default function ModalRightAtribuicoes({
             <LinhaInput label="Prazo">
               <Input
                 type="date"
-                className="agenda-modal-right-input input-editable"
+                className="agenda-atribuicao-modal-right-input input-editable"
                 value={formAtrib.prazo || ""}
                 onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
               />
@@ -288,7 +288,7 @@ export default function ModalRightAtribuicoes({
               <LinhaInput label="Horário Agendado">
                 <Input
                   type="datetime-local"
-                  className="agenda-modal-right-input input-editable"
+                  className="agenda-atribuicao-modal-right-input input-editable"
                   value={formAtrib.horario || ""}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, horario: e.target.value })

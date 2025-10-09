@@ -3346,13 +3346,7 @@ select.agenda-modal-right-input {
 /* ============================= */
 
 /* Wrapper geral (lado esquerdo do modal) */
-.agenda-modal-propostas-wrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  position: relative;   /* permite botão fixo */
-  overflow: hidden;
-}
+
 
 /* Conteúdo com rolagem */
 .agenda-modal-propostas-content {
@@ -3363,31 +3357,8 @@ select.agenda-modal-right-input {
   margin-top: 0.75rem;
 }
 
-/* Grid */
-.agenda-modal-propostas-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);   /* sempre 3 colunas */
-  grid-template-rows: repeat(8, auto);     /* sempre até 8 linhas */
-  grid-auto-flow: column;                  /* preenche verticalmente */
-  gap: 0.4rem;
-  max-height: calc(8 * 80px); /* altura total de 8 linhas, ajuste o 80px conforme a altura do card */
-  overflow-y: auto;
-  padding-right: 6px;
-  padding-top: 6px;
-  padding-left: 6px;
-}
 
-/* Card individual */
-.agenda-modal-propostas-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  font-size: 0.9rem;
-  line-height: 0.85;
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-}
+
 
 .agenda-modal-propostas-card:hover {
   border-color: #2563eb;
