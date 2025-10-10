@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import "./styles.css";
 
-export default function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode }) {
+export default function ModalLeftPropostas({ propostas, setPropostaSelecionada, setRightMode, modo, }) {
   return (
     <div className="agenda-modal-propostas-wrapper">
       {/* Área com rolagem e grid */}

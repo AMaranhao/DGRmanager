@@ -2,7 +2,7 @@ import React from "react";
 import "./styles.css"; 
 import { ordenarEventosAgenda } from "@/components/modais/shared/utilsFunctionsModals";
 
-export default function ModalLeftAgendaLista({ eventos = [], handleSelecionarEvento }) {
+export default function ModalLeftAgendaLista({ eventos = [], handleSelecionarEvento, modo, }) {
   const eventosOrdenados = ordenarEventosAgenda(eventos);
 
   return (

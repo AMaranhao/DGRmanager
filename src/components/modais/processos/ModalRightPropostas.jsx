@@ -18,6 +18,7 @@ export default function ModalRightPropostas({
   setPropostaSelecionada,
   editandoProposta,
   setEditandoProposta,
+  modo,
 }) {
   return (
     <div className="agenda-modal-right">
@@ -83,19 +84,22 @@ export default function ModalRightPropostas({
                         
                     </div>
 
-                    <div className="agenda-btn-modal-right-footer">
-                        <Button onClick={handleEditarProposta}>Editar</Button>
-                        <Button onClick={handleAceitarProposta}>Aceitar</Button>
-                        <Button
-                        variant="outline"
-                        onClick={() => {
-                            setEditandoProposta(false);
-                            setPropostaSelecionada(null);
-                        }}
-                        >
-                        Cancelar
-                        </Button>
-                    </div>
+                    {modo !== "visualizar" && (
+                        <div className="agenda-btn-modal-right-footer">
+                            <Button onClick={handleEditarProposta}>Editar</Button>
+                            <Button onClick={handleAceitarProposta}>Aceitar</Button>
+                            <Button
+                            variant="outline"
+                            onClick={() => {
+                                setEditandoProposta(false);
+                                setPropostaSelecionada(null);
+                            }}
+                            >
+                            Cancelar
+                            </Button>
+                        </div>
+                    )}
+
                 </div>
                 
             ) : (

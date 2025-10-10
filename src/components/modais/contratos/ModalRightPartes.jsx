@@ -30,6 +30,7 @@ export default function ModalRightPartes({
   setParteEditando,
   parteEncontrada,
   setParteEncontrada,
+  modo,
 }) {
   return (
     <div className="agenda-modal-right">

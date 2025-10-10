@@ -8,7 +8,7 @@ import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
 import "./styles.css";
 
 
-export default function ModalRightInicial({ form, setForm, setRightMode, rightMode }) {
+export default function ModalRightInicial({ form, setForm, setRightMode, rightMode, modo, }) {
     return (
     <div className="agenda-modal-right">
         <div className="agenda-modal-right-header">

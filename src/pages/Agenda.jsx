@@ -553,14 +553,17 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   salvar={salvar}
                   tiposEvento={tiposEvento}
                   setEventoSelecionado={setEventoSelecionado}
+                  modo="visualizarAgenda"
                 />
               )}
+
 
               {abaAtiva === "propostas" && (
                 <ModalLeftPropostas
                   propostas={propostas} 
                   setPropostaSelecionada={setPropostaSelecionada}
                   setRightMode={setRightMode}
+                  modo="visualizarAgenda"
                 />
               )}
 
@@ -597,6 +600,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                     setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
                   }
                   setRightMode={setRightMode}
+                  modo="visualizarAgenda"
                 />
               )}
 
@@ -607,6 +611,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                 <ModalLeftAgendaLista
                   eventos={eventos}
                   handleSelecionarEvento={handleSelecionarEvento}
+                  modo="visualizarAgenda"
                 />
               )}
 
@@ -624,6 +629,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setForm={setForm}
                   setRightMode={setRightMode}
                   rightMode={rightMode}
+                  modo="visualizarAgenda"
                 />
               ) 
               // 🔹 2. Partes do Contrato
@@ -655,6 +661,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleRemoverParte={handleRemoverParte}
                   setRightMode={setRightMode}
                   rightMode={rightMode}
+                  modo="visualizarAgenda"
                 />
               ) 
               // 🔹 3. Propostas de Processo
@@ -670,6 +677,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   setPropostaSelecionada={setPropostaSelecionada}
                   editandoProposta={editandoProposta}
                   setEditandoProposta={setEditandoProposta}
+                  modo="visualizarAgenda"
                 />
               )
               // 🔹 4. Parcelas de Acordo
@@ -684,6 +692,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   handleSalvarPagamento={(p) =>
                     console.log("Salvar pagamento", p)
                   }
+                  modo="visualizarAgenda"
                 />
               )
               // 🔹 5. Atribuições padrão (processo/acordo/contrato)
@@ -713,6 +722,7 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   entityType={eventoSelecionado?.entity_type}
                   form={form}
                   setForm={setForm}
+                  modo="visualizarAgenda"
                 />
               )
             ) : (

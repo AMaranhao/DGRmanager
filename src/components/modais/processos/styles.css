@@ -135,25 +135,26 @@
   }
   
   .agenda-modal-propostas-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(8, auto);
-    grid-auto-flow: column;
-    gap: 0.4rem;
-    max-height: calc(8 * 80px);
-    overflow-y: auto;
-    padding: 6px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-rows: repeat(8, auto) !important;
+    grid-auto-flow: column !important;
+    gap: 0.4rem !important;
+    max-height: calc(8 * 80px) !important;
+    overflow-y: auto !important;
+    padding: 6px !important;
   }
   
+  
   .agenda-modal-propostas-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 0.7rem;
-    font-size: 0.9rem;
-    line-height: 0.85;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
+    background: #fff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    padding: 0.7rem !important;
+    font-size: 0.9rem !important;
+    line-height: 0.85 !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
   }
   
   .agenda-modal-propostas-card:hover {

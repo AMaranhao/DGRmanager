@@ -20,6 +20,7 @@ export default function ModalRightAtribuicoes({
   entityType,
   form,
   setForm,
+  modo,
 }) {
   return (
     <div className="modalright-atribuicoes-content">
@@ -119,11 +120,13 @@ export default function ModalRightAtribuicoes({
             </ul>
           </div>
 
-          <div className="modalright-atribuicoes-footer">
-            <Button onClick={() => setRightMode("novaAtrib")}>
-              Próxima Atribuição
-            </Button>
-          </div>
+            {modo !== "visualizar" && (
+                <div className="modalright-atribuicoes-footer">
+                    <Button onClick={() => setRightMode("novaAtrib")}>
+                        Próxima Atribuição
+                    </Button>
+                </div>
+            )}
         </div>
       )}
 
@@ -210,10 +213,12 @@ export default function ModalRightAtribuicoes({
             </LinhaInput>
           </div>
 
-          <div className="modalright-atribuicoes-footer">
-            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-            <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
-          </div>
+            {modo !== "visualizar" && (
+                <div className="modalright-atribuicoes-footer">
+                    <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
+                    <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
+                </div>
+            )}
         </div>
       )}
 
@@ -298,10 +303,13 @@ export default function ModalRightAtribuicoes({
             )}
           </div>
 
-          <div className="modalright-atribuicoes-footer">
-            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-            <Button onClick={handleCriarAtribuicao}>Salvar</Button>
-          </div>
+            {modo !== "visualizar" && (
+                <div className="modalright-atribuicoes-footer">
+                    <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
+                    <Button onClick={handleCriarAtribuicao}>Salvar</Button>
+                </div>
+            )}
+
         </div>
       )}
     </div>

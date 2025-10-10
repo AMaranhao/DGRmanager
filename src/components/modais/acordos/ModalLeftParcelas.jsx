@@ -9,6 +9,7 @@ export default function ModalLeftParcelas({
   parcelas = [], 
   setParcelaSelecionada,
   setRightMode,
+  modo,
 }) {
   // Normaliza "hoje" para comparar só a data (sem hora)
   const hoje = new Date();

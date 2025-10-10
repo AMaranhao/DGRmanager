@@ -11,6 +11,7 @@ export default function ModalRightParcelas({
   parcelaSelecionada,
   setParcelaSelecionada,
   handleSalvarPagamento,
+  modo,
 }) {
   if (rightMode === "visualizarParcelas") {
     return (
@@ -115,14 +116,17 @@ export default function ModalRightParcelas({
           </LinhaInput>
         </div>
 
-        <div className="modalright-parcelas-footer">
-          <Button
-            onClick={() => setRightMode("realizarPagamento")}
-            disabled={parcelaSelecionada.status === "pago"}
-          >
-            Realizar Pagamento
-          </Button>
-        </div>
+        {modo !== "visualizar" && (
+            <div className="modalright-parcelas-footer">
+                <Button
+                    onClick={() => setRightMode("realizarPagamento")}
+                    disabled={parcelaSelecionada.status === "pago"}
+                    >
+                    Realizar Pagamento
+                </Button>
+            </div>
+        )}
+
       </div>
     );
   }
@@ -211,17 +215,20 @@ export default function ModalRightParcelas({
           </LinhaInput>
         </div>
 
-        <div className="modalright-parcelas-footer">
-          <Button
-            variant="secondary"
-            onClick={() => setRightMode("parcelaSelecionada")}
-          >
-            Cancelar
-          </Button>
-          <Button onClick={() => handleSalvarPagamento(parcelaSelecionada)}>
-            Salvar
-          </Button>
-        </div>
+        {modo !== "visualizar" && (
+            <div className="modalright-parcelas-footer">
+                <Button
+                    variant="secondary"
+                    onClick={() => setRightMode("parcelaSelecionada")}
+                    >
+                    Cancelar
+                </Button>
+                <Button onClick={() => handleSalvarPagamento(parcelaSelecionada)}>
+                    Salvar
+                </Button>
+            </div>
+        )}
+
       </div>
     );
   }
