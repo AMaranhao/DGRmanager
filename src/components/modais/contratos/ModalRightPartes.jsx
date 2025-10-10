@@ -59,7 +59,7 @@ export default function ModalRightPartes({
             </div>
         </div>
 
-        <div className="agenda-modal-right-scroll form">
+        <div className="modalright-partes-scroll form">
             {showFormParte ? (
                 <div className="parte-contrato-modal">
                 {parteEditando ? (

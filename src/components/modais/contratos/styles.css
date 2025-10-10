@@ -387,3 +387,19 @@ select.agenda-modal-right-input {
     min-height: 13rem !important;
     min-width: 15rem !important;
   }
+
+
+
+.modalright-partes-scroll {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+    margin-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+.modalright-partes-scroll {
+    max-height: 480px !important;
+    min-height: 480px !important;
+    height: 480px !important;
+}
