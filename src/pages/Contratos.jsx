@@ -727,7 +727,7 @@ const handleAtualizarAtribuicao = async () => {
                 abrirNovo();
               }}
             >
-              <Plus size={16} /> Novo Contrato
+              Novo Contrato
             </Button>
           </DialogTrigger>
 

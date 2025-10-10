@@ -78,7 +78,7 @@ import ModalRightPropostas from "@/components/modais/processos/ModalRightPropost
 
 
 
-import "@/styles/unified_refactored_styles.css";
+import "@/styles/agenda.css";
 
 
 const LinhaInput = React.memo(({ label, children }) => (

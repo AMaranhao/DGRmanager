@@ -776,7 +776,7 @@ const salvar = async () => {
               className="usuarios-btn-material"
               onClick={(e) => { e.currentTarget.blur(); abrirNovo(); }}
             >
-              <Plus size={16} /> Novo Processo
+              Novo Processo
             </Button>
           </DialogTrigger>
 

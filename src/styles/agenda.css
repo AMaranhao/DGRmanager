@@ -1,0 +1,256 @@
+/* ============================= */
+/* Processo – Modais Limpos      */
+/* ============================= */
+
+/* Estrutura base do split */
+.processo-split-modal {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 980px !important;
+    height: 580px !important;
+    gap: 24px;
+  }
+  
+  .processo-modal-split-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+    flex: 0 0 62%;
+    min-width: 380px;
+    position: relative;
+  }
+  
+  .processo-modal-split-right {
+    position: relative;
+    flex: 0 0 38%;
+    max-width: 320px;
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-y: auto;
+    padding-bottom: 70px;
+  }
+  
+  /* Inputs e labels */
+  .processo-modal-input {
+    border-radius: 9999px !important;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .processo-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+  
+  .processo-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Linhas de inputs */
+  .processo-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+  }
+  
+  .processo-input-row.triple {
+    flex-wrap: nowrap;
+  }
+  
+  /* Textarea */
+  .processo-textarea {
+    width: 100%;
+    min-height: 3.5rem;
+    resize: vertical;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.25rem;
+    max-width: 30rem;
+    background-color: white;
+    color: #111827;
+  }
+  
+  .processo-textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59,130,246,.3);
+    border-color: #93c5fd;
+  }
+  
+  /* Footer dos botões */
+  .agenda-btn-modal-left-footer {
+    display: flex;
+    justify-content: flex-end !important;
+    margin-top: 1rem;
+    gap: 0.75rem;
+  }
+  
+  /* Seções e títulos */
+  .agenda-modal-section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* ============================= */
+  /* Propostas – Lado Esquerdo     */
+  /* ============================= */
+  
+  .agenda-modal-propostas-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 0.75rem;
+  }
+  
+  .agenda-modal-propostas-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .agenda-modal-propostas-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .agenda-modal-propostas-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+  
+  .agenda-modal-propostas-linha {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .agenda-modal-propostas-label {
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  .agenda-modal-propostas-valor {
+    color: #111827;
+  }
+  
+  .agenda-modal-propostas-empty {
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  /* ============================= */
+  /* Propostas – Lado Direito      */
+  /* ============================= */
+  
+  .agenda-modal-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .agenda-modal-right-header {
+    flex-shrink: 0;
+  }
+  
+  .agenda-modal-tabs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    margin-top: 0.25rem;
+  }
+  
+  .agenda-modal-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    min-width: 130px;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    border-radius: 9999px !important;
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #2f4674;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .agenda-modal-tab-btn:hover {
+    background: #f3f4f6;
+  }
+  
+  .agenda-modal-right-wrapper {
+    min-height: 455px !important;
+    max-height: 455px !important;
+    height: 455px !important;
+  }
+  
+  .agenda-modal-right-content.form {
+    height: 455px !important;
+    max-height: 455px !important;
+    min-height: 455px !important;
+  }
+  
+  .agenda-modal-right-input {
+    border-radius: 9999px !important;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  input[type="date"].agenda-modal-right-input {
+    background-color: white !important;
+    color: #111827;
+  }
+  
+  .dark .agenda-modal-right-input {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+  
+  .agenda-btn-modal-right-footer {
+    display: flex;
+    justify-content: flex-end !important;
+    margin-top: 1rem;
+    gap: 0.75rem;
+  }
+  
+  /* Utilitárias */
+  .cursor-pointer { cursor: pointer; }
+  .input-editable { background-color: #fff !important; color: #000 !important; cursor: text; }
+  .input-readonly { background-color: #f5f5f5 !important; color: #555 !important; cursor: not-allowed; }
+  

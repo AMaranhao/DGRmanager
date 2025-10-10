@@ -377,7 +377,7 @@ const partesFiltradas = partes.filter((p) => {
                 }, 0);
               }}
             >
-              Nova Parte Adversa
+              Nova Parte
             </Button>
           </DialogTrigger>
 
