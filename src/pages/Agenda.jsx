@@ -243,6 +243,9 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
   const [novaProposta, setNovaProposta] = useState({ numero_parcelas: "", valor_parcela: "" });
   const [propostaSelecionada, setPropostaSelecionada] = useState(null);
   const [vencimentoAcordo, setVencimentoAcordo] = useState("");
+  const [formVencimento, setFormVencimento] = useState("");
+  const [formMes, setFormMes] = useState("");
+  const [editandoProposta, setEditandoProposta] = useState(false);
 
   useEffect(() => {
     async function carregarPropostas() {
@@ -326,12 +329,15 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
 
   useEffect(() => {
     if (abaAtiva !== "propostas") {
-      // Quando sai da aba Propostas, zera tudo relacionado
       setPropostaSelecionada(null);
       setNovaProposta({ numero_parcelas: "", valor_parcela: "" });
       setVencimentoAcordo("");
+      setFormVencimento("");           // ⬅️ limpa o campo de data
+      setFormMes("");                  // ⬅️ limpa o campo de mês
+      setEditandoProposta(false);     // ⬅️ sai do modo edição
     }
   }, [abaAtiva]);
+  
 
   // 🔽 Handlers de Partes
   function handleBuscarParte() {
@@ -564,13 +570,13 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
                   form={form}
                   setForm={setForm}
                   salvar={salvar}
-                  visualizando={visualizando}
-                  editando={editando}
                   salvarRef={salvarRef}
                   setEventoSelecionado={setEventoSelecionado}
                   setRightMode={setRightMode}
+                  modo="visualizarAgenda"
                 />
               )}
+
 
               {abaAtiva === "acordo" && (
                 <ModalLeftAcordo
@@ -654,18 +660,16 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               // 🔹 3. Propostas de Processo
               : abaAtiva === "propostas" ? (
                 <ModalRightPropostas
-                  rightMode={rightMode}
                   propostaSelecionada={propostaSelecionada}
-                  setPropostaSelecionada={setPropostaSelecionada}
-                  propostas={propostas}
-                  novaProposta={novaProposta}
-                  setNovaProposta={setNovaProposta}
-                  vencimentoAcordo={vencimentoAcordo}
-                  setVencimentoAcordo={setVencimentoAcordo}
-                  handleAdicionarProposta={handleAdicionarProposta}
+                  formVencimento={formVencimento}
+                  setFormVencimento={setFormVencimento}
+                  formMes={formMes}
+                  setFormMes={setFormMes}
                   handleEditarProposta={handleEditarProposta}
                   handleAceitarProposta={handleAceitarProposta}
-                  setRightMode={setRightMode}
+                  setPropostaSelecionada={setPropostaSelecionada}
+                  editandoProposta={editandoProposta}
+                  setEditandoProposta={setEditandoProposta}
                 />
               )
               // 🔹 4. Parcelas de Acordo

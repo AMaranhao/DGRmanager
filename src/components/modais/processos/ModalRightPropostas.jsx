@@ -34,58 +34,54 @@ export default function ModalRightPropostas({
 
         <div className="agenda-modal-right-wrapper">
             {propostaSelecionada ? (
-                <div className="agenda-modal-right-content form">
-                    <LinhaInput label="Valor Total da Proposta">
-                        <Input
-                        className="agenda-modal-right-input input-readonly"
-                        value={
-                            propostaSelecionada?.valor_total?.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                            }) || ""
-                        }
-                        readOnly
-                        />
-                    </LinhaInput>
+                <div>
 
-                    <LinhaInput label="Número de Parcelas">
-                        <Input
-                        className="agenda-modal-right-input input-readonly"
-                        value={propostaSelecionada?.numero_parcelas || ""}
-                        readOnly
-                        />
-                    </LinhaInput>
+                    <div className="agenda-proposta-modal-right-content form">
+                        <LinhaInput label="Valor Total da Proposta">
+                            <Input
+                            className="agenda-modal-right-input input-readonly"
+                            value={
+                                propostaSelecionada?.valor_acordo?.toLocaleString("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                }) || ""
+                            }
+                            readOnly
+                            />
+                        </LinhaInput>
 
-                    <LinhaInput label="Valor da Parcela">
-                        <Input
-                        className="agenda-modal-right-input input-readonly"
-                        value={
-                            propostaSelecionada?.valor_parcela?.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                            }) || ""
-                        }
-                        readOnly
-                        />
-                    </LinhaInput>
+                        <LinhaInput label="Número de Parcelas">
+                            <Input
+                            className="agenda-modal-right-input input-readonly"
+                            value={propostaSelecionada?.numero_parcelas || ""}
+                            readOnly
+                            />
+                        </LinhaInput>
 
-                    <LinhaInput label="Data do 1º Vencimento">
-                        <Input
-                        className="agenda-modal-right-input input-editable"
-                        type="date"
-                        value={formVencimento || ""}
-                        onChange={(e) => setFormVencimento(e.target.value)}
-                        />
-                    </LinhaInput>
+                        <LinhaInput label="Valor da Parcela">
+                            <Input
+                            className="agenda-modal-right-input input-readonly"
+                            value={
+                                propostaSelecionada?.valor_parcela?.toLocaleString("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                }) || ""
+                            }
+                            readOnly
+                            />
+                        </LinhaInput>
 
-                    <LinhaInput label="Mês de Referência da Primeira Parcela">
-                        <Input
-                        className="agenda-modal-right-input input-editable"
-                        value={formMes || ""}
-                        onChange={(e) => setFormMes(e.target.value)}
-                        placeholder="Ex: jan/25"
-                        />
-                    </LinhaInput>
+                        <LinhaInput label="Data do 1º Vencimento">
+                            <Input
+                            className="agenda-modal-right-input input-editable"
+                            type="date"
+                            value={formVencimento || ""}
+                            onChange={(e) => setFormVencimento(e.target.value)}
+                            />
+                        </LinhaInput>
+
+                        
+                    </div>
 
                     <div className="agenda-btn-modal-right-footer">
                         <Button onClick={handleEditarProposta}>Editar</Button>
@@ -101,6 +97,7 @@ export default function ModalRightPropostas({
                         </Button>
                     </div>
                 </div>
+                
             ) : (
                 <div className="agenda-modal-right-content">
                     <p className="agenda-modal-atr-label">

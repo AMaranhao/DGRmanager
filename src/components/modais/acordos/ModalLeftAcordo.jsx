@@ -116,29 +116,32 @@ export default function ModalLeftAcordo({
   
         {/* Rodapé */}
         <div className="modalleft-acordo-footer">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setEventoSelecionado(null);
-              setForm({});
-            }}
-          >
-            Voltar para Lista
-          </Button>
-  
-          {/* Exibe sempre em editar e visualizarAgenda */}
-          {(isEditar || isVisualizarAgenda) && (
-            <>
-              <Button
+            {/* Exibe sempre em editar e visualizarAgenda */}
+            {(isEditar || isVisualizarAgenda) && (
+                <Button
                 variant="ghost"
                 onClick={() => setForm({ ...form, status: "Cancelado" })}
-              >
+                >
                 Cancelar Acordo
-              </Button>
-              <Button onClick={salvar}>Salvar</Button>
-            </>
-          )}
+                </Button>
+            )}
+
+            <Button
+                variant="outline"
+                onClick={() => {
+                setEventoSelecionado(null);
+                setForm({});
+                }}
+            >
+                Voltar para Lista
+            </Button>
+
+            {/* Salvar permanece sempre visível conforme seu código atual */}
+            {(isEditar || isVisualizarAgenda) && (
+                <Button onClick={salvar}>Salvar</Button>
+            )}
         </div>
+
       </div>
     );
   }

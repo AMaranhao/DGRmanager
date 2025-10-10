@@ -22,11 +22,11 @@ export default function ModalRightAtribuicoes({
   setForm,
 }) {
   return (
-    <div className="agenda-modal-right modalright-atrib">
-      <div className="agenda-modal-right-header">
-        <div className="agenda-modal-tabs">
+    <div className="modalright-atribuicoes-content">
+      <div className="modalright-atribuicoes-header">
+        <div className="modalright-atribuicoes-tabs">
           <Button
-            className="agenda-modal-tab-btn"
+            className="modalright-atribuicoes-tab-btn"
             variant={
               ["visualizarAtrib", "editarAtrib", "novaAtrib"].includes(rightMode)
                 ? "default"
@@ -40,14 +40,14 @@ export default function ModalRightAtribuicoes({
           {entityType === "contrato" && (
             <>
               <Button
-                className="agenda-modal-tab-btn"
+                className="modalright-atribuicoes-tab-btn"
                 variant={rightMode === "inicialContrato" ? "default" : "outline"}
                 onClick={() => setRightMode("inicialContrato")}
               >
                 Inicial
               </Button>
               <Button
-                className="agenda-modal-tab-btn"
+                className="modalright-atribuicoes-tab-btn"
                 variant={rightMode === "partes" ? "default" : "outline"}
                 onClick={() => setRightMode("partes")}
               >
@@ -59,9 +59,9 @@ export default function ModalRightAtribuicoes({
       </div>
 
       {rightMode === "visualizarAtrib" && (
-        <div className="agenda-modal-right-wrapper">
-          <div className="agenda-atribuicao-modal-right-scroll">
-            <ul className="agenda-modal-right-lista">
+        <div className="modalright-atribuicoes-body">
+          <div className="modalright-atribuicoes-scroll">
+            <ul className="modalright-atribuicoes-lista">
               {(() => {
                 const { listaOrdenada, atual } = ordenarAtribuicoes(historicoAtribs);
 
@@ -71,7 +71,7 @@ export default function ModalRightAtribuicoes({
                   return (
                     <li
                       key={a.id}
-                      className={`agenda-modal-right-item agenda-atr-item cursor-pointer ${
+                      className={`modalright-atribuicoes-item agenda-atr-item cursor-pointer ${
                         isAtual ? "atual" : ""
                       }`}
                       onClick={() => {
@@ -90,24 +90,24 @@ export default function ModalRightAtribuicoes({
                       <div className="agenda-modal-right-texto">
                         <div className="atr-desc">{a.atribuicao_descricao}</div>
                         <div className="atr-lista">
-                          <div className="atr-linha">
-                            <span className="atr-label">Definida em</span>
+                          <div className="modalright-atribuicoes-atr-linha">
+                            <span className="modalright-atribuicoes-atr-label">Definida em</span>
                             <span className="atr-valor">
                               {a.data_inicial
                                 ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
                                 : "—"}
                             </span>
                           </div>
-                          <div className="atr-linha">
-                            <span className="atr-label">Prazo</span>
+                          <div className="modalright-atribuicoes-atr-linha">
+                            <span className="modalright-atribuicoes-atr-label">Prazo</span>
                             <span className="atr-valor">
                               {a.prazo
                                 ? new Date(a.prazo).toLocaleDateString("pt-BR")
                                 : "—"}
                             </span>
                           </div>
-                          <div className="atr-linha">
-                            <span className="atr-label">Responsável</span>
+                          <div className="modalright-atribuicoes-atr-linha">
+                            <span className="modalright-atribuicoes-atr-label">Responsável</span>
                             <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
                           </div>
                         </div>
@@ -119,7 +119,7 @@ export default function ModalRightAtribuicoes({
             </ul>
           </div>
 
-          <div className="agenda-btn-modal-right-footer">
+          <div className="modalright-atribuicoes-footer">
             <Button onClick={() => setRightMode("novaAtrib")}>
               Próxima Atribuição
             </Button>
@@ -128,24 +128,24 @@ export default function ModalRightAtribuicoes({
       )}
 
       {rightMode === "editarAtrib" && (
-        <div className="agenda-modal-right-wrapper">
+        <div className="modalright-atribuicoes-body">
           <div className="agenda-modal-right-content form">
             <div className="agenda-atr-section">
-              <h4 className="agenda-atr-section-title">Atribuição atual</h4>
-              <div className="atr-linha">
-                <span className="atr-label">Status Atual</span>
+              <h4 className="modalright-atribuicoes-section-title">Atribuição atual</h4>
+              <div className="modalright-atribuicoes-atr-linha">
+                <span className="modalright-atribuicoes-atr-label">Status Atual</span>
                 <span className="atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
               </div>
-              <div className="atr-linha">
-                <span className="atr-label">Definida em</span>
+              <div className="modalright-atribuicoes-atr-linha">
+                <span className="modalright-atribuicoes-atr-label">Definida em</span>
                 <span className="atr-valor">
                   {formAtrib.data_inicial
                     ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
                     : "—"}
                 </span>
               </div>
-              <div className="atr-linha">
-                <span className="atr-label">Tempo no Status</span>
+              <div className="modalright-atribuicoes-atr-linha">
+                <span className="modalright-atribuicoes-atr-label">Tempo no Status</span>
                 <span className="atr-valor">
                   {formAtrib.data_inicial
                     ? `${Math.floor(
@@ -160,7 +160,7 @@ export default function ModalRightAtribuicoes({
             <LinhaInput label="Prazo">
               <Input
                 type="date"
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.prazo || ""}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, prazo: e.target.value })
@@ -172,7 +172,7 @@ export default function ModalRightAtribuicoes({
               <LinhaInput label="Horário Agendado">
                 <Input
                   type="datetime-local"
-                  className="agenda-atribuicao-modal-right-input input-editable"
+                  className="modalright-atribuicoes-input input-editable"
                   value={formAtrib.horario || ""}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, horario: e.target.value })
@@ -183,7 +183,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Responsável">
               <select
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.responsavel_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })
@@ -200,7 +200,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Observação">
               <textarea
-                className="agenda-textarea input-editable"
+                className="modalright-atribuicoes-textarea input-editable"
                 rows={2}
                 value={formAtrib.observacao || ""}
                 onChange={(e) =>
@@ -210,7 +210,7 @@ export default function ModalRightAtribuicoes({
             </LinhaInput>
           </div>
 
-          <div className="agenda-btn-modal-right-footer">
+          <div className="modalright-atribuicoes-footer">
             <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
             <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
           </div>
@@ -218,13 +218,13 @@ export default function ModalRightAtribuicoes({
       )}
 
       {rightMode === "novaAtrib" && (
-        <div className="agenda-modal-right-wrapper">
+        <div className="modalright-atribuicoes-body">
           <div className="agenda-modal-right-content form">
-            <h4 className="agenda-atr-section-title">Atribuição Atual</h4>
+            <h4 className="modalright-atribuicoes-section-title">Atribuição Atual</h4>
 
             <LinhaInput label="Solucionador">
               <select
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.solucionador_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })
@@ -239,11 +239,11 @@ export default function ModalRightAtribuicoes({
               </select>
             </LinhaInput>
 
-            <h4 className="agenda-atr-section-title">Próxima Atribuição</h4>
+            <h4 className="modalright-atribuicoes-section-title">Próxima Atribuição</h4>
 
             <LinhaInput label="Status">
               <select
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.proxima_atr_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })
@@ -260,7 +260,7 @@ export default function ModalRightAtribuicoes({
 
             <LinhaInput label="Responsável">
               <select
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.proximo_resp_id}
                 onChange={(e) =>
                   setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })
@@ -278,7 +278,7 @@ export default function ModalRightAtribuicoes({
             <LinhaInput label="Prazo">
               <Input
                 type="date"
-                className="agenda-atribuicao-modal-right-input input-editable"
+                className="modalright-atribuicoes-input input-editable"
                 value={formAtrib.prazo || ""}
                 onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
               />
@@ -288,7 +288,7 @@ export default function ModalRightAtribuicoes({
               <LinhaInput label="Horário Agendado">
                 <Input
                   type="datetime-local"
-                  className="agenda-atribuicao-modal-right-input input-editable"
+                  className="modalright-atribuicoes-input input-editable"
                   value={formAtrib.horario || ""}
                   onChange={(e) =>
                     setFormAtrib({ ...formAtrib, horario: e.target.value })
@@ -298,7 +298,7 @@ export default function ModalRightAtribuicoes({
             )}
           </div>
 
-          <div className="agenda-btn-modal-right-footer">
+          <div className="modalright-atribuicoes-footer">
             <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
             <Button onClick={handleCriarAtribuicao}>Salvar</Button>
           </div>

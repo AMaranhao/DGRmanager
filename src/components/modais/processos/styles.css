@@ -3553,3 +3553,36 @@ select.agenda-modal-right-input {
   color: #555555 !important;
   cursor: not-allowed;
 }
+
+.agenda-proposta-modal-right-content {
+    padding: 1rem;
+    height: 100%;                /* ocupa todo o painel direito */
+    display: flex;
+    flex-direction: column;      /* organiza em coluna */
+    align-items: stretch;        /* inputs ocupam largura total */
+    justify-content: flex-start; /* começa do topo */
+    gap: 0.5rem;                   /* espaçamento entre campos */
+    overflow-y: auto;            /* ativa scroll interno se precisar */
+  }
+
+
+
+.agenda-proposta-modal-right-content {
+    height: 450px !important;
+    max-height: 450px !important;
+    min-height: 450px !important;
+}
+
+/* === Campos de data readonly no ModalLeftProcesso === */
+.processo-modal-input[type="date"].input-readonly {
+    background-color: #f9fafb !important; /* cinza claro */
+    color: #6b7280 !important; /* texto cinza */
+    cursor: not-allowed; /* mantém aparência de bloqueado */
+  }
+  
+  /* === Campos de data editáveis no ModalLeftProcesso === */
+  .processo-modal-input[type="date"].input-editable {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+  
