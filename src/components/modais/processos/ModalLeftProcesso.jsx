@@ -21,7 +21,7 @@ export default function ModalLeftProcesso({
         <div className="processo-input-row">
           <LinhaInput label="Número (CNJ)">
             <Input
-              className="processo-modal-input input-readonly"
+              className="processo-modal-input processo-modal-input-cnj input-readonly"
               value={form.numero || ""}
               readOnly
             />

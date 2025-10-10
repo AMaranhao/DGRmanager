@@ -92,7 +92,7 @@ export default function ModalRightAtribuicoes({
                         <div className="atr-lista">
                           <div className="modalright-atribuicoes-atr-linha">
                             <span className="modalright-atribuicoes-atr-label">Definida em</span>
-                            <span className="atr-valor">
+                            <span className="modalright-atribuicoes-atr-valor">
                               {a.data_inicial
                                 ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
                                 : "—"}
@@ -100,7 +100,7 @@ export default function ModalRightAtribuicoes({
                           </div>
                           <div className="modalright-atribuicoes-atr-linha">
                             <span className="modalright-atribuicoes-atr-label">Prazo</span>
-                            <span className="atr-valor">
+                            <span className="modalright-atribuicoes-atr-valor">
                               {a.prazo
                                 ? new Date(a.prazo).toLocaleDateString("pt-BR")
                                 : "—"}
@@ -108,7 +108,7 @@ export default function ModalRightAtribuicoes({
                           </div>
                           <div className="modalright-atribuicoes-atr-linha">
                             <span className="modalright-atribuicoes-atr-label">Responsável</span>
-                            <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
+                            <span className="modalright-atribuicoes-atr-valor">{a.responsavel?.nome || "—"}</span>
                           </div>
                         </div>
                       </div>
@@ -134,11 +134,11 @@ export default function ModalRightAtribuicoes({
               <h4 className="modalright-atribuicoes-section-title">Atribuição atual</h4>
               <div className="modalright-atribuicoes-atr-linha">
                 <span className="modalright-atribuicoes-atr-label">Status Atual</span>
-                <span className="atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
+                <span className="modalright-atribuicoes-atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
               </div>
               <div className="modalright-atribuicoes-atr-linha">
                 <span className="modalright-atribuicoes-atr-label">Definida em</span>
-                <span className="atr-valor">
+                <span className="modalright-atribuicoes-atr-valor">
                   {formAtrib.data_inicial
                     ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
                     : "—"}
@@ -146,7 +146,7 @@ export default function ModalRightAtribuicoes({
               </div>
               <div className="modalright-atribuicoes-atr-linha">
                 <span className="modalright-atribuicoes-atr-label">Tempo no Status</span>
-                <span className="atr-valor">
+                <span className="modalright-atribuicoes-atr-valor">
                   {formAtrib.data_inicial
                     ? `${Math.floor(
                         (new Date() - new Date(formAtrib.data_inicial)) /

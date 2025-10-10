@@ -10,13 +10,13 @@
     font-weight:600;
     color:#374151;
   }
-  .atr-valor{
+  .modalright-atribuicoes-atr-valor{
     color:#111827;
     word-break:break-word;
   }
   
   .dark .modalright-atribuicoes-atr-label{ color:#e5e7eb; }
-  .dark .atr-valor{ color:#f9fafb; }
+  .dark .modalright-atribuicoes-atr-valor{ color:#f9fafb; }
   
   .agenda-modal-right-header {
     flex-shrink: 0;
@@ -216,14 +216,14 @@
   
   
   .agenda-modal-right-content.form {
-    height: 455px !important;
-    max-height: 455px !important;
-    min-height: 455px !important;
+    height: 465px !important;
+    max-height: 465px !important;
+    min-height: 465px !important;
 }
 
 .modalright-atribuicoes-scroll {
-    height: 487px !important;
-    max-height: 487px !important;
-    min-height: 487px !important;
+    height: 490px !important;
+    max-height: 490px !important;
+    min-height: 490px !important;
 }
   

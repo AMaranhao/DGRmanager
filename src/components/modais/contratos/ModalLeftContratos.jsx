@@ -65,10 +65,11 @@ export default function ModalLeftContrato({
             </LinhaInput>
 
             <LinhaInput label="Observação">
-                <Input
-                    className={`processo-textarea ${
+                <textarea
+                    className={`contrato-textarea ${
                     isEditar || isVisualizarAgenda ? "input-editable" : "input-readonly"
                     }`}
+                    rows={4}
                     value={form.observacao || ""}
                     onChange={(e) => {
                     if (isEditar || isVisualizarAgenda) {
@@ -78,6 +79,7 @@ export default function ModalLeftContrato({
                     readOnly={isVisualizar && !isVisualizarAgenda}
                 />
             </LinhaInput>
+
       </div>
 
       <div className="agenda-btn-modal-left-footer">

@@ -200,14 +200,15 @@
   }
   
   .modalleft-acordo-textarea {
-    width: 100%;
-    max-width: 100%;              /* 🔹 impede que ultrapasse o container */
-    resize: none;                 /* 🔹 evita redimensionamento manual */
+    width: 80% !important;
+    resize: none !important;                 /* 🔹 evita redimensionamento manual */
     border-radius: 12px;          /* 🔹 igual aos inputs arredondados */
     border: 1px solid #d1d5db;
-    padding: 0.75rem;
-    font-size: 0.95rem;
+    margin-left: 10% !important;
+    min-height: 11rem !important;
     color: #111827;
+    padding:0.625rem 0.75rem !important;
+    font-size:0.75rem !important;
     background-color: #f9fafb;
     box-sizing: border-box;
     overflow-x: hidden;           /* 🔹 remove scroll horizontal */
