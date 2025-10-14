@@ -3,6 +3,13 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
+
+import {
+    createContrato,
+    updateContrato,
+    fetchContratos,
+  } from "@/services/ENDPOINTS_ServiceContratos";
+
 import "./styles.css";
 
 export default function ModalLeftContrato({ 
@@ -14,13 +21,44 @@ export default function ModalLeftContrato({
     setRightMode,
     modo
   }) {
+    
+    // =============================
+// Função de salvar contrato
+// =============================
+const handleSalvar = async () => {
+    try {
+      const payload = {
+        numero: form.numero,
+        valor: form.valor,
+        lote: form.lote,
+        observacao: form.observacao,
+      };
+  
+      if (form.id) {
+        await updateContrato(form.id, payload);
+        console.log("✅ Contrato atualizado com sucesso!");
+      } else {
+        await createContrato(payload);
+        console.log("🆕 Contrato criado com sucesso!");
+      }
+  
+      const atualizados = await fetchContratos();
+      console.log("🔁 Lista de contratos atualizada:", atualizados);
+  
+      // Fecha modal e atualiza interface pai
+      if (typeof salvar === "function") salvar();
+    } catch (err) {
+      console.error("❌ Erro ao salvar contrato:", err);
+    }
+  };
+  
     const isEditar = modo === "editar";
     const isCriar = modo === "criar";
     const isVisualizar = modo === "visualizar";
     const isVisualizarAgenda = modo === "visualizarAgenda";
   
-    const isCamposEditaveis = isEditar || isCriar;                    // Número, Valor, Lote
-    const isObservacaoEditavel = isCamposEditaveis || isVisualizarAgenda; // Observação
+    const isCamposEditaveis = isEditar || isCriar;                   
+    const isObservacaoEditavel = isCamposEditaveis || isVisualizarAgenda; 
   
     return (
       <div className="agenda-modal-left">
@@ -94,7 +132,7 @@ export default function ModalLeftContrato({
                     </Button>
                 )}
 
-                <Button onClick={salvar}>
+                <Button onClick={handleSalvar}>
                     {isCriar ? "Criar Contrato" : "Salvar"}
                 </Button>
             </div>

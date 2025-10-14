@@ -5,6 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
 import { ordenarAtribuicoes } from "@/components/modais/shared/utilsFunctionsModals";
+
+import {
+createAtribuicaoEvento,
+updateAtribuicaoEvento,
+} from "@/services/ENDPOINTS_ServiceAtribuicaoEvento";
+  
+  import { fetchAcordoUnificadoById } from "@/services/ENDPOINTS_ServiceAcordos";
+  import { fetchContratoById } from "@/services/ENDPOINTS_ServiceContratos";
+  import { fetchProcessoById } from "@/services/ENDPOINTS_ServiceProcessos";
+  
+
 import "./styles.css";
 
 export default function ModalRightAtribuicoes({
@@ -15,13 +26,100 @@ export default function ModalRightAtribuicoes({
   historicoAtribs,
   formAtrib,
   setFormAtrib,
-  handleCriarAtribuicao,
-  handleEditarAtribuicao,
   entityType,
   form,
   setForm,
   modo,
 }) {
+
+    // =============================
+// Funções internas de API
+// =============================
+const handleCriarAtribuicao = async () => {
+    if (!form?.id && !form?.acordo_id && !form?.contrato_id && !form?.processo_id) {
+      console.error("❌ Nenhum ID encontrado para criar atribuição.");
+      return;
+    }
+  
+    try {
+      const entityId =
+        form?.id || form?.acordo_id || form?.contrato_id || form?.processo_id;
+  
+      const payload = {
+        entity_type: entityType || "acordo", // padrão
+        entity_id: entityId,
+        prazo: formAtrib.prazo,
+        observacao: formAtrib.observacao,
+        solucionador_id: formAtrib.solucionador_id,
+        proxima_atr_id: formAtrib.proxima_atr_id,
+        proximo_resp_id: formAtrib.proximo_resp_id,
+        horario: formAtrib.horario || null,
+      };
+  
+      console.log("🟢 Criando atribuição:", payload);
+      await createAtribuicaoEvento(payload);
+  
+      // 🔁 Recarrega o item atualizado
+      let dadosAtualizados = null;
+      if (entityType === "acordo") dadosAtualizados = await fetchAcordoUnificadoById(entityId);
+      if (entityType === "contrato") dadosAtualizados = await fetchContratoById(entityId);
+      if (entityType === "processo") dadosAtualizados = await fetchProcessoById(entityId);
+  
+      // Atualiza estados
+      setForm(dadosAtualizados);
+      setFormAtrib({
+        atribuicao_id: "",
+        responsavel_id: "",
+        solucionador_id: "",
+        prazo: "",
+        observacao: "",
+      });
+      setRightMode("visualizarAtrib");
+  
+      console.log("✅ Atribuição criada e dados recarregados!");
+    } catch (err) {
+      console.error("❌ Erro ao criar atribuição:", err);
+    }
+  };
+  
+  
+  const handleEditarAtribuicao = async () => {
+    if (!formAtrib?.atribuicao_id) {
+      console.error("❌ Nenhum ID de atribuição encontrado.");
+      return;
+    }
+  
+    try {
+      const entityId =
+        form?.id || form?.acordo_id || form?.contrato_id || form?.processo_id;
+  
+      const payload = {
+        entity_type: entityType || "acordo",
+        entity_id: entityId,
+        prazo: formAtrib.prazo,
+        observacao: formAtrib.observacao,
+        responsavel_id: formAtrib.responsavel_id,
+        horario: formAtrib.horario || null,
+      };
+  
+      console.log("🟡 Atualizando atribuição:", payload);
+      await updateAtribuicaoEvento(formAtrib.atribuicao_id, payload);
+  
+      // 🔁 Recarrega dados atualizados
+      let dadosAtualizados = null;
+      if (entityType === "acordo") dadosAtualizados = await fetchAcordoUnificadoById(entityId);
+      if (entityType === "contrato") dadosAtualizados = await fetchContratoById(entityId);
+      if (entityType === "processo") dadosAtualizados = await fetchProcessoById(entityId);
+  
+      setForm(dadosAtualizados);
+      setRightMode("visualizarAtrib");
+  
+      console.log("✅ Atribuição atualizada com sucesso!");
+    } catch (err) {
+      console.error("❌ Erro ao atualizar atribuição:", err);
+    }
+  };
+  
   return (
     <div className="modalright-atribuicoes-content">
       <div className="modalright-atribuicoes-header">

@@ -4,6 +4,16 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import {
+  createParteContrato,
+  deleteParteContrato,
+  updateParteContrato,
+} from "@/services/ENDPOINTS_ServicePartesContrato";
+
+import { fetchContratoById } from "@/services/ENDPOINTS_ServiceContratos";
+
+import { fetchParteAdversaByCPF } from "@/services/ENDPOINTS_ServiceParteAdversa";
+
 import "./styles.css";
 
 export default function ModalRightPartes({
@@ -23,15 +33,88 @@ export default function ModalRightPartes({
   setParteAviso,
   parteParaRemover,
   setParteParaRemover,
-  handleBuscarParte,
-  handleAdicionarParte,
-  handleRemoverParte,
   parteEditando,
   setParteEditando,
   parteEncontrada,
   setParteEncontrada,
   modo,
 }) {
+  // =============================
+  // Funções internas de manipulação de partes
+  // =============================
+  const handleBuscarParte = async (cpf) => {
+    try {
+      const parte = await fetchParteAdversaByCPF(cpf);
+      if (parte) {
+        setParteEncontrada(parte);
+        console.log("✅ Parte encontrada:", parte);
+      } else {
+        console.warn("Nenhuma parte encontrada para o CPF informado.");
+      }
+    } catch (err) {
+      console.error("❌ Erro ao buscar parte por CPF:", err);
+    }
+  };
+
+  const handleAdicionarParte = async () => {
+    if (!contratoSelecionado?.id || !parteEncontrada?.id) return;
+  
+    try {
+      await createParteContrato({
+        contrato_id: contratoSelecionado.id,
+        parte_adversa_id: parteEncontrada.id,
+      });
+  
+      const contratoAtualizado = await fetchContratoById(contratoSelecionado.id);
+      setPartesVinculadas(
+        contratoAtualizado.partes ||
+        contratoAtualizado.partes_adversas ||
+        []
+      );
+  
+      // 🔁 Reset após adicionar parte
+      setShowFormParte(false);
+      setParteEncontrada(null);
+      setFetchParte("");
+    } catch (err) {
+      console.error("❌ Erro ao adicionar parte:", err);
+    }
+  };
+  
+
+  const handleRemoverParte = async (parteId) => {
+    if (!parteId) return;
+  
+    try {
+      await deleteParteContrato(parteId);
+  
+      // 🔄 Recarrega a lista atualizada de partes
+      const contratoAtualizado = await fetchContratoById(contratoSelecionado.id);
+      setPartesVinculadas(
+        contratoAtualizado.partes ||
+        contratoAtualizado.partes_adversas ||
+        []
+      );
+  
+      // 🧭 Retorna automaticamente à lista de partes
+      setShowFormParte(false);
+      setParteEditando(null);
+      setParteEncontrada(null);
+      setParteAviso("");
+    } catch (err) {
+      console.error("❌ Erro ao remover parte:", err);
+    }
+  };
+  
+
+  // 🧱 Garante que o componente sempre trabalhe com array
+    const partes = Array.isArray(partesVinculadas)
+    ? partesVinculadas
+    : partesVinculadas?.partes_adversas
+    ? partesVinculadas.partes_adversas
+    : [];
+
+
   return (
     <div className="agenda-modal-right">
         <div className="agenda-modal-right-header">
@@ -139,10 +222,9 @@ export default function ModalRightPartes({
                 </div>
             ) : (
                 <ul>
-                {partesVinculadas?.length ? (
-                    partesVinculadas.map((p) => (
-                    <li
-                        key={p.id ?? p.cpf}
+                {partes?.length ? (
+                    partes.map((p) => (
+                        <li key={p.id ?? p.cpf}
                         onClick={() => {
                         setParteEditando(p);
                         setShowFormParte(true);
@@ -168,20 +250,40 @@ export default function ModalRightPartes({
         <div className="agenda-btn-modal-right-footer">
                 {parteEditando ? (
                 <>
-                    <Button variant="destructive" onClick={handleRemoverParte}>Remover</Button>
+                    <Button onClick={() => handleRemoverParte(parteEditando.id)}>Remover</Button>
+
                     <Button
-                    onClick={() => {
-                        setPartesVinculadas(prev =>
-                        prev.map(parte =>
-                            parte.id === parteEditando.id ? parteEditando : parte
-                        )
-                        );
-                        setShowFormParte(false);
-                        setParteEditando(null);
-                    }}
-                    >
-                    Atualizar
+                        onClick={async () => {
+                            try {
+                            if (parteEditando?.id) {
+                                await updateParteContrato(parteEditando.id, {
+                                contrato_id: contratoSelecionado.id,
+                                parte_adversa_id: parteEditando.id,
+                                principal: parteEditando.principal || false,
+                                });
+                            }
+
+                            // 🔁 Recarrega o contrato após o PUT
+                            const contratoAtualizado = await fetchContratoById(contratoSelecionado.id);
+                            setPartesVinculadas(
+                                contratoAtualizado.partes ||
+                                contratoAtualizado.partes_adversas ||
+                                []
+                            );
+
+                            console.log("✅ Parte atualizada com sucesso via PUT!");
+                            } catch (err) {
+                            console.error("❌ Erro ao atualizar parte:", err);
+                            } finally {
+                            setShowFormParte(false);
+                            setParteEditando(null);
+                            }
+                        }}
+                        >
+                        Atualizar
                     </Button>
+
+
                     <Button
                     variant="outline"
                     onClick={() => {
@@ -194,8 +296,9 @@ export default function ModalRightPartes({
                 </>
                 ) : parteEncontrada ? (
                 <>
-                    <Button onClick={handleAdicionarParte}>Salvar</Button>
-                    <Button onClick={handleBuscarParte}>Buscar</Button>
+                    <Button onClick={handleAdicionarParte}>Adicionar</Button>
+                    <Button onClick={() => handleBuscarParte(fetchParte)}>Buscar</Button>
+
                     <Button
                     variant="outline"
                     onClick={() => {
@@ -211,7 +314,8 @@ export default function ModalRightPartes({
                 </>
                 ) : showFormParte ? (
                 <>
-                    <Button onClick={handleBuscarParte}>Buscar</Button>
+                    <Button onClick={() => handleBuscarParte(fetchParte)}>Buscar</Button>
+
                     <Button
                     variant="outline"
                     onClick={() => {
