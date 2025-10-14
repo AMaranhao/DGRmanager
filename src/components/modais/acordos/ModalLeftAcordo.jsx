@@ -2,6 +2,16 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
+import { useState } from "react";
+
+import {
+  createAcordo,
+  updateAcordo,
+  fetchAcordoUnificadoById,
+} from "@/services/ENDPOINTS_ServiceAcordos";
+
+import { fetchModalParcelasByAcordoId } from "@/services/ENDPOINTS_ServiceParcelasAcordo";
+
 
 import "./styles.css";
 
@@ -20,6 +30,93 @@ export default function ModalLeftAcordo({
 
   const isEditavelGeral = isEditar || isCriar;
   const isEditavelObservacao = isEditavelGeral || isVisualizarAgenda;
+
+  const [mensagem, setMensagem] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSalvar = async () => {
+    try {
+      setMensagem("");
+      setLoading(true);
+  
+      // 🧩 Garante que o ID do acordo exista (para PUT)
+      const acordoId = form?.id || form?.acordo_id;
+      if ((modo === "editar" || modo === "visualizarAgenda") && !acordoId) {
+        console.error("❌ O acordo não possui ID válido:", form);
+        setMensagem("❌ ID do acordo não encontrado. Reabra o modal.");
+        setLoading(false);
+        return;
+      }
+  
+  
+      // --- CRIAÇÃO ---
+      if (modo === "criar") {
+        const payload = {
+          contrato_id: form?.contrato?.id || null,
+          parte_adversa_id: form?.parte_adversa?.id || null,
+          data_vencimento: form?.data_vencimento || null,
+          status: form?.status || "ativo",
+          observacao: form?.observacao || "",
+          valor_acordo: Number(form?.proposta?.valor_acordo || 0),
+          valor_parcela: Number(form?.proposta?.valor_parcela || 0),
+          numero_parcelas: Number(form?.proposta?.numero_parcelas || 0),
+        };
+  
+        const novo = await createAcordo(payload);
+  
+        if (novo?.id || novo?.acordo_id) {
+          const novoId = novo.id || novo.acordo_id;
+          const atualizado = await fetchAcordoUnificadoById(novoId);
+          setForm({ ...atualizado, id: novoId }); // garante persistência local do ID
+          setMensagem("✅ Acordo criado com sucesso.");
+        } else {
+          setMensagem("⚠️ Acordo criado, mas sem retorno de ID.");
+        }
+      }
+  
+      // --- EDIÇÃO / VISUALIZAR AGENDA ---
+      if (modo === "editar" || modo === "visualizarAgenda") {
+        const payload =
+          modo === "visualizarAgenda"
+            ? { observacao: form.observacao }
+            : {
+                status: form.status,
+                observacao: form.observacao,
+                data_vencimento: form.data_vencimento,
+              };
+  
+        await updateAcordo(acordoId, payload);
+  
+        const atualizado = await fetchAcordoUnificadoById(acordoId);
+
+        // 🔹 Recarrega parcelas do acordo atualizado
+        let parcelasAtualizadas = [];
+        try {
+        parcelasAtualizadas = await fetchModalParcelasByAcordoId(acordoId);
+        } catch (err) {
+        console.warn("⚠️ Falha ao recarregar parcelas:", err);
+        }
+
+        // Atualiza o form, mantendo id e anexando parcelas
+        setForm({
+        ...atualizado,
+        id: acordoId,
+        parcelas: parcelasAtualizadas || [],
+        });
+
+        setMensagem("✅ Acordo atualizado com sucesso.");
+
+      }
+    } catch (err) {
+      console.error("❌ Erro ao salvar acordo:", err);
+      setMensagem("❌ Erro ao salvar o acordo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
 
   return (
     <div className="modalleft-acordo-wrapper">
@@ -193,9 +290,10 @@ export default function ModalLeftAcordo({
                 )}
 
                 {(isEditar || isCriar || isVisualizarAgenda) && (
-                <Button onClick={salvar}>
-                    {isCriar ? "Criar Acordo" : "Salvar"}
-                </Button>
+                    <Button onClick={handleSalvar} disabled={loading}>
+                        {loading ? "Salvando..." : isCriar ? "Criar Acordo" : "Salvar"}
+                    </Button>
+
                 )}
             </div>
         )}

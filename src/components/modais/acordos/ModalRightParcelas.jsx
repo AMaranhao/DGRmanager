@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
+
+import {
+    createPagamentoAcordo,
+    updatePagamentoAcordo,
+  } from "@/services/ENDPOINTS_ServiceAcordoPagamento";
+  
+  import { fetchModalParcelasByAcordoId } from "@/services/ENDPOINTS_ServiceParcelasAcordo";
+  import { fetchAcordoUnificadoById } from "@/services/ENDPOINTS_ServiceAcordos";
+  
 
 import "./styles.css";
 
@@ -10,9 +19,57 @@ export default function ModalRightParcelas({
   setRightMode,
   parcelaSelecionada,
   setParcelaSelecionada,
-  handleSalvarPagamento,
   modo,
 }) {
+
+    const [mensagem, setMensagem] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [pagamentos, setPagamentos] = useState([]);
+
+    // ✅ Substituir função handleSalvar
+    const handleSalvar = async () => {
+        if (!parcelaSelecionada?.id) return;
+        try {
+        setMensagem("");
+        setLoading(true);
+    
+        const payload = {
+            data_pagamento: parcelaSelecionada.data_pagamento,
+            valor_pago: Number(parcelaSelecionada.valor_pago || 0),
+            observacao: parcelaSelecionada.observacao || "",
+        };
+    
+    
+        // ✅ PUT direto, igual ao Acordos.jsx
+        await updatePagamentoAcordo(parcelaSelecionada.id, payload);
+        setMensagem("✅ Pagamento atualizado com sucesso!");
+    
+        // 🔁 Recarrega parcelas atualizadas
+        const parcelasAtualizadas = await fetchModalParcelasByAcordoId(
+            parcelaSelecionada.acordo_id || parcelaSelecionada.id_acordo
+        );
+    
+    
+        // ✅ Atualiza visual (mantém a seleção)
+        if (parcelasAtualizadas?.length) {
+            const atualizada = parcelasAtualizadas.find((p) => p.id === parcelaSelecionada.id);
+            setParcelaSelecionada(atualizada || parcelaSelecionada);
+        }
+    
+        // ✅ Volta para modo de visualização
+        setRightMode("parcelaSelecionada");
+        } catch (err) {
+        console.error("❌ Erro ao atualizar pagamento:", err);
+        setMensagem("❌ Erro ao atualizar pagamento.");
+        } finally {
+        setLoading(false);
+        }
+    };
+  
+      
+      
+
+
   if (rightMode === "visualizarParcelas") {
     return (
       <div className="modalright-parcelas-wrapper">
@@ -223,9 +280,10 @@ export default function ModalRightParcelas({
                     >
                     Cancelar
                 </Button>
-                <Button onClick={() => handleSalvarPagamento(parcelaSelecionada)}>
-                    Salvar
+                <Button onClick={handleSalvar} disabled={loading}>
+                    {loading ? "Salvando..." : "Salvar"}
                 </Button>
+
             </div>
         )}
 
