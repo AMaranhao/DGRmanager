@@ -36,14 +36,11 @@ const handleSalvar = async () => {
   
       if (form.id) {
         await updateContrato(form.id, payload);
-        console.log("✅ Contrato atualizado com sucesso!");
       } else {
         await createContrato(payload);
-        console.log("🆕 Contrato criado com sucesso!");
       }
   
       const atualizados = await fetchContratos();
-      console.log("🔁 Lista de contratos atualizada:", atualizados);
   
       // Fecha modal e atualiza interface pai
       if (typeof salvar === "function") salvar();

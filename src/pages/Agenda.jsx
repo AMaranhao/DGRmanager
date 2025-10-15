@@ -668,17 +668,16 @@ function AgendaModalAtribuicoes({ open, onClose, eventos, dataSelecionada, event
               : abaAtiva === "propostas" ? (
                 <ModalRightPropostas
                   propostaSelecionada={propostaSelecionada}
-                  formVencimento={formVencimento}
-                  setFormVencimento={setFormVencimento}
-                  formMes={formMes}
-                  setFormMes={setFormMes}
-                  handleEditarProposta={handleEditarProposta}
-                  handleAceitarProposta={handleAceitarProposta}
                   setPropostaSelecionada={setPropostaSelecionada}
                   editandoProposta={editandoProposta}
                   setEditandoProposta={setEditandoProposta}
+                  formVencimento={formVencimento}
+                  setFormVencimento={setFormVencimento}
+                  processoSel={form} // ✅ processo atual
+                  setPropostasProcesso={setPropostas} // ✅ reaproveita o mesmo estado
                   modo="visualizarAgenda"
                 />
+
               )
               // 🔹 4. Parcelas de Acordo
               : abaAtiva === "parcelas" ? (

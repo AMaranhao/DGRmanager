@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState } from "react"; // <-- já deve ter o useState aqui
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LinhaInput } from "@/components/modais/shared/utilsFunctionsModals";
+
+import {
+    fetchProcessos,
+    fetchProcessoById,
+    createProcesso,
+    updateProcesso,
+  } from "@/services/ENDPOINTS_ServiceProcessos";
+
 import "./styles.css";
 
 export default function ModalLeftProcesso({ 
@@ -19,6 +27,66 @@ export default function ModalLeftProcesso({
 
   const isEditavelFull = isCriar || isEditar;
   const isEditavelEvento = isCriar || isEditar || isVisualizarAgenda;
+
+  const [mensagem, setMensagem] = useState("");
+  const [loading, setLoading] = useState(false);
+
+
+  // =============================
+// Função de salvar processo
+// =============================
+const handleSalvar = async () => {
+    try {
+      setMensagem("");
+      setLoading(true);
+  
+      const processoId = form?.id;
+      if ((isEditar || isVisualizarAgenda) && !processoId) {
+        setMensagem("❌ ID do processo não encontrado. Reabra o modal.");
+        setLoading(false);
+        return;
+      }
+  
+      const payload = {
+        numero: form.numero,
+        contrato_numero: form.contrato_numero,
+        data_distribuicao: form.data_distribuicao,
+        data_publicacao: form.data_publicacao,
+        comarca: form.comarca,
+        processo_evento: form.processo_evento,
+      };
+  
+      // --- CRIAÇÃO ---
+      if (isCriar) {
+        const novo = await createProcesso(payload);
+  
+        if (novo?.id) {
+          const atualizado = await fetchProcessoById(novo.id);
+          setForm({ ...atualizado, id: novo.id });
+          setMensagem("✅ Processo criado com sucesso.");
+        } else {
+          setMensagem("⚠️ Processo criado, mas sem retorno de ID.");
+        }
+      }
+  
+      // --- EDIÇÃO / VISUALIZAR AGENDA ---
+      if (isEditar || isVisualizarAgenda) {
+        await updateProcesso(processoId, payload);
+        const atualizado = await fetchProcessoById(processoId);
+        setForm({ ...atualizado, id: processoId });
+        setMensagem("✅ Processo atualizado com sucesso.");
+      }
+  
+      // 🔄 Atualiza a lista principal (pai)
+      if (typeof salvar === "function") salvar();
+    } catch (err) {
+      console.error("❌ Erro ao salvar processo:", err);
+      setMensagem("❌ Erro ao salvar o processo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
     <div className="processo-form-wrapper">
@@ -236,9 +304,11 @@ export default function ModalLeftProcesso({
                 )}
 
                 {(isEditar || isCriar || isVisualizarAgenda) && (
-                <Button onClick={salvar}>
+                <Button onClick={handleSalvar}>
                     {isCriar ? "Criar Processo" : "Salvar"}
                 </Button>
+              
+              
                 )}
             </div>
         )}

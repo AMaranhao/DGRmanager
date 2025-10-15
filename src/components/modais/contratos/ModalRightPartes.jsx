@@ -47,7 +47,6 @@ export default function ModalRightPartes({
       const parte = await fetchParteAdversaByCPF(cpf);
       if (parte) {
         setParteEncontrada(parte);
-        console.log("✅ Parte encontrada:", parte);
       } else {
         console.warn("Nenhuma parte encontrada para o CPF informado.");
       }
@@ -271,7 +270,6 @@ export default function ModalRightPartes({
                                 []
                             );
 
-                            console.log("✅ Parte atualizada com sucesso via PUT!");
                             } catch (err) {
                             console.error("❌ Erro ao atualizar parte:", err);
                             } finally {

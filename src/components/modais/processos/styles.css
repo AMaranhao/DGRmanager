@@ -275,3 +275,9 @@
     max-width: 16rem !important;
     width: 16rem !important;
   }
+
+  .agenda-modal-right-proposta-wrapper {
+    min-height: 465px !important;
+    max-height: 465px !important;
+    height: 465px !important;
+  }
