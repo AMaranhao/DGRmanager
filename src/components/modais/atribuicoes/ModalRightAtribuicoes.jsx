@@ -14,7 +14,8 @@ updateAtribuicaoEvento,
   import { fetchAcordoUnificadoById } from "@/services/ENDPOINTS_ServiceAcordos";
   import { fetchContratoById } from "@/services/ENDPOINTS_ServiceContratos";
   import { fetchProcessoById } from "@/services/ENDPOINTS_ServiceProcessos";
-  
+  import { fetchModalParcelasByAcordoId } from "@/services/ENDPOINTS_ServiceParcelasAcordo";
+
 
 import "./styles.css";
 
@@ -59,14 +60,25 @@ const handleCriarAtribuicao = async () => {
       console.log("🟢 Criando atribuição:", payload);
       await createAtribuicaoEvento(payload);
   
-      // 🔁 Recarrega o item atualizado
+      // 🔁 Recarrega o item atualizado (com parcelas se for acordo)
       let dadosAtualizados = null;
-      if (entityType === "acordo") dadosAtualizados = await fetchAcordoUnificadoById(entityId);
-      if (entityType === "contrato") dadosAtualizados = await fetchContratoById(entityId);
-      if (entityType === "processo") dadosAtualizados = await fetchProcessoById(entityId);
-  
-      // Atualiza estados
+      if (entityType === "acordo") {
+        dadosAtualizados = await fetchAcordoUnificadoById(entityId);
+      const parcelasAtualizadas = await fetchModalParcelasByAcordoId(entityId);
+      dadosAtualizados = {
+          ...dadosAtualizados,
+          parcelas: parcelasAtualizadas || [],
+      };
+      }
+      if (entityType === "contrato") {
+        dadosAtualizados = await fetchContratoById(entityId);
+      }
+      if (entityType === "processo") {
+        dadosAtualizados = await fetchProcessoById(entityId);
+      }
+
       setForm(dadosAtualizados);
+
       setFormAtrib({
         atribuicao_id: "",
         responsavel_id: "",
@@ -105,13 +117,25 @@ const handleCriarAtribuicao = async () => {
       console.log("🟡 Atualizando atribuição:", payload);
       await updateAtribuicaoEvento(formAtrib.atribuicao_id, payload);
   
-      // 🔁 Recarrega dados atualizados
+      // 🔁 Recarrega dados atualizados (com parcelas se for acordo)
       let dadosAtualizados = null;
-      if (entityType === "acordo") dadosAtualizados = await fetchAcordoUnificadoById(entityId);
-      if (entityType === "contrato") dadosAtualizados = await fetchContratoById(entityId);
-      if (entityType === "processo") dadosAtualizados = await fetchProcessoById(entityId);
-  
+      if (entityType === "acordo") {
+      dadosAtualizados = await fetchAcordoUnificadoById(entityId);
+      const parcelasAtualizadas = await fetchModalParcelasByAcordoId(entityId);
+      dadosAtualizados = {
+          ...dadosAtualizados,
+          parcelas: parcelasAtualizadas || [],
+      };
+      }
+      if (entityType === "contrato") {
+        dadosAtualizados = await fetchContratoById(entityId);
+      }
+      if (entityType === "processo") {
+        dadosAtualizados = await fetchProcessoById(entityId);
+      }
+
       setForm(dadosAtualizados);
+
       setRightMode("visualizarAtrib");
   
       console.log("✅ Atribuição atualizada com sucesso!");

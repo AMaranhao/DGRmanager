@@ -1,0 +1,279 @@
+/* ============================== */
+/*        Módulo: Acordos         */
+/* ============================== */
+
+/* ===== Estrutura da Página ===== */
+.dashboard-wrapper {
+    padding: 1rem 2rem;
+    background: #f9fafb;
+    min-height: 100vh;
+  }
+  
+  .dashboard-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+  
+  /* ===== Filtros ===== */
+  .usuarios-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-filtro-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+  }
+  
+  .dashboard-select {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.95rem;
+    color: #111827;
+    background: white;
+  }
+  
+  .dashboard-filtro-usuario-input {
+    width: 14rem;
+    padding-right: 1.75rem;
+  }
+  
+  .dashboard-filtro-clear {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+  
+  .dashboard-filtro-clear:hover {
+    color: #1e3a8a;
+  }
+  
+  /* ===== Tabela ===== */
+  .usuarios-tabela-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .usuarios-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  
+  .usuarios-tabela th {
+    background-color: #f3f4f6;
+    text-align: left;
+    font-weight: 600;
+    padding: 0.75rem;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .usuarios-tabela td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+  }
+  
+  /* ===== Colunas específicas ===== */
+  .acordo-col-contrato,
+  .acordo-col-parte,
+  .acordo-col-telefone,
+  .acordo-col-ultimo,
+  .acordo-col-emaberto,
+  .acordo-col-parcela,
+  .acordo-col-residual,
+  .acordo-col-acoes {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .acordo-col-acoes {
+    text-align: center;
+  }
+  
+  /* ===== Botões da tabela ===== */
+  .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .table-actions button {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.4rem;
+    transition: all 0.2s ease;
+  }
+  
+  .table-actions button:hover {
+    transform: scale(1.05);
+  }
+  
+  /* ===== Modal ===== */
+  .dashboard-overlay {
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+  }
+  
+  .split-modal {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    max-width: 950px;
+    width: 100%;
+  }
+  
+  .acordo-modal-split {
+    display: flex;
+    flex-direction: row;
+    width: 900px;
+    max-width: 95%;
+    height: auto;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* ===== Responsividade ===== */
+  @media (max-width: 768px) {
+    .dashboard-wrapper {
+      padding: 1rem;
+    }
+  
+    .dashboard-heading {
+      font-size: 1.25rem;
+    }
+  
+    .usuarios-tabela th,
+    .usuarios-tabela td {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+  
+    .table-actions {
+      flex-direction: column;
+    }
+  
+    .acordo-modal-split {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+  
+  /* ===================== */
+/*      SPLIT MODAL      */
+/* ===================== */
+
+.dashboard-overlay {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(4px);
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+  }
+  
+  .split-modal {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 900px !important;
+    max-width: 90vw !important;
+    min-height: 600px;
+    background: white !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+    position: relative;
+    z-index: 50;
+  }
+  
+  /* container que divide o modal em dois lados */
+  .acordo-modal-split {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 0;
+  }
+  
+  /* cada lado do modal */
+  .split-left,
+  .split-right {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  
+  .split-right {
+    border-left: 1px solid #e0e0e0;
+    background: #fff;
+  }
+  
+  /* ============================
+   Abas do Modal Left Acordos
+   ============================ */
+.agenda-modal-tabs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .agenda-modal-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    min-width: 130px;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    border-radius: 9999px !important;
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #2f4674;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .agenda-modal-tab-btn:hover {
+    background: #f3f4f6;
+  }
+  
+
+  .agenda-modal-tab-btn.active {
+    background: #1e3a8a !important;
+    color: white !important;
+    border-color: #1e3a8a !important;
+  }

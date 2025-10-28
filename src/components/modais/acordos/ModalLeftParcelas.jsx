@@ -49,7 +49,7 @@ export default function ModalLeftParcelas({
           {itens.length > 0 ? (
             itens.map((parcela) => (
               <div
-                key={parcela.id}
+                key={parcela.id || parcela.numero_parcela || parcela.key}
                 className={getCardClass(parcela)}
                 onClick={() => {
                   setParcelaSelecionada?.(parcela);

@@ -36,619 +36,29 @@ import {
 
 import { fetchColaboradores } from "@/services/ENDPOINTS_ServiceColaboradores";
 
-import "@/styles/unified_styles.css";
-import "@/styles/unified_refactored_styles.css";
+// ===============================
+// 🧩 Modais de Acordos (modularizados)
+// ===============================
+import ModalLeftAcordo from "@/components/modais/acordos/ModalLeftAcordo";
+import ModalLeftParcelas from "@/components/modais/acordos/ModalLeftParcelas";
+import ModalRightParcelas from "@/components/modais/acordos/ModalRightParcelas";
+import ModalRightAtribuicoes from "@/components/modais/atribuicoes/ModalRightAtribuicoes";
 
-const norm = (s) =>
-  (s ?? "")
-    .toString()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase();
+// ===============================
+// 🎨 Estilos específicos de Acordos
+// ===============================
+import "@/styles/acordos.css";
 
-    function ModalLeftAcordo({ form, visualizando, setForm, salvar }) {
-      return (
-        <div className="acordo-modal-split-left">
-          <DialogTitle className="acordo-modal-title">
-            {visualizando ? "Detalhar Acordo" : "Editar Acordo"}
-          </DialogTitle>
-    
-          <DialogDescription className="acordo-modal-description">
-            Preencha os dados do acordo.
-          </DialogDescription>
-    
-          {/* Scrollável */}
-          <div className="acordo-modal-scroll">
-            {/* Linha 1 - Contrato + Parte Adversa */}
-            <div className="acordo-input-row">
-              <div>
-                <label className="acordo-label">Contrato</label>
-                <input
-                  className="acordo-modal-input"
-                  value={form?.contrato?.numero || ""}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="acordo-label">Parte Adversa</label>
-                <input
-                  className="acordo-modal-input"
-                  value={form?.parte_adversa?.nome || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-    
-            {/* Linha 2 - Valores e número de parcelas */}
-            <div className="acordo-input-row triple">
-              <div>
-                <label className="acordo-label">Valor do Acordo</label>
-                <input
-                  className="acordo-modal-input"
-                  value={
-                    form?.proposta?.valor_acordo?.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }) || ""
-                  }
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="acordo-label">Valor da Parcela</label>
-                <input
-                  className="acordo-modal-input"
-                  value={
-                    form?.proposta?.valor_parcela?.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }) || ""
-                  }
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="acordo-label">Número de Parcelas</label>
-                <input
-                  className="acordo-modal-input"
-                  value={form?.proposta?.numero_parcelas || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-    
-            {/* Linha 3 - Status + Data de Início */}
-            <div className="acordo-input-row">
-              <div>
-                <label className="acordo-label">Status</label>
-                <input
-                  className="acordo-modal-input"
-                  value={form?.status || ""}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="acordo-label">Data de Início</label>
-                <input
-                  type="date"
-                  className="acordo-modal-input"
-                  value={form?.data_vencimento || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-    
-            {/* Observações */}
-              <div>
-                <label className="acordo-label">Observações</label>
-                <textarea
-                  className="acordo-textarea"
-                  rows={2}
-                  value={form?.observacao || ""}
-                  onChange={(e) => {
-                    if (!visualizando) {
-                      setForm({ ...form, observacao: e.target.value });
-                    }
-                  }}
-                  readOnly={visualizando}
-                />
-              </div>
 
-          </div>
-    
-          {/* Rodapé fixo com botão apenas no modo editar */}
-          {!visualizando && (
-            <div className="acordo-btn-modal-left-footer">
-              <Button
-                variant="ghost"
-                onClick={() => setForm({ ...form, status: "Cancelado" })}
-              >
-                Cancelar Acordo
-              </Button>
-              <Button onClick={salvar}>Salvar</Button>
-            </div>
-          )}
-        </div>
-      );
-    }
-    
-    
 
-function ModalRightAtribuicoesAcordo({
-  rightMode,
-  setRightMode,
-  atribs,
-  colabs,
-  historicoAtribs,
-  formAtrib,
-  setFormAtrib,
-  handleCriarAtribuicao,
-  handleEditarAtribuicao,
-  visualizando,
-}) {
-  return (
-    <div className="acordo-modal-split-right">
-      {/* Cabeçalho fixo (sempre visível) */}
-      <div className="acordo-right-header">
-        <h2 className="acordo-modal-title">
-          {rightMode === "editarAtrib"
-            ? "Atribuições do Acordo"
-            : rightMode === "novaAtrib"
-            ? "Atribuições do Acordo"
-            : "Atribuições do Acordo"}
-        </h2>
-      </div>
-
-  
-      {/* Modo: visualizar atribuições */}
-      {rightMode === "visualizarAtrib" && (
-        <div className="acordo-right-wrapper">
-          <div className="acordo-right-scroll">
-            <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
-              {(historicoAtribs || []).map((a, idx, arr) => {
-
-                const ultima = idx === arr.length - 1;
-                return (
-                  <li
-                    key={a.id}
-                    className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
-                    onClick={() => {
-                      setFormAtrib({
-                        atribuicao_id: a.atribuicao_id,
-                        atribuicao_descricao: a.atribuicao_descricao,
-                        status_atual: a.atribuicao_descricao,
-                        data_inicial: a.data_inicial,
-                        prazo: a.prazo ?? "",
-                        responsavel_id: a?.responsavel?.id ?? "",  // ⬅️ Corrigido aqui
-                        observacao: a?.observacao ?? "",
-                      });
-                      setRightMode("editarAtrib");
-                    }}
-                  >
-                    <div className="processo-modal-right-texto">
-                      <div className="atr-desc">{a.atribuicao_descricao}</div>
-                      <div className="atr-lista">
-                        <div className="atr-linha">
-                          <span className="atr-label">Definida em</span>
-                          <span className="atr-valor">
-                            {a.data_inicial ? new Date(a.data_inicial).toLocaleDateString("pt-BR") : "—"}
-                          </span>
-                        </div>
-                        <div className="atr-linha">
-                          <span className="atr-label">Prazo</span>
-                          <span className="atr-valor">
-                            {a.prazo ? new Date(a.prazo).toLocaleDateString("pt-BR") : "—"}
-                          </span>
-                        </div>
-                        <div className="atr-linha">
-                          <span className="atr-label">Responsável</span>
-                          <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-  
-          {!visualizando && (
-            <div className="acordo-btn-modal-right-footer">
-              <Button onClick={() => setRightMode("novaAtrib")}>Próxima Atribuição</Button>
-            </div>
-          )}
-        </div>
-      )}
-  
-      {/* Modo: editar atribuição */}
-      {rightMode === "editarAtrib" && (
-        <div className="acordo-right-wrapper">
-          <div className="acordo-right-content form">
-            <div className="acordo-atr-section">
-              <p className="acordo-atr-section-title">Atribuição Atual</p>
-              <div className="acordo-atr-linha">
-                <span className="acordo-atr-label">Status Atual</span>
-                <span className="acordo-atr-valor">{formAtrib.atribuicao_descricao || "—"}</span>
-              </div>
-              <div className="acordo-atr-linha">
-                <span className="acordo-atr-label">Definida em</span>
-                <span className="acordo-atr-valor">
-                  {formAtrib.data_inicial
-                    ? new Date(formAtrib.data_inicial).toLocaleDateString("pt-BR")
-                    : "—"}
-                </span>
-              </div>
-              <div className="acordo-atr-linha">
-                <span className="acordo-atr-label">Tempo no Status</span>
-                <span className="acordo-atr-valor">
-                  {formAtrib.data_inicial
-                    ? `${Math.floor(
-                        (new Date() - new Date(formAtrib.data_inicial)) / (1000 * 60 * 60 * 24)
-                      )} dias`
-                    : "—"}
-                </span>
-              </div>
-            </div>
-  
-            <div className="acordo-input-wrapper">
-              <label className="acordo-label">Prazo</label>
-              <input
-                type="date"
-                className="acordo-modal-input"
-                value={formAtrib.prazo}
-                onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
-              />
-            </div>
-  
-            <div className="acordo-input-wrapper">
-              <label className="acordo-label">Responsável</label>
-              <select
-                className="acordo-modal-input"
-                value={formAtrib.responsavel_id}
-                onChange={(e) => setFormAtrib({ ...formAtrib, responsavel_id: e.target.value })}
-              >
-                <option value="">Selecione…</option>
-                {colabs.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
-                ))}
-              </select>
-            </div>
-  
-            <div className="acordo-input-wrapper">
-              <label className="acordo-label">Observação</label>
-              <textarea
-                className="acordo-textarea"
-                rows={2}
-                value={formAtrib.observacao || ""}
-                onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
-              />
-            </div>
-          </div>
-  
-            <div className="acordo-btn-modal-right-footer">
-              <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-              <Button onClick={handleEditarAtribuicao}>Atualizar</Button>
-            </div>
-        </div>
-      )}
-  
-      {/* Modo: nova atribuição */}
-      {rightMode === "novaAtrib" && (
-        <div className="acordo-right-wrapper">
-          <div className="acordo-right-scroll">
-            <div className="acordo-right-content form">
-              <div className="acordo-atr-section-title">Atribuição Atual</div>
-              <div className="acordo-input-wrapper">
-                <label className="acordo-label">Solucionador</label>
-                <select
-                  className="acordo-modal-input"
-                  value={formAtrib.solucionador_id}
-                  onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
-                >
-                  <option value="">Selecione…</option>
-                  {colabs.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
-                  ))}
-                </select>
-              </div>
-  
-              <div className="acordo-atr-section-title" style={{ marginTop: "2rem" }}>Próxima Atribuição</div>
-  
-              <div className="acordo-input-wrapper">
-                <label className="acordo-label">Status</label>
-                <select
-                  className="acordo-modal-input"
-                  value={formAtrib.proxima_atr_id}
-                  onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
-                >
-                  <option value="">Selecione…</option>
-                  {atribs.map((a) => (
-                    <option key={a.id} value={a.id}>{a.descricao}</option>
-                  ))}
-                </select>
-              </div>
-  
-              <div className="acordo-input-wrapper">
-                <label className="acordo-label">Responsável</label>
-                <select
-                  className="acordo-modal-input"
-                  value={formAtrib.proximo_resp_id}
-                  onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
-                >
-                  <option value="">Selecione…</option>
-                  {colabs.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
-                  ))}
-                </select>
-              </div>
-  
-              <div className="acordo-input-wrapper">
-                <label className="acordo-label">Prazo</label>
-                <input
-                  type="date"
-                  className="acordo-modal-input"
-                  value={formAtrib.prazo}
-                  onChange={(e) => setFormAtrib({ ...formAtrib, prazo: e.target.value })}
-                />
-              </div>
-  
-
-            </div>
-          </div>
-  
-          <div className="acordo-btn-modal-right-footer">
-            <Button variant="secondary" onClick={() => setRightMode("visualizarAtrib")}>Cancelar</Button>
-            <Button onClick={handleCriarAtribuicao}>Salvar</Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-  
-  
-  
+// 🔧 Calcula status da parcela (mesma lógica usada em Agenda.jsx)
+function definirStatusParcela(parcela) {
+  if (parcela.pago) return "pago";
+  const hoje = new Date();
+  const venc = new Date(parcela.data_vencimento);
+  return venc < hoje ? "em_atraso" : "pendente";
 }
-    
-    
-    function ModalLeftParcelas({ parcelas, parcelaSelecionada, setParcelaSelecionada }) {
-      const linhas = 7;
-      const colunas = Math.ceil(parcelas.length / linhas);
-    
-      // Distribui as parcelas em colunas verticais
-      const colunasDeParcelas = Array.from({ length: colunas }, (_, colIdx) =>
-        parcelas.slice(colIdx * linhas, colIdx * linhas + linhas)
-      );
-    
-      return (
-        <div className="acordo-modal-split-left">
-          <DialogTitle className="acordo-modal-title">Parcelas do Acordo</DialogTitle>
-    
-          <DialogDescription className="acordo-modal-description">
-            Clique em uma parcela para ver ou registrar um pagamento.
-          </DialogDescription>
-    
-          <div className="acordo-modal-parcelas">
-            {colunasDeParcelas.map((coluna, colIdx) => (
-              <div className="acordo-parcela-coluna" key={colIdx}>
-                {coluna.map((parcela, idx) => (
-                  <div
-                    key={idx}
-                    className={`acordo-parcela-item ${
-                      parcelaSelecionada?.numero_parcela === parcela.numero_parcela
-                        ? "selecionada"
-                        : ""
-                    }`}
-                    onClick={() => setParcelaSelecionada(parcela)}
-                  >
-                    <div className="acordo-parcela-linha">
-                      <span className="parcela-check">
-                        {parcela.status === "pago" && "✅"}
-                        {parcela.status === "em_atraso" && (
-                          <span style={{ color: "red", fontWeight: "bold" }}>❗</span>
-                        )}
-                        {parcela.status !== "pago" && parcela.status !== "em_atraso" && "•"}
-                      </span>
-                      <div className="parcela-duas-linhas">
-                        <span className="parcela-data">
-                          {parcela.vencimento
-                            ? new Date(parcela.vencimento).toLocaleDateString("pt-BR")
-                            : "—"}
-                        </span>
-                        <span className="parcela-valor">
-                          {parcela.valor_parcela?.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }) ?? "—"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-    
-    
-    
-    
-    
-    
-    
-    function ModalRightPagamentos({ parcelaSelecionada, recarregarParcelas }) {
-      // Soma os pagamentos da parcela selecionada
-      const [editandoPagamento, setEditandoPagamento] = useState(false);
-      const [dataPagamento, setDataPagamento] = useState("");
-      const [valorPago, setValorPago] = useState("");
 
-      const handleCancelar = () => {
-        setEditandoPagamento(false);
-        setDataPagamento("");
-        setValorPago("");
-      };
-
-      const handleSalvar = async () => {
-        if (!dataPagamento || !valorPago) {
-          alert("Preencha todos os campos.");
-          return;
-        }
-
-        try {
-          await updatePagamentoAcordo(parcelaSelecionada.id, {
-            data_pagamento: dataPagamento,
-            valor_pago: parseFloat(valorPago),
-          });
-          handleCancelar(); // limpa campos
-          await recarregarParcelas(); // atualiza os dados no frontend
-          
-        } catch (error) {
-          alert("Erro ao salvar pagamento.");
-          console.error(error);
-        }
-      };
-
- 
-    
-      return (
-        <div className="acordo-modal-split-right">
-          {/* Cabeçalho */}
-          <div className="acordo-right-header">
-            <h2 className="acordo-modal-title">Pagamentos</h2>
-          </div>
-    
-          {/* Conteúdo scrollável */}
-          <div className="acordo-right-scroll">
-            <div className="acordo-right-content centered">
-              {parcelaSelecionada ? (
-                <>
-                  <div className="acordo-pag-detalhe">
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Parcela</span>
-                      <span className="acordo-atr-valor">{parcelaSelecionada.numero_parcela}</span>
-                    </div>
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Data do Vencimento</span>
-                      <span className="acordo-atr-valor">
-                        {new Date(parcelaSelecionada.vencimento).toLocaleDateString("pt-BR")}
-                      </span>
-                    </div>
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Data do Pagamento</span>
-                      <span className="acordo-atr-valor">
-                        {parcelaSelecionada.data_pagamento
-                          ? new Date(parcelaSelecionada.data_pagamento).toLocaleDateString("pt-BR")
-                          : "—"}
-                      </span>
-                    </div>
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Valor</span>
-                      <span className="acordo-atr-valor">
-                        {parcelaSelecionada.valor_parcela?.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }) ?? "—"}
-                      </span>
-                    </div>
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Valor Pago</span>
-                      <span className="acordo-atr-valor">
-                        {(parcelaSelecionada.valor_pago ?? 0).toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </span>
-                    </div>
-                    <div className="acordo-atr-linha">
-                      <span className="acordo-atr-label">Status</span>
-                      <span
-                        className={`acordo-atr-valor status-${parcelaSelecionada.status}`}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {parcelaSelecionada.status === "pago" && (
-                          <>
-                            <CheckCircle size={16} className="status-icon status-icon-pago" />
-                            Pago
-                          </>
-                        )}
-                        {parcelaSelecionada.status === "em_atraso" && (
-                          <>
-                            <AlertCircle size={16} className="status-icon status-icon-atraso" />
-                            Em Atraso
-                          </>
-                        )}
-                        {parcelaSelecionada.status === "pendente" && <>Pendente</>}
-                      </span>
-                    </div>
-                      {editandoPagamento && (
-                        <div className="pagamento-formulario">
-                          <input
-                            type="date"
-                            value={dataPagamento}
-                            onChange={(e) => setDataPagamento(e.target.value)}
-                            className="acordo-modal-input"
-                            placeholder="Data do Pagamento"
-                          />
-                          <input
-                            type="number"
-                            value={valorPago}
-                            onChange={(e) => setValorPago(e.target.value)}
-                            className="acordo-modal-input"
-                            placeholder="Valor Pago"
-                          />
-                        </div>
-                      )}
-
-                  </div>
-
-                  
-                </>
-              ) : (
-                <p className="acordo-pag-empty">
-                  Selecione uma parcela para visualizar os pagamentos.
-                </p>
-              )}
-
-              
-            </div>
-          </div>
-    
-          {/* Rodapé com botão */}
-            {parcelaSelecionada && (
-              <div className="acordo-btn-modal-right-footer">
-                {!editandoPagamento ? (
-                  <Button onClick={() => setEditandoPagamento(true)}>
-                    Realizar Pagamento
-                  </Button>
-                ) : (
-                  
-                  <div className="acordo-formulario-botoes">
-                  <Button onClick={handleCancelar} variant="ghost">Cancelar</Button>
-                  <Button
-                    onClick={handleSalvar}
-                    disabled={!dataPagamento || !valorPago}
-                  >
-                    Salvar
-                  </Button>
-
-                </div>
-                  
-                )}
-              </div>
-            )}
-
-        </div>
-      );
-    }
-    
-    
-    
     
     
 export default function Acordos() {
@@ -658,6 +68,7 @@ export default function Acordos() {
   const [visualizando, setVisualizando] = useState(false);
   const [editando, setEditando] = useState(false);
   const salvarRef = useRef(null);
+  const [abaAtiva, setAbaAtiva] = useState("acordo");
 
   const [fStatus, setFStatus] = useState("");
   const [fBusca, setFBusca] = useState("");
@@ -686,7 +97,23 @@ export default function Acordos() {
     }
   };
   
+  // Normalizador de texto (corrige erro de "norm is not defined")
+  const norm = (text = "") =>
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
 
+  // Filtro com normalização de texto
+  const filtrados = useMemo(() => {
+    const termo = norm(fBusca);
+    return lista.filter((a) => {
+      const parte = norm(a.parte_adversa?.nome);
+      const contrato = norm(a.contrato?.numero);
+      return termo ? parte.includes(termo) || contrato.includes(termo) : true;
+    });
+  }, [lista, fBusca]);
 
 
 
@@ -727,60 +154,153 @@ export default function Acordos() {
     })();
   }, []);
 
-  const filtrados = useMemo(() => {
-    const termo = norm(fBusca);
-    return lista.filter((a) => {
-      const parte = norm(a.parte_adversa?.nome);
-      const contrato = norm(a.contrato?.numero);
-      return termo ? parte.includes(termo) || contrato.includes(termo) : true;
-    });
-  }, [lista, fBusca]);
+
+  const normalizarParcelas = (parcelas = []) =>
+    parcelas.map((p, idx) => ({
+      id: p.id ?? idx,
+      numero: p.numero ?? p.numero_parcela ?? "",
+      valor: Number(p.valor ?? p.valor_parcela) || 0,
+      data_vencimento: p.data_vencimento ?? p.vencimento ?? "",
+      pago: p.pago ?? false,
+      data_pagamento: p.data_pagamento ?? "",
+      valor_pago: Number(p.valor_pago ?? 0) || 0,
+      status: definirStatusParcela(p),
+    }));
+
+    // 🔧 Formata as parcelas para exibição no ModalLeftParcelas
+    const formatarParcelas = (form) => {
+      if (!form?.parcelas) return [];
+      return form.parcelas.map((p, idx) => ({
+        id: p.id ?? idx,
+        numero_parcela: p.numero ?? p.numero_parcela ?? "",
+        valor_parcela: Number(p.valor ?? p.valor_parcela) || 0,
+        vencimento: p.data_vencimento ?? p.vencimento ?? "",
+        pago: p.pago ?? false,
+        data_pagamento: p.data_pagamento ?? "",
+        valor_pago: Number(p.valor_pago ?? 0) || 0,
+        status: definirStatusParcela(p),
+      }));
+    };
+
+  
+  
+    const abrirDetalhar = async (acordo) => {
+      setVisualizando(true);
+      setEditando(false);
+      setRightMode("visualizarAtrib");
+    
+      try {
+        // 🔹 Busca dados do acordo e parcelas (igual Agenda.jsx)
+        const dados = await fetchAcordoUnificadoById(acordo.acordo_id);
+        const parcelas = await fetchModalParcelasByAcordoId(acordo.acordo_id);
+    
+        // 🔹 Monta o form completo antes de renderizar
+        setForm({
+          ...dados,
+          parcelas: parcelas || [],
+        });
+    
+        // 🔹 Prepara as atribuições e colaboradores
+        const atribuicoes = await fetchAtribuicoesAcordo(acordo.acordo_id);
+        const colaboradores = await fetchColaboradores();
+    
+        setAtribs(atribuicoes || []);
+        setColabs(colaboradores);
+        setHistoricoAtribs(dados.atribuicoes_evento || []);
+        setAcordoSelecionado(dados);
+        
+        setAbaAtiva("acordo");
+        setRightMode("visualizarAtrib");
+        // 🔹 Agora sim abre o modal (igual ao Agenda)
+        setModalAberto(true);
+    
+        console.log(`🟢 abrirDetalhar → Acordo ${acordo.acordo_id}, Parcelas: ${parcelas?.length}`);
+      } catch (err) {
+        console.error("Erro ao buscar acordo:", err);
+      }
+    };
+    
+    
+    const abrirEditar = async (acordo) => {
+      setVisualizando(false);
+      setEditando(true);
+      setRightMode("visualizarAtrib");
+    
+      try {
+        // 🔹 Busca dados do acordo e parcelas
+        const dados = await fetchAcordoUnificadoById(acordo.acordo_id);
+        const parcelas = await fetchModalParcelasByAcordoId(acordo.acordo_id);
+    
+        // 🔹 Atualiza o form e o acordo selecionado
+        setForm({
+          ...dados,
+          parcelas: parcelas || [],
+        });
+        setAcordoSelecionado(dados);
+    
+        // 🔹 Busca atribuições e colaboradores
+        const atribuicoes = await fetchAtribuicoesAcordo(acordo.acordo_id);
+        const colaboradores = await fetchColaboradores();
+    
+        setAtribs(atribuicoes || []);
+        setColabs(colaboradores);
+        setHistoricoAtribs(dados.atribuicoes_evento || []);
+        
+        setAbaAtiva("acordo");
+        setRightMode("visualizarAtrib");
+        // 🔹 Abre o modal
+        setModalAberto(true);
+    
+        console.log(`🟢 abrirEditar → Acordo ${acordo.acordo_id}, Parcelas: ${parcelas?.length}`);
+      } catch (err) {
+        console.error("Erro ao buscar acordo:", err);
+      }
+    };
+
+
+
+
+    const abrirParcelasDireto = async (acordo) => {
+      setEditando(true);              // 👈 entra no modo de edição
+      setVisualizando(false);
+      setRightMode("visualizarParcelas");
+      setAbaAtiva("parcelas");
+    
+      try {
+        // 🔹 Busca dados completos do acordo
+        const dados = await fetchAcordoUnificadoById(acordo.acordo_id);
+        const parcelas = await fetchModalParcelasByAcordoId(acordo.acordo_id);
+    
+        // 🔹 Monta o form completo com as parcelas
+        setForm({
+          ...dados,
+          parcelas: parcelas || [],
+        });
+    
+        // 🔹 Carrega atribuições e colaboradores
+        const atribuicoes = await fetchAtribuicoesAcordo(acordo.acordo_id);
+        const colaboradores = await fetchColaboradores();
+    
+        setAtribs(atribuicoes || []);
+        setColabs(colaboradores);
+        setHistoricoAtribs(dados.atribuicoes_evento || []);
+        setAcordoSelecionado(dados);
+    
+        // 🔹 Abre o modal grande
+        setModalAberto(true);
+    
+        console.log(`🟢 abrirParcelasDireto (modo editar) → Acordo ${acordo.acordo_id}, Parcelas: ${parcelas?.length}`);
+      } catch (err) {
+        console.error("Erro ao abrir modal direto de parcelas:", err);
+      }
+    };
+    
+    
+    
   
 
-  const abrirDetalhar = async (acordo) => {
-    setVisualizando(true);
-    setEditando(false);
-    setRightMode("visualizarAtrib");
-    try {
-      const dados = await fetchAcordoUnificadoById(acordo.acordo_id);
-      const atribuicoes = await fetchAtribuicoesAcordo(acordo.acordo_id);
-      const colaboradores = await fetchColaboradores();
-
-      setAcordoSelecionado(dados);
-      setForm(dados);
-      setAtribs(atribuicoes || []);
-      setColabs(colaboradores);
-      setModalAberto(true);
-
-    } catch (err) {
-      console.error("Erro ao buscar acordo:", err);
-    }
-  };
-
-  const abrirEditar = async (acordo) => {
-    setVisualizando(false);
-    setEditando(true);
-    setRightMode("visualizarAtrib");
-    try {
-      const dados = await fetchAcordoUnificadoById(acordo.acordo_id);
-      const opcoesAtribuicoes = await fetchAtribuicoesAcordo(acordo.acordo_id);
-      const colaboradores = await fetchColaboradores();
-      
-      setAcordoSelecionado(dados);
-      setForm(dados);
-      setHistoricoAtribs(dados.atribuicoes_evento || []); // ✅ lista de eventos reais
-      setAtribs(opcoesAtribuicoes || []);                 // ✅ opções para o select
-      setColabs(colaboradores);
-      setModalAberto(true);
-      
-      setColabs(colaboradores);
-      setModalAberto(true);
-
-    } catch (err) {
-      console.error("Erro ao buscar acordo:", err);
-    }
-  };
-
+  
+/*
   const salvar = async () => {
     if (!acordoSelecionado?.acordo_id) return;
     try {
@@ -788,23 +308,58 @@ export default function Acordos() {
         status: form.status,
         observacao: form.observacao
       });
+  
+      // 🔹 Busca novamente o acordo completo (com parcelas e atribuições)
+      const dadosAtualizados = await fetchAcordoUnificadoById(acordoSelecionado.acordo_id);
+  
+      // 🔹 Atualiza o form e o acordo selecionado
+      setAcordoSelecionado(dadosAtualizados);
+
+      // 🔹 Garante que o form e as parcelas sejam atualizados em conjunto
+      const novasParcelas = normalizarParcelas(dadosAtualizados.parcelas || []);
+
+      setForm((prev) => ({
+        ...prev,                        // 👈 preserva a referência anterior (evita reset visual)
+        ...dadosAtualizados,            // 👈 atualiza apenas os campos alterados
+        parcelas: [...novasParcelas],   // 👈 garante array novo, mas compatível com os modais
+        parcelaSelecionada:
+          novasParcelas.find(p => ["pendente", "em_atraso"].includes(p.status)) ||
+          prev.parcelaSelecionada || null
+      }));
+      
+
+  
+      // 🔹 Atualiza a lista principal (mantém coerência)
       const atualizados = await fetchAcordosUnificados();
       setLista(atualizados);
-      setModalAberto(false);
+  
+      // 🔹 Mantém o modal aberto e já atualizado
+      console.log(
+        `🟢 salvar() → Acordo atualizado com ${dadosAtualizados.parcelas?.length || 0} parcelas`
+      );
+  
     } catch (err) {
       console.error("Erro ao atualizar acordo:", err);
     }
   };
+ */ 
 
   const recarregarParcelas = async () => {
     if (!acordoIdParcelas) return;
     try {
       const novasParcelas = await fetchModalParcelasByAcordoId(acordoIdParcelas);
-      setParcelas(novasParcelas);
+      setParcelas(
+        novasParcelas.map((p) => ({
+          ...p,
+          valor: Number(p.valor) || 0,
+          valor_pago: Number(p.valor_pago) || 0,
+        }))
+      );
     } catch (err) {
       console.error("Erro ao recarregar parcelas", err);
     }
   };
+  
   
   
   const montarPayloadAtribuicao = () => {
@@ -839,21 +394,35 @@ export default function Acordos() {
     }
   };
 
+  
+
+
   const handleEditarAtribuicao = async () => {
+    if (!formAtrib?.atribuicao_id) return;
+  
     try {
-      const payload = montarPayloadAtribuicao(); // mesmo payload
-      await updateAtribuicaoEvento(formAtrib.atribuicao_id, payload); // PUT com ID da atribuição
+      await updateAtribuicaoEvento(formAtrib.atribuicao_id, {
+        prazo: formAtrib.prazo,
+        observacao: formAtrib.observacao,
+        responsavel_id: formAtrib.responsavel_id,
+        solucionador_id: formAtrib.solucionador_id,
+      });
+  
+      // ⏱️ Garante atualização no Mockoon antes do GET
+      await new Promise((resolve) => setTimeout(resolve, 300));
+  
       const dadosAtualizados = await fetchAcordoUnificadoById(acordoSelecionado.acordo_id);
   
-      setAcordoSelecionado(dadosAtualizados);
-      setForm(dadosAtualizados); // ← atualiza os campos do lado esquerdo do modal
-      setHistoricoAtribs(dadosAtualizados.atribuicoes_evento || []); // ← eventos reais
+      setForm({ ...dadosAtualizados });
+      setHistoricoAtribs(dadosAtualizados.atribuicoes_evento || []);
+      setRightMode("visualizarAtrib");
   
-      setRightMode("visualizarAtrib"); // volta para modo de visualização
-    } catch (error) {
-      console.error("Erro ao editar atribuição:", error);
+      console.log("🟢 Atribuição atualizada e Acordo recarregado!");
+    } catch (err) {
+      console.error("Erro ao editar atribuição:", err);
     }
   };
+  
   
   
   
@@ -865,17 +434,24 @@ export default function Acordos() {
       await createAtribuicaoEvento({
         entity_type: "acordo",
         entity_id: acordoSelecionado.acordo_id,
-        ...formAtrib,
+        prazo: formAtrib.prazo,
+        observacao: formAtrib.observacao,
+        responsavel_id: formAtrib.responsavel_id,
+        solucionador_id: formAtrib.solucionador_id,
       });
   
+      // ⏱️ Garante que o Mockoon tenha processado o POST antes do GET
+      await new Promise((resolve) => setTimeout(resolve, 300));
+  
+      // 🔄 Busca dados atualizados (igual Agenda.jsx)
       const dadosAtualizados = await fetchAcordoUnificadoById(acordoSelecionado.acordo_id);
-      setAcordoSelecionado(dadosAtualizados);
-      setForm(dadosAtualizados); // ← garante que o lado esquerdo também reflita dados atualizados
+  
+      // ✅ Garante que o React veja o objeto como novo (re-render forçado)
+      setForm({ ...dadosAtualizados });
       setHistoricoAtribs(dadosAtualizados.atribuicoes_evento || []);
-      
-      
       setRightMode("visualizarAtrib");
   
+      // 🔹 Limpa o form da atribuição
       setFormAtrib({
         atribuicao_id: "",
         responsavel_id: "",
@@ -884,10 +460,13 @@ export default function Acordos() {
         observacao: "",
       });
   
+      console.log("✅ Atribuição criada e Acordo recarregado!");
     } catch (err) {
       console.error("Erro ao criar atribuição:", err);
     }
   };
+  
+  
   
   
 
@@ -961,7 +540,7 @@ export default function Acordos() {
                       <div className="table-actions">
                         <Button variant="secondary" onClick={() => abrirEditar(a)}>✏️ Editar</Button>
                         <Button variant="outline" onClick={() => abrirDetalhar(a)}>👁️ Detalhar</Button>
-                        <Button variant="default" onClick={() => abrirModalParcelas(a.acordo_id)}>🔄 Parcelas</Button>
+                        <Button variant="default" onClick={() => abrirParcelasDireto(a)}>💰 Parcelas</Button>
                       </div>
                     </td>
                   </tr>
@@ -977,64 +556,111 @@ export default function Acordos() {
 
       {/* Modal: a ser expandido nas próximas etapas */}
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogOverlay className="dialog-overlay" />
-          <DialogContent className="acordo-modal-container">
-            <DialogTitle>
-              <VisuallyHidden>{visualizando ? "Detalhar Acordo" : "Editar Acordo"}</VisuallyHidden>
-            </DialogTitle>
-            <DialogDescription>
-              <VisuallyHidden>Informações do acordo selecionado</VisuallyHidden>
-            </DialogDescription>
+        <DialogOverlay className="agenda-modal-overlay" />
+          <DialogContent
+            aria-describedby={undefined}
+            className="agenda-modal-container"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <DialogTitle style={{ display: "none" }}>Acordos</DialogTitle>
 
-            <div className="acordo-modal-split">
-              {/* ESQUERDA */}
-              <ModalLeftAcordo
-                form={form}
-                setForm={setForm}
-                visualizando={visualizando}
-                salvar={salvar}
-              />
+            
+
+            <div className="agenda-modal-split">
+         
+
+            {/* LADO ESQUERDO */}
+            <div className="agenda-modal-split-left">
+
+                    {/* === Abas do Modal (mesmo padrão da Agenda.jsx) === */}
+              <div className="agenda-modal-tabs">
+                <Button
+                  className="agenda-modal-tab-btn"
+                  variant={abaAtiva === "acordo" ? "default" : "outline"}
+                  onClick={() => {
+                    setAbaAtiva("acordo");
+                    setRightMode("visualizarAtrib");
+                  }}
+                >
+                  🧾 Acordo
+                </Button>
+                <Button
+                  className="agenda-modal-tab-btn"
+                  variant={abaAtiva === "parcelas" ? "default" : "outline"}
+                  onClick={() => {
+                    setAbaAtiva("parcelas");
+                    setRightMode("visualizarParcelas");
+                  }}
+                >
+                  💰 Parcelas
+                </Button>
+              </div>
 
 
-              {/* DIREITA */}
-              <ModalRightAtribuicoesAcordo
-                rightMode={rightMode}
-                setRightMode={setRightMode}
-                atribs={atribs}
-                colabs={colabs}
-                historicoAtribs={historicoAtribs}
-                formAtrib={formAtrib}
-                setFormAtrib={setFormAtrib}
-                handleCriarAtribuicao={handleCriarAtribuicao}
-                handleEditarAtribuicao={handleEditarAtribuicao}
-                visualizando={visualizando}
-              />
+
+
+              
+                {abaAtiva === "acordo" && (
+                  <ModalLeftAcordo
+                    form={form}
+                    setForm={setForm}
+                    salvarRef={salvarRef}
+                    setEventoSelecionado={setAcordoSelecionado}
+                    modo={editando ? "editar" : visualizando ? "visualizar" : "criar"}
+                  />
+                )}
+                
+                {abaAtiva === "parcelas" && (
+                  <ModalLeftParcelas
+                    parcelas={form?.parcelas || []}
+                    parcelaSelecionada={form?.parcelaSelecionada}
+                    setParcelaSelecionada={(p) =>
+                      setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
+                    }
+                    setRightMode={setRightMode}
+                    modo={editando ? "editar" : visualizando ? "visualizar" : "criar"}
+                  />
+                
+                )}
+
+                
+            </div>
+
+            {/* LADO DIREITO */}
+            <div className="agenda-modal-split-right">
+              {abaAtiva === "parcelas" ? (
+                <ModalRightParcelas
+                  rightMode={rightMode}
+                  setRightMode={setRightMode}
+                  parcelaSelecionada={form?.parcelaSelecionada}
+                  setParcelaSelecionada={(p) =>
+                    setForm((prev) => ({ ...prev, parcelaSelecionada: p }))
+                  }
+                  modo={editando ? "editar" : visualizando ? "visualizar" : "criar"}
+                />
+              ) : (
+                <ModalRightAtribuicoes
+                  rightMode={rightMode}
+                  setRightMode={setRightMode}
+                  atribs={atribs}
+                  colabs={colabs}
+                  historicoAtribs={historicoAtribs}
+                  formAtrib={formAtrib}
+                  setFormAtrib={setFormAtrib}
+                  handleCriarAtribuicao={handleCriarAtribuicao}
+                  handleEditarAtribuicao={handleEditarAtribuicao}
+                  form={form}
+                  setForm={setForm}
+                  entityType="acordo"
+                  modo={editando ? "editar" : visualizando ? "visualizar" : "criar"}
+                />
+              )}
 
             </div>
-          </DialogContent>
-      </Dialog>
-
-      <Dialog open={modalParcelasAberto} onOpenChange={setModalParcelasAberto}>
-        <DialogOverlay className="dialog-overlay" />
-        <DialogContent className="acordo-modal-container">
-          
-
-
-          <div className="acordo-modal-split">
-            <ModalLeftParcelas
-              parcelas={parcelas}
-              parcelaSelecionada={parcelaSelecionada}
-              setParcelaSelecionada={setParcelaSelecionada}
-            />
-            <ModalRightPagamentos
-              parcelaSelecionada={parcelaSelecionada}
-              abaPagamentos={abaPagamentos}
-              setAbaPagamentos={setAbaPagamentos}
-              recarregarParcelas={recarregarParcelas}
-            />
           </div>
         </DialogContent>
       </Dialog>
+
 
 
     </div>
