@@ -1,0 +1,210 @@
+/* ============================= */
+/*   Processos – Estilos gerais */
+/* ============================= */
+
+.processo-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+  }
+  
+  .processo-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+  }
+  
+  .processo-modal-input {
+    border-radius: 9999px;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    color: #111827;
+  }
+  
+  .processo-textarea {
+    width: 100%;
+    min-height: 3.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.25rem;
+    resize: vertical;
+  }
+  
+  .processo-modal-split-left,
+  .processo-modal-split-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+    position: relative;
+  }
+  
+  .processo-input-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+  
+  .processo-input-row.triple {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .processo-botao-salvar-bottom {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .processo-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+  
+  .processo-modal-description {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+  }
+  
+  .processo-modal-error {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0.5rem 1rem;
+  }
+  
+  .processo-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .processo-right-actions {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+  
+  /* =============================== */
+  /*   Processo – Lista Atribuições */
+  /* =============================== */
+  
+  .processo-modal-right-lista {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .processo-modal-right-item {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+  }
+  
+  .processo-modal-right-item:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .processo-modal-right-item.atual::before {
+    content: "✔";
+    color: #2563eb;
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+  
+  .atr-linha {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  
+  .atr-label {
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  .atr-valor {
+    color: #111827;
+    word-break: break-word;
+  }
+  
+  /* ============================ */
+  /*   Processos – Modal Propostas */
+  /* ============================ */
+  
+  .propostas-scroll-wrapper {
+    overflow-y: auto;
+    margin-top: 1.5rem;
+    flex-grow: 1;
+  }
+  
+  .propostas-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
+  }
+  
+  .propostas-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .proposta-card {
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .proposta-card:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .proposta-aceita {
+    color: #22c55e;
+    font-weight: 600;
+  }
+  
+  .proposta-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .proposta-input-grande {
+    width: 300px !important;
+    height: 2rem;
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .proposta-linha-formulario {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  

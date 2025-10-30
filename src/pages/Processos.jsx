@@ -36,8 +36,7 @@ import { createAcordo } from "@/services/ENDPOINTS_ServiceAcordos.js";
 
 
 
-import "@/styles/unified_styles.css";
-import "@/styles/unified_refactored_styles.css";
+import "@/styles/processos.css";
 
 // normaliza para busca local
 const norm = (s) =>
@@ -723,40 +722,38 @@ const salvar = async () => {
           </div>
 
           {/* Prazo Interno – intervalo (início e fim) */}
-          <div className="dashboard-filtro-group" style={{ position: "relative", gap: "0.5rem" }}>
-            <span style={{ fontSize: 12, color: "#6b7280" }}>de</span>
-            <div style={{ position: "relative" }}>
-              <Input
-                type="date"
-                className="dashboard-select dashboard-filtro-usuario-input"
-                value={fDataIni}
-                onChange={(e) => setFDataIni(e.target.value)}
-                title="Prazo Interno - Início"
-              />
-              {fDataIni && (
-                <button onClick={() => setFDataIni("")} className="dashboard-filtro-clear">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
-            <span style={{ fontSize: 12, color: "#6b7280" }}>até</span>
-
-            <div style={{ position: "relative" }}>
-              <Input
-                type="date"
-                className="dashboard-select dashboard-filtro-usuario-input"
-                value={fDataFim}
-                onChange={(e) => setFDataFim(e.target.value)}
-                title="Prazo Interno - Fim"
-              />
-              {fDataFim && (
-                <button onClick={() => setFDataFim("")} className="dashboard-filtro-clear">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+          {/* Prazo Interno - De */}
+          <div className="dashboard-filtro-group" style={{ position: "relative" }}>
+            <Input
+              type="date"
+              className="dashboard-select dashboard-filtro-usuario-input"
+              value={fDataIni}
+              onChange={(e) => setFDataIni(e.target.value)}
+              title="Prazo Interno - De"
+            />
+            {fDataIni && (
+              <button onClick={() => setFDataIni("")} className="dashboard-filtro-clear">
+                <X size={14} />
+              </button>
+            )}
           </div>
+
+          {/* Prazo Interno - Até */}
+          <div className="dashboard-filtro-group" style={{ position: "relative" }}>
+            <Input
+              type="date"
+              className="dashboard-select dashboard-filtro-usuario-input"
+              value={fDataFim}
+              onChange={(e) => setFDataFim(e.target.value)}
+              title="Prazo Interno - Até"
+            />
+            {fDataFim && (
+              <button onClick={() => setFDataFim("")} className="dashboard-filtro-clear">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
         </div>
 
         <Dialog

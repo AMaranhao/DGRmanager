@@ -380,7 +380,7 @@ const abrirNovo = () => {
   setParteParaRemover(null);
   setParteAviso("");
 
-  setAbaAtiva("inicialContrato");
+  setAbaAtiva("contrato");
   setRightMode("visualizarAtrib");
 
   setModalAberto(true);
@@ -402,7 +402,7 @@ const abrirDetalhar = async (c) => {
   setParteParaRemover(null);
   setParteAviso("");
 
-  setAbaAtiva("inicialContrato");
+  setAbaAtiva("contrato");
   setRightMode("visualizarAtrib");
 
   try {
@@ -447,7 +447,7 @@ const abrirEditar = async (c) => {
   setParteAviso("");
 
   // 🔹 Define aba e painel inicial
-  setAbaAtiva("inicialContrato");
+  setAbaAtiva("contrato");
   setRightMode("visualizarAtrib");  // padrão para abrir no painel de atribuições
 
   try {
@@ -481,7 +481,7 @@ const abrirInicial = async (c) => {
   setEditando(true);
   setContratoSelecionado(c);
 
-  setAbaAtiva("inicialContrato");     // ✅ define aba ativa
+  setAbaAtiva("contrato");     // ✅ define aba ativa
   setRightMode("inicialContrato");    // ✅ define painel direito
 
   setForm({
