@@ -37,9 +37,15 @@ import {
   createParteContrato 
 } from "@/services/ENDPOINTS_ServicePartesContrato";
 
+import "@/styles/contratos.css";
 
-import "@/styles/unified_styles.css";
-import "@/styles/unified_refactored_styles.css";
+import ModalLeftContratos from "@/components/modais/contratos/ModalLeftContratos";
+import ModalRightInicial from "@/components/modais/contratos/ModalRightInicial";
+import ModalRightPartes from "@/components/modais/contratos/ModalRightPartes";
+import ModalRightAtribuicoes from "@/components/modais/atribuicoes/ModalRightAtribuicoes";
+
+
+import "@/styles/contratos.css";
 
 
 
@@ -67,6 +73,43 @@ const norm = (s) =>
     
       return ordenados[0]; // retorna o evento mais atual
     }
+
+    function renderModalLeftTabs(entityType, abaAtiva, setAbaAtiva, setRightMode) {
+      let tabs = [];
+    
+      if (entityType === "contrato") {
+        tabs = [
+          { id: "contrato", label: "Contrato" },
+        ];
+      }
+    
+      return (
+        <div className="agenda-modal-tabs">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              className="agenda-modal-tab-btn"
+              variant={abaAtiva === tab.id ? "default" : "outline"}
+              onClick={() => {
+                setAbaAtiva(tab.id);
+                if (tab.id === "partes") {
+                  setRightMode("partes");
+                } else if (tab.id === "inicialContrato") {
+                  setRightMode("inicialContrato");
+                } else {
+                  setRightMode("visualizarAtrib");
+                }
+              }}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
+      );
+    }
+    
+    
+    
     
 
     export default function Contratos() {
@@ -76,6 +119,8 @@ const norm = (s) =>
       // filtros
       const [fStatus, setFStatus] = useState("");
       const [fLote, setFLote] = useState("");
+      const [abaAtiva, setAbaAtiva] = useState("contrato"); // ou "partes" como padrão
+
     
       // modal
       const [modalAberto, setModalAberto] = useState(false);
@@ -103,6 +148,7 @@ const norm = (s) =>
       const [parteParaRemover, setParteParaRemover] = useState(null);
       const [visualizando, setVisualizando] = useState(false);
       const [parteFoiBuscada, setParteFoiBuscada] = useState(false);
+      const [parteEncontrada, setParteEncontrada] = useState(null);
 
       // identifica o contrato aberto no modal
       const [contratoSelecionado, setContratoSelecionado] = useState(null);
@@ -125,6 +171,14 @@ const norm = (s) =>
         prazo: ""
       });
       
+
+      // Deriva o modo com prioridade: editar > visualizar > criar
+      const modo =
+        editando ? "editar" :
+        visualizando ? "visualizar" :
+        "criar";
+
+
       useEffect(() => {
         if (rightMode === "visualizarAtrib" && atrSelecionada) {
           setFormAtrib({
@@ -306,48 +360,53 @@ const filtrados = useMemo(() => {
 
 
 
-  const abrirNovo = () => {
-  setShowFormParte(false);
+const abrirNovo = () => {
+  setEditando(false);
+  setVisualizando(false);
+
+  setForm({ 
+    id: "",
+    numero: "", 
+    valor: "", 
+    lote: "", 
+    observacao: "", 
+    atribId: "" 
+  });
+  setContratoSelecionado(null);
+  setPartesVinculadas([]);
   setSearchParte("");
   setFoundParte(null);
+  setShowFormParte(false);
+  setParteParaRemover(null);
   setParteAviso("");
-  setVisualizando(false);
-  setEditando(false);
 
-  setForm({ numero: "", valor: "", lote: "", observacao: "", atribId: "" });
-  setPartesVinculadas([]);
-  setContratoSelecionado(null);
-  setAtrSelecionada(null);
-  setFormAtrib({
-    solucionador_id: "",
-    proxima_atr_id: "",
-    proximo_resp_id: "",
-    observacao: "",
-    proximo_prazo: ""
-  });
-  setHistoricoAtribs([]);
-  setMostrarHistorico(false);
+  setAbaAtiva("inicialContrato");
+  setRightMode("visualizarAtrib");
 
-  setRightMode("partes"); // <<< aqui a mudança
   setModalAberto(true);
   setTimeout(() => salvarRef.current?.focus(), 0);
 };
 
 
+
+
+
+
 const abrirDetalhar = async (c) => {
-  setVisualizando(true);
   setEditando(false);
+  setVisualizando(true);
+
   setShowFormParte(false);
   setSearchParte("");
   setFoundParte(null);
   setParteParaRemover(null);
   setParteAviso("");
-  setRightMode("atribuicoes");
-  setMostrarHistorico(false);
-  setHistoricoAtribs([]);
+
+  setAbaAtiva("inicialContrato");
+  setRightMode("visualizarAtrib");
 
   try {
-    const atualizado = await fetchContratoById(c.id); // faz GET /contratos/:id
+    const atualizado = await fetchContratoById(c.id);
 
     setContratoSelecionado(atualizado);
 
@@ -356,67 +415,90 @@ const abrirDetalhar = async (c) => {
       valor: atualizado.valor ?? "",
       lote: atualizado.lote ?? "",
       observacao: atualizado.observacao ?? "",
-      atribId: "", // ou null, se preferir
+      atribId: getCurrentEvento(atualizado)?.atribuicao_id ?? "",
     });
 
     setPartesVinculadas(atualizado.partes_adversas || []);
-
-    // carrega histórico imediatamente
-    const eventos = Array.isArray(atualizado.atribuicoes_evento) ? atualizado.atribuicoes_evento : [];
-    const ordenados = [...eventos].sort((a, b) => {
-      const da = a?.data_inicial ?? "";
-      const db = b?.data_inicial ?? "";
-      if (da && db && da !== db) return da < db ? -1 : 1;
-      return (a?.id ?? 0) - (b?.id ?? 0);
-    });
-
-    setHistoricoAtribs(ordenados);
-    setMostrarHistorico(true);
+    setHistoricoAtribs(atualizado.atribuicoes_evento || []); 
 
   } catch (err) {
     console.error("Erro ao carregar contrato:", err);
   }
 
   setModalAberto(true);
-  requestAnimationFrame(() => document.activeElement.blur());
 };
 
+
   
   
   
 
   
-  const abrirEditar = async (c) => {
-    setEditando(true);
-    setShowFormParte(false);
-    setSearchParte("");
-    setFoundParte(null);
-    setParteParaRemover(null);
-    setParteAviso("");
-    setRightMode("atribuicoes");
-  
-    try {
-      const atualizado = await fetchContratoById(c.id); // faz GET /contratos/:id
+const abrirEditar = async (c) => {
+  // 🔹 Define modo corretamente
+  setEditando(true);
+  setVisualizando(false);
 
-      setContratoSelecionado(atualizado);
-  
-      setForm({
-        numero: atualizado.numero || "",
-        valor: atualizado.valor ?? "",
-        lote: atualizado.lote ?? "",
-        observacao: atualizado.observacao ?? "",
-        atribId: getCurrentEvento(atualizado)?.atribuicao_id ?? "",
-      });
-  
-      setPartesVinculadas(atualizado.partes_adversas || []);
-    } catch (err) {
-      console.error("Erro ao carregar contrato:", err);
-    }
-  
-    setModalAberto(true);
-    setTimeout(() => salvarRef.current?.focus(), 0);
-  };
-  
+  // 🔹 Reset de estados auxiliares do modal
+  setShowFormParte(false);
+  setSearchParte("");
+  setFoundParte(null);
+  setParteParaRemover(null);
+  setParteAviso("");
+
+  // 🔹 Define aba e painel inicial
+  setAbaAtiva("inicialContrato");
+  setRightMode("visualizarAtrib");  // padrão para abrir no painel de atribuições
+
+  try {
+    const atualizado = await fetchContratoById(c.id);
+
+    setContratoSelecionado(atualizado);
+
+    setForm({
+      id: atualizado.id,
+      numero: atualizado.numero || "",
+      valor: atualizado.valor ?? "",
+      lote: atualizado.lote ?? "",
+      observacao: atualizado.observacao ?? "",
+      atribId: getCurrentEvento(atualizado)?.atribuicao_id ?? "",
+    });
+
+    setPartesVinculadas(atualizado.partes_adversas || []);
+    setHistoricoAtribs(atualizado.atribuicoes_evento || []);
+
+  } catch (err) {
+    console.error("Erro ao carregar contrato:", err);
+  }
+
+  setModalAberto(true);
+  setTimeout(() => salvarRef.current?.focus(), 0);
+};
+
+const abrirInicial = async (c) => {
+  setEditando(false);
+  setVisualizando(false);
+  setEditando(true);
+  setContratoSelecionado(c);
+
+  setAbaAtiva("inicialContrato");     // ✅ define aba ativa
+  setRightMode("inicialContrato");    // ✅ define painel direito
+
+  setForm({
+    id: c.id,
+    numero: c.numero || "",
+    valor: c.valor ?? "",
+    lote: c.lote ?? "",
+    observacao: c.observacao ?? "",
+    atribId: getCurrentEvento(c)?.atribuicao_id ?? "",
+  });
+
+  setPartesVinculadas(c.partes_adversas || []);
+  setHistoricoAtribs(c.atribuicoes_evento || []);
+
+  setModalAberto(true);
+};
+
 
 
   const carregarHistoricoAtribuicoes = async () => {
@@ -578,7 +660,7 @@ const handleNovaAtribuicao = async () => {
     setHistoricoAtribs(ordenados);
     setMostrarHistorico(true);
 
-    setRightMode("atribuicoes");
+    setRightMode("visualizarAtrib");
     setFormAtrib({
       solucionador_id: "",
       proxima_atr_id: "",
@@ -607,7 +689,7 @@ const handleAtualizarAtribuicao = async () => {
     const atualizado = await fetchContratoById(contratoSelecionado.id);
     setContratoSelecionado(atualizado);
     setHistoricoAtribs(atualizado.atribuicoes_evento || []);
-    setRightMode("atribuicoes");
+    setRightMode("visualizarAtrib");
     setAtrSelecionada(null);
   } catch (error) {
     console.error("Erro ao atualizar atribuição:", error);
@@ -712,12 +794,28 @@ const handleAtualizarAtribuicao = async () => {
         </div>
 
         <Dialog open={modalAberto} onOpenChange={(open) => {
-            setModalAberto(open);
-            if (!open) {
-              setVisualizando(false);
-              setRightMode("atribuicoes");
-            }
-          }}>
+          setModalAberto(open);
+
+          if (!open) {
+            setVisualizando(false);
+            setEditando(false);
+            setContratoSelecionado(null);
+            setForm({ numero: "", valor: "", lote: "", observacao: "", atribId: "" });
+            setPartesVinculadas([]);
+            setFormAtrib({
+              solucionador_id: "",
+              proxima_atr_id: "",
+              proximo_resp_id: "",
+              observacao: "",
+              proximo_prazo: "",
+              prazo: ""
+            });
+            setAtrSelecionada(null);
+            setHistoricoAtribs([]);
+            setRightMode("visualizarAtrib");
+          }
+        }}>
+
           <DialogOverlay className="dialog-overlay" />
           <DialogTrigger asChild>
             <Button
@@ -732,626 +830,96 @@ const handleAtualizarAtribuicao = async () => {
           </DialogTrigger>
 
           <DialogContent
-              className="contratos-modal contratos-modal-no-close contratos-split-modal"
-              onOpenAutoFocus={(e) => {
-                if (visualizando) {
-                  e.preventDefault();               // impede o foco automático do Radix
-                  requestAnimationFrame(() => {
-                    document.activeElement?.blur(); // garante que nada fique focado
-                  });
-                }
-              }}
+            aria-describedby={undefined}
+            className="agenda-modal-container"
+            onOpenAutoFocus={(e) => {
+              if (visualizando) {
+                e.preventDefault(); // impede foco automático
+                requestAnimationFrame(() => {
+                  document.activeElement?.blur();
+                });
+              }
+            }}
           >
-            <style>{`button.absolute.top-4.right-4 { display: none !important; }`}</style>
+     
 
-            <div className="contratos-split-modal-left">
-              <DialogTitle>
-                {visualizando ? "Detalhar Contrato" : editando ? "Editar Contrato" : "Novo Contrato"}
-              </DialogTitle>
-              <DialogDescription className="contratos-modal-descricao">
-                Preencha os dados do contrato.
-              </DialogDescription>
 
-              <div className="contratos-input-wrapper">
-                <label className="contratos-input-label">Número</label>
-                <Input
-                  className="contratos-modal-input"
-                  value={form.numero}
-                  onChange={(e) => setForm({ ...form, numero: e.target.value })}
-                  readOnly={visualizando}
+            <div className="agenda-modal-split">
+              {/* LADO ESQUERDO */}
+              
+              <div className="agenda-modal-split-left">
+                <DialogTitle className="agenda-modal-title">
+                  {renderModalLeftTabs("contrato", abaAtiva, setAbaAtiva, setRightMode)}
+                </DialogTitle>
+                <ModalLeftContratos
+                  form={form}
+                  setForm={setForm}
+                  salvarRef={salvarRef}
+                  setEventoSelecionado={setContratoSelecionado}
+                  setRightMode={setRightMode}
+                  setContratoSelecionado={setContratoSelecionado}
+                  modo={modo}
+                  setModalAberto={setModalAberto}
                 />
               </div>
 
-              <div className="contratos-input-wrapper">
-                <label className="contratos-input-label">Valor</label>
-                <Input
-                  className="contratos-modal-input"
-                  type="number"
-                  value={form.valor}
-                  onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                  readOnly={visualizando}
-                />
-              </div>
-
-              <div className="contratos-input-wrapper">
-                <label className="contratos-input-label">Lote</label>
-                <Input
-                  className="contratos-modal-input"
-                  value={form.lote}
-                  onChange={(e) => setForm({ ...form, lote: e.target.value })}
-                  readOnly={visualizando}
-                />
-              </div>
-
-              <div className="contratos-input-wrapper">
-                <label className="contratos-input-label">Observação</label>
-                <Input
-                  className="contratos-modal-input"
-                  value={form.observacao}
-                  onChange={(e) => setForm({ ...form, observacao: e.target.value })}
-                  readOnly={visualizando}
-                />
-              </div>
-
-             
-
-              {!visualizando && (
-              <div className="botao-salvar-bottom">
-                <Button ref={salvarRef} onClick={salvar}>Salvar</Button>
-              </div>
-              )}
-            </div>
-
-              <div className="contratos-split-modal-right">
-                {/* Cabeçalho com título dinâmico + botão de alternância (somente no Detalhar) */}
-                  {(editando || visualizando) && contratoSelecionado?.id ? (
-
-                    // Modo edição/detalhar → mostra cabeçalho com botão de troca
-                    <div className="flex items-center justify-between">
-                      <h5>
-                        {rightMode === "novaAtrib"
-                          ? "Nova Atribuição"
-                          : rightMode === "historico" || rightMode === "atribuicoes" || rightMode === "visualizarAtrib"
-                          ? "Atribuições do Contrato"
-                          : "Partes Vinculadas"}
-                      </h5>
-
-
-                      {rightMode === "partes" && !showFormParte && (
-                        <div className="botao-adicionar-contrato flex justify-end gap-2">
-                          {!visualizando && (
-                            <Button
-                              onClick={() => {
-                                setShowFormParte(true);
-                                setParteFoiBuscada(false);
-                              }}
-                            >
-                              + Parte
-                            </Button>
-                          )}
-                          <Button
-                            variant="secondary"
-                            onClick={async () => {
-                              if (!mostrarHistorico) {
-                                await carregarHistoricoAtribuicoes();
-                              }
-                              setRightMode("atribuicoes");
-                            }}
-                          >
-                            Atribuições
-                          </Button>
-                        </div>
-                      )}
-
-                    </div>
-
-
-                    ) : (
-                      // Modo criação → apenas título fixo
-                      <div className="flex items-center justify-between">
-                        <h5>Partes Vinculadas</h5>
-                      </div>
-                  )}
-
-
-              {/* Conteúdo do painel direito */}
-              {rightMode === "historico" ? (
-                // ======= MODO HISTÓRICO =======
-                <ul className="processo-modal-right-lista" style={{ marginTop: "0.75rem" }}>
-                  {loadingHistorico && <li>Carregando histórico…</li>}
-                  {!loadingHistorico && historicoAtribs.length === 0 && (
-                    <li>Nenhuma atribuição encontrada.</li>
-                  )}
-                  {!loadingHistorico &&
-                    historicoAtribs.map((evt, idx, arr) => {
-                      const ultima = idx === arr.length - 1;
-                      const dt = evt?.data_inicial ? new Date(evt.data_inicial) : null;
-                      const dataStr = dt ? dt.toLocaleDateString("pt-BR") : "—";
-                      const desc = evt?.atribuicao_descricao || "—";
-                      const resp = evt?.responsavel?.nome || "—";
-                      return (
-                        <li
-                          key={evt.id ?? `${evt.data_inicial}-${desc}`}
-                          className={`processo-modal-right-item processo-atr-item ${ultima ? "atual" : ""}`}
-                        >
-                          <div className="processo-modal-right-texto">
-                            <div className="atr-desc">{desc}</div>
-                            <div className="atr-lista">
-                              <div className="atr-linha">
-                                <span className="atr-label">Definida em</span>
-                                <span className="atr-valor">{dataStr}</span>
-                              </div>
-                              <div className="atr-linha">
-                                <span className="atr-label">Responsável</span>
-                                <span className="atr-valor">{resp}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                </ul>
-
-              ) : rightMode === "atribuicoes" ? (
-                // Painel de Atribuições do Contrato
-              
-                <>
-                  {(editando || visualizando) && contratoSelecionado?.id && (
-                    <div className="botao-contrato-painel-adicionar-parte">
-                      {!visualizando && (
-                        <Button
-                          className="ml-2"
-                          onClick={() => {
-                            setFormAtrib({
-                              solucionador_id: "",
-                              proxima_atr_id: "",
-                              proximo_resp_id: "",
-                              observacao: "",
-                              proximo_prazo: "",
-                            });
-                            setRightMode("novaAtrib");
-                          }}
-                        >
-                          Próxima Atribuição
-                        </Button>
-                      
-                      )}
-                    
-                      <Button
-                        variant="secondary"
-                        onClick={() => setRightMode("partes")}
-                      >
-                        Partes
-                      </Button>
-                    </div>
-                  )}
-
-
-              
-                    <ul className="processo-modal-right-lista">
-                      {(contratoSelecionado?.atribuicoes_evento || []).map((a, idx, arr) => {
-                        const ultima = idx === arr.length - 1;
-                        const dataStr = a.data_inicial
-                          ? new Date(a.data_inicial).toLocaleDateString("pt-BR")
-                          : "—";
-                          const formatarData = (isoDate) => {
-                            if (!isoDate) return "—";
-                            const [ano, mes, dia] = isoDate.split("-");
-                            return `${dia}/${mes}/${ano}`;
-                          };
-                          
-
-                        return (
-                          <li
-                            key={a.id}
-                            className={`atr-item-wrapper ${ultima ? "atr-item-final" : ""}`}
-                            onClick={() => {
-                              setAtrSelecionada(a);
-                              setFormAtrib({
-                                solucionador_id: a?.responsavel?.id || "",
-                                proxima_atr_id: "",
-                                proximo_resp_id: "",
-                                observacao: "",
-                                proximo_prazo: a?.prazo ? a.prazo.split("T")[0] : "", 
-                              });
-                              setRightMode("visualizarAtrib");
-                            }}
-                            
-                          >
-                            <div className="atr-marker">
-                              <span className={ultima ? "atr-check" : "atr-dot"}>
-                                {ultima ? "✔" : "•"}
-                              </span>
-                            </div>
-
-                            <div className="atr-conteudo">
-                              <div className="atr-desc">{a.atribuicao_descricao}</div>
-                              <div className="atr-lista">
-                                {a?.status && (
-                                  <div className="atr-linha">
-                                    <span className="atr-status">{a.status}</span>
-                                  </div>
-                                )}
-                                <div className="atr-linha">
-                                  <span className="atr-label">Definida em</span>
-                                  <span className="atr-valor">{dataStr}</span>
-                                </div>
-                                <div className="atr-linha">
-                                  <span className="atr-label">Prazo</span>
-                                  <span className="atr-valor">{formatarData(a.prazo)}</span>
-                                </div>
-                                <div className="atr-linha">
-                                  <span className="atr-label">Responsável</span>
-                                  <span className="atr-valor">{a.responsavel?.nome || "—"}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-
-                </>
-              
-               
-              ) : rightMode === "visualizarAtrib" ? (
-                // ======= MODO VISUALIZAR ATRIBUIÇÃO =======
-                <div className="processo-right-content">
-                  <div className="processo-atr-section">
-                    <div className="processo-atr-section-title">Atribuição atual</div>
-                    <div className="processo-atr-atual">
-                      <div className="atr-linha">
-                        <span className="atr-label">Status Atual</span>
-                        <span className="atr-valor">{atrSelecionada?.atribuicao_descricao || "-"}</span>
-                      </div>
-                      <div className="atr-linha">
-                        <span className="atr-label">Definida em</span>
-                        <span className="atr-valor">{atrSelecionada?.data_inicial ? new Date(atrSelecionada.data_inicial).toLocaleDateString("pt-BR") : "-"}</span>
-                      </div>
-                      {atrSelecionada?.data_inicial && (
-                        <div className="atr-linha">
-                          <span className="atr-label">Tempo no Status</span>
-                          <span className="atr-valor">
-                            {Math.floor(
-                              (new Date().getTime() - new Date(atrSelecionada.data_inicial).getTime()) /
-                              (1000 * 60 * 60 * 24)
-                            )}{" "}
-                            dias
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label" htmlFor="prazo">Prazo</label>
-                    <input
-                      id="prazo"
-                      type="date"
-                      className="processo-modal-input"
-                      value={formAtrib.prazo || ""}
-                      onChange={(e) =>
-                        setFormAtrib({ ...formAtrib, prazo: e.target.value })
-                      }
-                      disabled={visualizando}
-                    />
-
-                  </div>              
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Responsável</label>
-                    <select
-                      className="processo-modal-input"
-                      value={formAtrib.solucionador_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
-                      disabled={visualizando}
-                    >
-                      <option value="">Selecione…</option>
-                      {colabs.map(c => (
-                        <option key={c.id} value={c.id}>{c.nome}</option>
-                      ))}
-                    </select>
-
-                  </div>
-              
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Observação</label>
-                    <textarea
-                      className="processo-textarea-right"
-                      rows={2}
-                      value={formAtrib.observacao}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, observacao: e.target.value })}
-                      readOnly={visualizando}
-                    />
-
-                  </div>
-                  <div className="processo-right-actions">
-                    {!visualizando && (
-                      <Button
-                        onClick={handleAtualizarAtribuicao}
-                      >
-                        Atualizar
-                      </Button>
-                    )}
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setRightMode("atribuicoes");
-                        setAtrSelecionada(null);
-                      }}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-
-
-
-                </div>
+              {/* LADO DIREITO */}
+              <div className="agenda-modal-split-right">
                 
-            
 
-              ) : rightMode === "novaAtrib" ? (
-                <div className="processo-right-content">
-                  {/* Atribuição Atual */}
-                  <div className="processo-atr-section-title">Atribuição Atual</div>
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Solucionador</label>
-                    <select
-                      className="processo-modal-input"
-                      value={formAtrib.solucionador_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, solucionador_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {colabs.map(c => (
-                        <option key={c.id} value={c.id}>{c.nome}</option>
-                      ))}
-                    </select>
-                  </div>
-              
-                  {/* Próxima Atribuição */}
-                  <div className="processo-atr-section-title" style={{ marginTop: "1rem" }}>Próxima Atribuição</div>
-              
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Status</label>
-                    <select
-                      className="processo-modal-input"
-                      value={formAtrib.proxima_atr_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, proxima_atr_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {atribs.map(a => (
-                        <option key={a.id} value={a.id}>{a.descricao}</option>
-                      ))}
-                    </select>
-                  </div>
-              
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Responsável</label>
-                    <select
-                      className="processo-modal-input"
-                      value={formAtrib.proximo_resp_id}
-                      onChange={(e) => setFormAtrib({ ...formAtrib, proximo_resp_id: e.target.value })}
-                    >
-                      <option value="">Selecione…</option>
-                      {colabs.map(c => (
-                        <option key={c.id} value={c.id}>{c.nome}</option>
-                      ))}
-                    </select>
-                  </div>
-              
-                  <div className="processo-input-wrapper">
-                    <label className="processo-label">Prazo</label>
-                    <input
-                      type="date"
-                      className="processo-modal-input"
-                      value={formAtrib.proximo_prazo || ""}
-                      onChange={(e) =>
-                        setFormAtrib({ ...formAtrib, proximo_prazo: e.target.value })
-                      }
-                    />
-                  </div>
-              
-                  <div className="processo-right-actions">
-                    <Button onClick={handleNovaAtribuicao}>Salvar</Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setRightMode("atribuicoes");
-                        setAtrSelecionada(null);
-                      }}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                // ======= MODO PARTES =======
-          
-
-
-                <>
-                  {showFormParte && !visualizando ? (
-                    // ===== Form de busca de Parte já existente =====
-                    <div className="parte-contrato-modal">
-                      <div className="editable-input-wrapper">
-                        <label className="usuarios-label">CPF</label>
-                        <Input
-                          className="usuarios-modal-input"
-                          value={fetchParte}
-                          onChange={(e) => setSearchParte(e.target.value)}
-                          placeholder="Digite o CPF"
-                        />
-                      </div>
-
-                      <div className="non-editable-input-wrapper">
-                        <label className="usuarios-label">Nome</label>
-                        <Input
-                          className="usuarios-modal-input"
-                          value={foundParte?.nome || ""}
-                          readOnly
-                          placeholder="—"
-                        />
-                      </div>
-
-                      <div className="non-editable-input-wrapper">
-                        <label className="usuarios-label">CPF</label>
-                        <Input
-                          className="usuarios-modal-input"
-                          value={foundParte?.cpf || ""}
-                          readOnly
-                          placeholder="—"
-                        />
-                      </div>
-
-                      <div className="checkbox-wrapper">
-                        <label className="usuarios-label flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={foundParte?.principal || false}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-                            
-                              // Garante que só possa haver um principal marcado
-                              if (checked) {
-                                setPartesVinculadas((prev) =>
-                                  prev.map((p) => ({ ...p, principal: false }))
-                                );
-                              }
-                            
-                              setFoundParte((prev) => ({
-                                ...prev,
-                                principal: checked,
-                              }));
-                            }}
-                            
-                            disabled={visualizando}
-                          />
-                          Parte Principal
-                        </label>
-                      </div>
-
-
-                      {parteAviso && (
-                        <div
-                          className="dashboard-modal-error"
-                          style={{ margin: "0.5rem 0 0.25rem 0" }}
-                        >
-                          {parteAviso}
-                        </div>
-                      )}
-
-                      {/* Ações do formulário de Parte */}
-                      <div className="botao-adicionar-contrato">
-                      {!parteParaRemover && (
-                        <>
-                          <Button onClick={handleBuscarParte} disabled={fetchingParte}>
-                            {fetchingParte ? "Buscando..." : "Buscar"}
-                          </Button>
-
-                          {parteFoiBuscada && isParteValida(foundParte) && (
-                            <Button className="ml-2" onClick={handleAdicionarParte}>
-                              Adicionar
-                            </Button>
-                          )}
-                        </>
-                      )}
-
-
-                        {parteParaRemover && (
-                          <>
-                            <Button
-                              variant="destructive"
-                              onClick={() => {
-                                handleRemoverParte(parteParaRemover);
-                                setShowFormParte(false);
-                                setFoundParte(null);
-                                setParteParaRemover(null);
-                              }}
-                            >
-                              Remover
-                            </Button>
-
-                            <Button
-                              onClick={() => {
-                                // lógica de atualização
-                                console.log("Atualizar parte:", foundParte);
-                                setShowFormParte(false);
-                                setParteParaRemover(null);
-                                setParteAviso("Parte atualizada.");
-                              }}
-                            >
-                              Atualizar
-                            </Button>
-                          </>
-                        )}
-
-                        <Button
-                          variant="outline"
-                          className="ml-2"
-                          onClick={() => {
-                            setShowFormParte(false);
-                            setSearchParte("");
-                            setFoundParte(null);
-                            setParteParaRemover(null);
-                            setParteAviso("");
-                            setParteFoiBuscada(false); 
-                          }}
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-
-
-                    </div>
-                  ) : (
-                    // ===== Lista de Partes =====
-                    <>
-                      {partesVinculadas?.length ? (
-                        <ul className="contratos-modal-right-lista">
-                          {partesVinculadas.map((p) => (
-                            <li
-                              key={p.id ?? p.cpf}
-                              className={`contratos-modal-right-item ${p.principal ? "emoji-indicador" : ""}`}
-                              onClick={
-                                visualizando
-                                  ? undefined
-                                  : () => {
-                                      setFoundParte(p);
-                                      setSearchParte("");
-                                      setParteParaRemover(p);
-                                      setShowFormParte(true);
-                                      setParteAviso("");
-                                    }
-                              }
-                              style={{ cursor: visualizando ? "default" : "pointer" }}
-                              title={visualizando ? undefined : "Clique para remover"}
-                              >
-                              <div className="contratos-modal-right-texto">
-                                <div className={p.principal ? "font-bold" : ""}>
-                                  {p.nome}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  {p.cpf ? `CPF: ${p.cpf}` : p.tipo_parte}
-                                </div>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>Nenhuma parte vinculada ainda.</p>
-                      )}
-
-                      {/* + Parte só aparece em Novo/Editar */}
-                  
-
-
-
-
-                    </>
-                  )}
-                </>
-              )}
+                {rightMode === "inicialContrato" && (
+                  <ModalRightInicial
+                    form={form}
+                    setForm={setForm}
+                    setRightMode={setRightMode}
+                    rightMode={rightMode}
+                    modo={editando ? "editar" : visualizando ? "visualizar" : "criar"}
+                  />
+                )}
+                {rightMode === "partes" && (
+                  <ModalRightPartes
+                    contratoSelecionado={contratoSelecionado}
+                    partesVinculadas={partesVinculadas}
+                    setPartesVinculadas={setPartesVinculadas}
+                    visualizando={visualizando}
+                    showFormParte={showFormParte}
+                    setShowFormParte={setShowFormParte}
+                    fetchParte={fetchParte}
+                    setFetchParte={setSearchParte}
+                    foundParte={foundParte}
+                    setFoundParte={setFoundParte}
+                    parteAviso={parteAviso}
+                    setParteAviso={setParteAviso}
+                    parteParaRemover={parteParaRemover}
+                    setParteParaRemover={setParteParaRemover}
+                    parteEncontrada={parteEncontrada}
+                    setParteEncontrada={setParteEncontrada}
+                    rightMode={rightMode}
+                    setRightMode={setRightMode}
+                    modo={modo}
+                  />
+                )}
+                {(rightMode === "visualizarAtrib" ||
+                  rightMode === "novaAtrib" ||
+                  rightMode === "editarAtrib") && (
+                  <ModalRightAtribuicoes
+                    rightMode={rightMode}
+                    setRightMode={setRightMode}
+                    atribs={atribs}
+                    colabs={colabs}
+                    historicoAtribs={historicoAtribs}
+                    formAtrib={formAtrib}
+                    setFormAtrib={setFormAtrib}
+                    entityType="contrato"
+                    form={form}
+                    setForm={setForm}
+                    modo={modo}
+                  />
+                )}
+              </div>
             </div>
           </DialogContent>
+
 
         </Dialog>
       </div>
@@ -1415,12 +983,14 @@ const handleAtualizarAtribuicao = async () => {
                     <Button
                       variant="default"
                       className="table-action-btn"
-                      onClick={() => {
-                        console.log("Clicou em Inicial para contrato:", c.id);
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        abrirInicial(c); // ✅ chama função que abre com aba inicial
                       }}
                     >
                       Inicial
                     </Button>
+
                   </div>
 
                   </td>

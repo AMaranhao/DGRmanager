@@ -560,7 +560,14 @@ export default function Acordos() {
           <DialogContent
             aria-describedby={undefined}
             className="agenda-modal-container"
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={(e) => {
+              if (visualizando) {
+                e.preventDefault();               // impede o foco automático do Radix
+                requestAnimationFrame(() => {
+                  document.activeElement?.blur(); // garante que nada fique focado
+                });
+              }
+            }}
           >
             <DialogTitle style={{ display: "none" }}>Acordos</DialogTitle>
 

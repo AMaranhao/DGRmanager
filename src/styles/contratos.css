@@ -1,0 +1,248 @@
+/* ========================= */
+/*       CONTRATOS.CSS       */
+/* ========================= */
+
+/* Wrapper principal */
+.dashboard-wrapper {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  
+  /* Título da página */
+  .dashboard-heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Cabeçalho e filtros */
+  .usuarios-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .usuarios-filtros {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .dashboard-filtro-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dashboard-select {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ccc;
+    min-width: 180px;
+  }
+  
+  .dashboard-filtro-usuario-input {
+    width: 200px;
+  }
+  
+  /* Botão principal */
+  .usuarios-btn-material {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .usuarios-btn-material:hover {
+    background-color: #1d4ed8;
+  }
+  
+  /* ========================= */
+  /*         MODAL BASE        */
+  /* ========================= */
+  
+
+  .agenda-modal-container {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    width: 960px;
+    max-width: 95vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    outline: none;
+  }
+  
+  .agenda-modal-split {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .agenda-modal-split-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .agenda-modal-split-right {
+    flex: 1;
+    background-color: #f9f9f9;
+    border-radius: 0.75rem;
+    overflow-y: auto;
+    max-height: 600px;
+  }
+  
+  /* Dark Mode (opcional) */
+  .dark .agenda-modal-container {
+    background: #1f2937;
+    color: white;
+  }
+  
+  .dark .agenda-modal-split-right {
+    background: #374151;
+  }
+  
+  /* Utilitárias */
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  /* ========================= */
+  /*         TABELAS           */
+  /* ========================= */
+  
+  .usuarios-tabela-wrapper {
+    overflow-x: auto;
+    margin-top: 2rem;
+  }
+  
+  .usuarios-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  
+  .contratos-tabela th,
+  .contratos-tabela td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  
+  .col-acoes-three-buttons {
+    white-space: nowrap;
+  }
+  
+  /* ========================= */
+  /*      AÇÕES NA TABELA      */
+  /* ========================= */
+  
+  .table-actions {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+  
+  .table-action-btn {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .table-action-btn:hover {
+    background-color: #f3f4f6;
+  }
+  
+  /* Colunas específicas */
+  .contratos-col-numero {
+    width: 10%;
+  }
+  
+  .contratos-col-valor {
+    width: 10%;
+  }
+  
+  .contratos-col-status {
+    width: 20%;
+  }
+  
+  .contratos-col-responsavel {
+    width: 20%;
+  }
+  
+  .contratos-col-lote {
+    width: 10%;
+  }
+  
+
+  
+  /* ========================= */
+  /*       MODO ESCURO         */
+  /* ========================= */
+  
+  .dark .contratos-modal {
+    background-color: #1f2937;
+    border: 1px solid #4b5563;
+    color: lightgray;
+  }
+  
+  .dark .usuarios-btn-material {
+    background-color: lightgray !important;
+    color: #2f4674;
+  }
+  
+  .dark .contratos-tabela th,
+  .dark .contratos-tabela td {
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+  
+  /* ========================= */
+  /*       OUTROS ELEMENTOS    */
+  /* ========================= */
+  
+  .dashboard-filtro-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+  }
+  
+  button:disabled,
+  .table-action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ========================= */
+  /*      FINAL CONTRATOS.CSS  */
+  /* ========================= */
+  
+
+  .agenda-modal-tabs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  
+  .agenda-modal-tab-btn {
+    min-width: 120px;
+    border-radius: 9999px;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    background: white;
+    color: #2f4674;
+  }
+  
+  .agenda-modal-tab-btn:hover {
+    background: #f3f4f6;
+  }
+  

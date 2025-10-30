@@ -8,6 +8,7 @@ import {
     createContrato,
     updateContrato,
     fetchContratos,
+    fetchContratoById,
   } from "@/services/ENDPOINTS_ServiceContratos";
 
 import "./styles.css";
@@ -19,35 +20,61 @@ export default function ModalLeftContrato({
     salvarRef,
     setEventoSelecionado,
     setRightMode,
-    modo
+    modo,
+    setModalAberto,
   }) {
     
     // =============================
 // Função de salvar contrato
 // =============================
 const handleSalvar = async () => {
-    try {
-      const payload = {
-        numero: form.numero,
-        valor: form.valor,
-        lote: form.lote,
-        observacao: form.observacao,
-      };
-  
-      if (form.id) {
-        await updateContrato(form.id, payload);
-      } else {
-        await createContrato(payload);
+  try {
+    const payload = {
+      numero: form.numero,
+      valor: form.valor,
+      lote: form.lote,
+      observacao: form.observacao,
+    };
+
+    let atualizado = null;
+
+    if (modo === "editar" || modo === "visualizarAgenda") {
+      await updateContrato(form.id, payload);
+      atualizado = await fetchContratoById(form.id);
+    } else if (modo === "criar") {
+      const novo = await createContrato(payload);
+      const novoId = novo?.id || novo?.data?.id;
+      if (novoId) {
+        atualizado = await fetchContratoById(novoId);
       }
-  
-      const atualizados = await fetchContratos();
-  
-      // Fecha modal e atualiza interface pai
-      if (typeof salvar === "function") salvar();
-    } catch (err) {
-      console.error("❌ Erro ao salvar contrato:", err);
+
+      // ✅ Fecha o modal ao criar
+      if (typeof setModalAberto === "function") {
+        setModalAberto(false);
+      }
     }
-  };
+
+    if (atualizado) {
+      setForm({
+        id: atualizado.id,
+        numero: atualizado.numero || "",
+        valor: atualizado.valor ?? "",
+        lote: atualizado.lote ?? "",
+        observacao: atualizado.observacao ?? "",
+      });
+
+      console.log("✅ Contrato atualizado:", atualizado);
+    }
+
+    // Atualiza interface pai (agenda ou lista)
+    if (typeof salvar === "function") salvar();
+
+  } catch (err) {
+    console.error("❌ Erro ao salvar contrato:", err);
+  }
+};
+
+
   
     const isEditar = modo === "editar";
     const isCriar = modo === "criar";
